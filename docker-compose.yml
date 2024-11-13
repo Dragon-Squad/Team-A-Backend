@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  emailservice:
+    build: ./microservices/EmailService
+    container_name: email_service
+    hostname: email_service
+    networks:
+      - test-network
+    ports:
+      - 3001:3001  
+
+  authservice:
+    build: ./microservices/AuthService
+    container_name: auth_service
+    hostname: auth_service
+    networks:
+      - test-network
+    ports:
+      - 3000:3000  
+    depends_on:
+      - emailservice
+
+  charitymanagementservice:
+    build: ./microservices/CharityManagementService
+    container_name: charity_management_service
+    hostname: charity_management_service
+    networks:
+      - test-network
+    ports:
+      - 3002:3002
+    depends_on:
+      - authservice
+
+  projectmanagementservice:
+    build: ./microservices/ProjectManagementService
+    container_name: project_management_service
+    hostname: project_management_service
+    networks:
+      - test-network
+    ports:
+      - 3003:3003
+    depends_on:
+      - charitymanagementservice
+
+# Optional networks setup if needed
+networks:
+  test-network:
+    name: microservice-network
+    driver: bridge
+    external: true
