@@ -2,7 +2,7 @@
 
 ## Run 
 #### 1. Grant Permission to execute ``run_docker.sh`` file
-- For Linuc/MacOs:
+- For Linux/MacOs:
 ```sh
 chmod +x ./run_docker.sh
 ```
