@@ -1,65 +1,38 @@
-require("dotenv").config();
-const express = require("express");
-const bodyParser = require("body-parser");
-const cors = require("cors");
-const cookieParser = require("cookie-parser");
-const path = require("path");
-const helmet = require("helmet");
-const httpStatus = require("http-status"); 
-const CharityRouter = require('./Charity/CharityRouter');
-const { connectDB } = require('./config/DBconfig');
-
-const app = express();
-const SERVER_PORT = 3002;
+const { app, SERVER_PORT, configureApp, errorHandler } = require("./config/AppConfig");
+const { connectDB } = require("./config/DBconfig");
+const CharityService = require("./Charity/CharityService");
+const MessageBroker = require("./broker/MessageBroker");
 
 const runApp = async () => {
   try {
     // Connect to DB
-    await connectDB(); 
+    await connectDB();
 
-    // CORS setup
-    const whitelistedCors = [
-      `http://localhost:${SERVER_PORT}`,
-      'http://localhost:3000',
-    ];
+    // Configure the app
+    configureApp();
 
-    // Middleware setup
-    app.use(helmet()); // Set security-related HTTP headers
-    app.use(cors({
-      origin: (origin, callback) => {
-        if (whitelistedCors.includes(origin) || !origin) {
-          callback(null, true);
-        } else {
-          callback(new Error("Not allowed by CORS"));
-        }
-      },
-      credentials: true,
-    }));
-    app.use(cookieParser()); // Parse cookies
-    app.use(bodyParser.json()); // Parse JSON bodies
-    app.use(bodyParser.urlencoded({ extended: true })); // Parse URL-encoded bodies
-    app.use(express.static(path.join(__dirname, 'public'))); // Serve static files
+    // connect to the producer and consumer
+    const producer = await MessageBroker.connectProducer();
+    producer.on("producer.connect", () => {
+      console.log("producer connected");
+    });
 
-    app.use(`/charitan/api/v1/charity/`, CharityRouter);
+    const consumer = await MessageBroker.connectConsumer();
+    consumer.on("consumer.connect", () => {
+      console.log("consumer connected");
+    });
 
-    const errorHandler = (err, req, res, next) => {
-      console.error(err); 
-      return res.status(err.status || httpStatus.INTERNAL_SERVER_ERROR).json({
-        message: "Internal Server Error",
-        error: err.message,
-      });
-    };
+    await MessageBroker.subscribe("SearchCharities", CharityService.searchByName);
 
-    // Global error handler
+    // Add error handler
     app.use(errorHandler);
 
     // Start the server
     app.listen(SERVER_PORT, () => {
       console.log(`Server running on port ${SERVER_PORT}`);
     });
-    
   } catch (err) {
-    console.error('Error during initialization:', err);
+    console.error("Error during initialization:", err);
     process.exit(1);
   }
 };

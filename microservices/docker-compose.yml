@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   emailservice:
-    build: ./microservices/EmailService
+    build: ./EmailService
     container_name: email_service
     hostname: email_service
     networks:
@@ -11,7 +11,7 @@ services:
       - 3001:3001  
 
   authservice:
-    build: ./microservices/AuthService
+    build: ./AuthService
     container_name: auth_service
     hostname: auth_service
     networks:
@@ -22,7 +22,7 @@ services:
       - emailservice
 
   charitymanagementservice:
-    build: ./microservices/CharityManagementService
+    build: ./CharityManagementService
     container_name: charity_management_service
     hostname: charity_management_service
     networks:
@@ -31,9 +31,10 @@ services:
       - 3002:3002
     depends_on:
       - authservice
+      - emailservice
 
   projectmanagementservice:
-    build: ./microservices/ProjectManagementService
+    build: ./ProjectManagementService
     container_name: project_management_service
     hostname: project_management_service
     networks:
@@ -43,7 +44,6 @@ services:
     depends_on:
       - charitymanagementservice
 
-# Optional networks setup if needed
 networks:
   test-network:
     name: microservice-network

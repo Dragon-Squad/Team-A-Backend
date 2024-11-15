@@ -24,6 +24,7 @@ class ProjectController {
 
   async getActiveProjects(req, res) {
     try {
+      console.log("Controller Executes");
       const page = parseInt(req.query.page) || 1; 
       const limit = parseInt(req.query.limit) || 10; 
       const filters = {

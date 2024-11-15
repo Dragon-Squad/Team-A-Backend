@@ -1,5 +1,6 @@
 const ProjectRepository = require('./ProjectRepository');
 const ProjectValidator = require('./ProjectValidator');
+const MessageBroker = require('../broker/MessageBroker');
 
 class ProjectService {
   // Method to get all projects
@@ -51,28 +52,15 @@ class ProjectService {
     const search =  filters.search;
     let charityList, categoryId, regionId;
     if (search) {
-        try {
-            // Wait for the fetch response to complete
-            const response = await fetch(`http://172.18.0.4:3002/charitan/api/v1/charity?search=${encodeURIComponent(search)}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                credentials: 'include'
-            });
+      await MessageBroker.publish({
+        topic: "SearchCharities",
+        event: "Request",
+        message: search,
+      });
 
-            // Check if the response is okay (status 200)
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-
-            // Wait for the response body to be parsed as JSON
-            const data = await response.json();
-            charityList = data;
-
-        } catch (error) {
-            console.error('Error fetching charity list:', error);
-        }
+      while(!charityList){
+        charityList = await MessageBroker.subscribe("SearchCharities");
+      }
     }
 
     // Now update the filters with the fetched charity list
