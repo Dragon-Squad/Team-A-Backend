@@ -12,7 +12,6 @@ const projectSchema = new Schema({
   createdAt: { type: Date, default: Date.now },
   status: { type: String, enum: ['pending', 'active', 'halted', 'inactive', 'closed'], required: true },
   endDate: { type: Date, required: true },
-  charity: { type: Schema.Types.ObjectId, ref: 'Charity', required: true },
   images: { type: [String] },
   videos: { type: [String] },
   account: { type: String }
