@@ -3,6 +3,7 @@ const { connectFileDB } = require('../../Config/DBConfig');
 const buckets = [
     'charity-resources',
     'donor-resources',
+    'project-resources',
 ];
 
 const createBuckets = async () => {
