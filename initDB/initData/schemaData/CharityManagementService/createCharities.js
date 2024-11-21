@@ -2,11 +2,13 @@ const bcrypt = require('bcryptjs');
 const initialData = require('../../../resources/initialData');
 const charitiesData = initialData.charities;
 
-const createCharities = async (User, Charity) => {
+const createCharities = async (User, Charity, fileIds) => {
     try {
         // Clear existing charity data
         console.log('Clearing existing charity data...');
         await Charity.deleteMany();
+
+        let imageIndex = 0;
 
         // Process each charity entry
         console.log('Creating charity accounts...');
@@ -28,6 +30,7 @@ const createCharities = async (User, Charity) => {
                     address: `${charity.companyName} Address`,
                     taxCode: `TAX${Math.floor(Math.random() * 10000)}`,
                     type: charity.type,
+                    images: [fileIds[imageIndex]],
                 });
                 await charityDoc.save();
                 return charityDoc;

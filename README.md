@@ -15,6 +15,7 @@ cd Team-A-Backend
 To set up the required data for all databases, run the initialization script. This will ensure that all necessary database tables and configurations are properly set up before starting the services.
 ```` sh
 cd initDB
+npm install
 node scripts.js
 ````
 

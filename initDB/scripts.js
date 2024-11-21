@@ -1,16 +1,10 @@
 const { connectAuthDB, connectCharityDB, connectDonorDB, connectDonationDB, connectProjectDB } = require('./Config/DBConfig');
-const createUserModel = require('./model/UserSchema');
-const createCharityModel = require('./model/CharitySchema');
-const createDonorModel = require('./model/DonorSchema');
-const createCategoryModel = require('./model/CategorySchema');
-const createRegionModel = require('./model/RegionSchema');
-const createProjectModel = require('./model/ProjectSchema');
+const { createUserModel, createCharityModel, createDonorModel, createCategoryModel, createRegionModel, createProjectModel, createDonationModel, createMonthlyDonationModel, createPaymentTransactionModel } = require('./model');
 const { createAdminAccount } = require('./initData/schemaData/AuthService/createAdminAccount');
 const { createCharities } = require('./initData/schemaData/CharityManagementService/createCharities');
 const { createDonors } = require('./initData/schemaData/DonorManagementService/createDonors');
-const { createCategories } = require('./initData/schemaData/ProjectManagementService/createCategories');
-const { createRegions } = require('./initData/schemaData/ProjectManagementService/createRegions');
-const { createProjects } = require('./initData/schemaData/ProjectManagementService/createProjects');
+const { createCategories, createRegions, createProjects } = require('./initData/schemaData/ProjectManagementService');
+const { createBuckets, initImageFiles } = require('./initData/fileData');
 
 (async () => {
   try {
@@ -28,9 +22,21 @@ const { createProjects } = require('./initData/schemaData/ProjectManagementServi
     const Region = createRegionModel(projectDB);
     const Project = createProjectModel(projectDB);
 
+    const donationDB = await connectDonationDB();
+    const Donation = createDonationModel(donationDB);
+    const MonthlyDonation = createMonthlyDonationModel(donationDB);
+    const PaymentTransaction = createPaymentTransactionModel(donationDB);
+
+    console.log('Creating collections for buckets...');
+    await createBuckets();  
+
+    console.log("Init Image Files...");
+    const fileIds = await initImageFiles();
+    console.log(fileIds);
+
     // Perform operations
     await createAdminAccount(User);
-    const charityDocs = await createCharities(User, Charity);
+    const charityDocs = await createCharities(User, Charity, fileIds);
     await createDonors(User, Donor);
     const categoryDocs = await createCategories(Category);
     const regionDocs = await createRegions(Region);

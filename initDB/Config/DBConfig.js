@@ -1,7 +1,7 @@
 require('dotenv').config();
 const mongoose = require('mongoose');
 
-let AuthDB, CharityDB, DonorDB, DonationDB, ProjectDB;
+let AuthDB, CharityDB, DonorDB, DonationDB, ProjectDB, FileDB;
 
 const connectAuthDB = async () => {
   if (!AuthDB) {
@@ -58,4 +58,15 @@ const connectProjectDB = async () => {
     return ProjectDB;
 };
 
-module.exports = { connectAuthDB, connectCharityDB, connectDonationDB, connectDonorDB, connectProjectDB };
+const connectFileDB = async () => {
+  if (!FileDB) {
+      FileDB = await mongoose.createConnection(process.env.MONGO_URI_FILE, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log('Connected to FileDB');
+  }
+  return FileDB;
+};
+
+module.exports = { connectAuthDB, connectCharityDB, connectDonationDB, connectDonorDB, connectProjectDB, connectFileDB };

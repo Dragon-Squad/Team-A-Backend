@@ -7,6 +7,8 @@ const donorSchema = new Schema({
   lastName: { type: String , required: true},
   gender: { type: String, enum: ['male', 'female', 'other']}, 
   address: { type: String },
+  city: { type: String },
+  postcode: { type: String },
   avatar: { type: String },
   totalDonation: { type: Number, default: 0},
   stripeId: { type: String }
