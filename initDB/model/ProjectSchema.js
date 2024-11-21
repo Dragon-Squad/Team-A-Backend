@@ -15,7 +15,7 @@ const projectSchema = new Schema({
   images: { type: [String] },
   videos: { type: [String] },
   country: { type: String },
-  account: { type: String }
+  stripeId: { type: String }
 });
 
 const createProjectModel = (dbConnection) => dbConnection.model('Project', projectSchema);

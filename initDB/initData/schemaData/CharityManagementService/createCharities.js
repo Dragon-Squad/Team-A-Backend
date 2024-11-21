@@ -2,11 +2,13 @@ const bcrypt = require('bcryptjs');
 const initialData = require('../../../resources/initialData');
 const charitiesData = initialData.charities;
 
-const createCharities = async (User, Charity, fileIds) => {
+const createCharities = async (User, Charity, Address, fileIds) => {
     try {
         // Clear existing charity data
         console.log('Clearing existing charity data...');
+        await User.deleteMany();
         await Charity.deleteMany();
+        await Address.deleteMany();
 
         let imageIndex = 0;
 
@@ -14,12 +16,18 @@ const createCharities = async (User, Charity, fileIds) => {
         console.log('Creating charity accounts...');
         const charityDocs = await Promise.all(
             charitiesData.map(async (charity) => {
+                const address = new Address({
+                    street: `${charity.companyName} St.`,
+                    country: charity.country
+                });
+                await address.save();
+
                 // Create a user in authDB
                 const charityUser = new User({
                     email: `${charity.companyName.replace(' ', '').toLowerCase()}@charitan.com`,
-                    password: await bcrypt.hash('charitypassword', 10),
+                    hashedPassword: await bcrypt.hash('charitypassword', 10),
                     role: 'Charity', 
-                    isVerified: true,
+                    address: address._id
                 });
                 await charityUser.save();
 

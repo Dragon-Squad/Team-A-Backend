@@ -6,13 +6,7 @@ const charitySchema = new Schema({
   companyName: { type: String , required: true},
   type: { type: String, enum: ['individual', 'corporate', 'non-profit'], required: true },
   description: { type: String },
-  address: { type: String, required: true},
-  city: { type: String },
-  postcode: { type: String },
-  taxCode: { type: String , required: true},
-  images: { type: [String] },
-  videos: { type: [String] },
-  stripeId: { type: String }
+  taxCode: { type: String , required: true}
 });
 
 const createCharityModel = (dbConnection) => dbConnection.model('Charity', charitySchema);

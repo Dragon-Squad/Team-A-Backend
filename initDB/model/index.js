@@ -1,3 +1,5 @@
+const createAddressModel = require('./AddressSchema');
+const createAdminModel = require('./AdminSchema');
 const createUserModel = require('./UserSchema');
 const createCharityModel = require('./CharitySchema');
 const createDonorModel = require('./DonorSchema');
@@ -9,6 +11,8 @@ const createMonthlyDonationModel = require('./MonthlyDonationSchema');
 const createPaymentTransactionModel = require('./PaymentTransactionSchema');
 
 module.exports = {
+    createAddressModel,
+    createAdminModel,
     createUserModel,
     createCharityModel,
     createDonorModel,

@@ -1,7 +1,6 @@
 const bcrypt = require('bcryptjs');
-const initialData = require('../../../resources/initialData');
 
-const createDonors= async (User, Donor) => {
+const createDonors= async (User, Donor, Address) => {
     try {
         // Clear existing charity data
         console.log('Clearing existing donor data...');
@@ -12,11 +11,16 @@ const createDonors= async (User, Donor) => {
         const donors = [];
 
         for (let i = 0; i < 30; i++) {
+            const address = new Address({
+                street: `Address ${i}`,
+            });
+            await address.save();
+
             const donorUser = new User({
                 email: `donor${i}@gmail.com`,
-                password: await bcrypt.hash('donorpassword', 10),
+                hashedPassword: await bcrypt.hash('donorpassword', 10),
                 role: 'Donor',
-                isVerified: true,
+                address: address._id
             });
             await donorUser.save();
 
@@ -24,7 +28,6 @@ const createDonors= async (User, Donor) => {
                 userId: donorUser._id,
                 firstName: `First${i}`,
                 lastName: `Last${i}`,
-                address: `Address ${i}`,
             });
             donors.push(await donor.save());
         }

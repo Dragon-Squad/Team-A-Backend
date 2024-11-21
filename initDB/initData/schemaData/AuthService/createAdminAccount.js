@@ -4,19 +4,17 @@ const bcrypt = require('bcryptjs');
 
 const adminData = initialData.admin;
 
-const createAdminAccount = async (User) => {
+const createAdminAccount = async (Admin) => {
     try {
       // Clear existing admin data
       console.log('Clearing existing admin data...');
-      await User.deleteMany();
+      await Admin.deleteMany();
   
       // Create the new admin account
       console.log('Creating admin account...');
-      const admin = new User({
+      const admin = new Admin({
         email: adminData.email,
-        password: await bcrypt.hash(adminData.password, 10),
-        role: adminData.role,
-        isVerified: true,
+        hashedPassword: await bcrypt.hash(adminData.password, 10),
       });
       await admin.save();
       console.log('Admin account created successfully');

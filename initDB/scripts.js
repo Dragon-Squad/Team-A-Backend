@@ -1,5 +1,5 @@
 const { connectAuthDB, connectCharityDB, connectDonorDB, connectDonationDB, connectProjectDB } = require('./Config/DBConfig');
-const { createUserModel, createCharityModel, createDonorModel, createCategoryModel, createRegionModel, createProjectModel, createDonationModel, createMonthlyDonationModel, createPaymentTransactionModel } = require('./model');
+const { createAddressModel, createAdminModel, createUserModel, createCharityModel, createDonorModel, createCategoryModel, createRegionModel, createProjectModel, createDonationModel, createMonthlyDonationModel, createPaymentTransactionModel } = require('./model');
 const { createAdminAccount } = require('./initData/schemaData/AuthService/createAdminAccount');
 const { createCharities } = require('./initData/schemaData/CharityManagementService/createCharities');
 const { createDonors } = require('./initData/schemaData/DonorManagementService/createDonors');
@@ -9,7 +9,9 @@ const { createBuckets, initImageFiles } = require('./initData/fileData');
 (async () => {
   try {
     const authDB = await connectAuthDB();
+    const Address = createAddressModel(authDB);
     const User = createUserModel(authDB);
+    const Admin = createAdminModel(authDB);
 
     const charityDB = await connectCharityDB();
     const Charity = createCharityModel(charityDB);
@@ -35,8 +37,8 @@ const { createBuckets, initImageFiles } = require('./initData/fileData');
     console.log(fileIds);
 
     // Perform operations
-    await createAdminAccount(User);
-    const charityDocs = await createCharities(User, Charity, fileIds);
+    await createAdminAccount(Admin);
+    const charityDocs = await createCharities(User, Charity, Address, fileIds);
     await createDonors(User, Donor);
     const categoryDocs = await createCategories(Category);
     const regionDocs = await createRegions(Region);
