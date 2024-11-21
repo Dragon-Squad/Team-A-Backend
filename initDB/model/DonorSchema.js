@@ -20,8 +20,6 @@ const donorSchema = new Schema({
   donationStat: { type: donationStatSchema, default: () => ({}) } 
 });
 
-const createDonorModel = (dbConnection) => {
-  dbConnection.model('Donor', donorSchema);
-}
+const createDonorModel = (dbConnection) => dbConnection.model('Donor', donorSchema);
 
 module.exports = createDonorModel;

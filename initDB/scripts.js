@@ -39,7 +39,7 @@ const { createBuckets, initImageFiles } = require('./initData/fileData');
     // Perform operations
     await createAdminAccount(Admin);
     const charityDocs = await createCharities(User, Charity, Address, fileIds);
-    await createDonors(User, Donor);
+    await createDonors(User, Donor, Address);
     const categoryDocs = await createCategories(Category);
     const regionDocs = await createRegions(Region);
     await createProjects(Project, charityDocs, categoryDocs, regionDocs);
