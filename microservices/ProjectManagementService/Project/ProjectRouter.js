@@ -11,6 +11,8 @@ ProjectRouter.post(
   ProjectController.create
 );
 ProjectRouter.put("/:id", ProjectController.update);
+ProjectRouter.delete("/:id", ProjectController.delete);
+
 ProjectRouter.get("/:id", ProjectController.getById);
 ProjectRouter.get("/", ProjectController.getAll);
 

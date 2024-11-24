@@ -10,6 +10,11 @@ class ProjectRepository {
     return await Project.findByIdAndUpdate(id, projectData, { new: true });
   }
 
+  async delete(id) {
+    const result = await Project.findByIdAndDelete(id);
+    return result !== null; // Returns true if deleted, false if not found
+  }
+
   async getById(id) {
     return await Project.findById(id);
   }

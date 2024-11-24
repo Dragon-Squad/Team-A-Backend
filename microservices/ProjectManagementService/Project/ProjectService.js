@@ -11,6 +11,10 @@ class ProjectService {
     return await ProjectRepository.update(id, projectData);
   }
 
+  async delete(id) {
+    return await ProjectRepository.delete(id);
+  }
+
   async getById(id) {
     return await ProjectRepository.getById(id);
   }
