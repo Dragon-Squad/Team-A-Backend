@@ -10,7 +10,7 @@ ProjectRouter.post(
   //   authorize([UserType.ADMIN, UserType.CHARITY]),
   ProjectController.create
 );
-
+ProjectRouter.put("/:id", ProjectController.update);
 ProjectRouter.get("/:id", ProjectController.getById);
 ProjectRouter.get("/", ProjectController.getAll);
 

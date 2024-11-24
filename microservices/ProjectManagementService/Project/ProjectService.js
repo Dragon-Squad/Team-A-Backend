@@ -7,6 +7,10 @@ class ProjectService {
     return await ProjectRepository.create(projectData);
   }
 
+  async update(id, projectData) {
+    return await ProjectRepository.update(id, projectData);
+  }
+
   async getById(id) {
     return await ProjectRepository.getById(id);
   }

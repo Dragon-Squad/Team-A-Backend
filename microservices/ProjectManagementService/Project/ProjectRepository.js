@@ -6,6 +6,10 @@ class ProjectRepository {
     return await project.save();
   }
 
+  async update(id, projectData) {
+    return await Project.findByIdAndUpdate(id, projectData, { new: true });
+  }
+
   async getById(id) {
     return await Project.findById(id);
   }

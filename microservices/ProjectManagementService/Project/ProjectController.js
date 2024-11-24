@@ -12,6 +12,21 @@ class ProjectController {
     }
   }
 
+  // Update Project Details
+  async update(req, res) {
+    try {
+      const { id } = req.params;
+      const projectData = req.body;
+      const updatedProject = await ProjectService.update(id, projectData);
+      if (!updatedProject) {
+        return res.status(404).json({ message: "Project not found" });
+      }
+      res.status(200).json(updatedProject);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+
   // Read a Project by ID
   async getById(req, res) {
     try {
