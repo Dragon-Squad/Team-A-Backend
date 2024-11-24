@@ -12,7 +12,8 @@ ProjectRouter.post(
 );
 ProjectRouter.put("/:id", ProjectController.update);
 ProjectRouter.delete("/:id", ProjectController.delete);
-
+ProjectRouter.patch("/:id/halt", ProjectController.halt);
+ProjectRouter.patch("/:id/resume", ProjectController.resume);
 ProjectRouter.get("/:id", ProjectController.getById);
 ProjectRouter.get("/", ProjectController.getAll);
 
