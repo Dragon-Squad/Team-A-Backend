@@ -11,4 +11,7 @@ ProjectRouter.post(
   ProjectController.create
 );
 
+ProjectRouter.get("/:id", ProjectController.getById);
+ProjectRouter.get("/", ProjectController.getAll);
+
 module.exports = ProjectRouter;
