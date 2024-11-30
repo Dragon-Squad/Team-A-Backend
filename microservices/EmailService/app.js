@@ -5,7 +5,7 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const path = require("path");
 const helmet = require("helmet");
-const httpStatus = require("http-status"); 
+const httpStatus = require("http-status");
 const EmailRouter = require('./Email/EmailRouter');
 
 const app = express();
@@ -39,7 +39,7 @@ const runApp = async () => {
     app.use(`/charitan/api/v1/send/`, EmailRouter);
 
     const errorHandler = (err, req, res, next) => {
-      console.error(err); 
+      console.error(err);
       return res.status(err.status || httpStatus.INTERNAL_SERVER_ERROR).json({
         message: "Internal Server Error",
         error: err.message,
@@ -53,7 +53,7 @@ const runApp = async () => {
     app.listen(SERVER_PORT, () => {
       console.log(`Server running on port ${SERVER_PORT}`);
     });
-    
+
   } catch (err) {
     console.error('Error during initialization:', err);
     process.exit(1);
