@@ -2,6 +2,9 @@ const transporter = require("../config/EmailConfig");
 const {
     verifyMail,
     welcomeMail,
+    donorDonationSuccessMail,
+    donorProjectCreatedMail,
+    donorProjectHaltedMail,
 } = require("../resources/emailTemplates");
 
 class EmailService {
@@ -17,10 +20,70 @@ class EmailService {
         await this.sendEmail(mailOptions);
     }
 
+    // Send an email for successful donation
+    static async sendDonorDonationSuccessEmail(
+        receiver,
+        name,
+        projectTitle,
+        projectUrl,
+        amount
+    ) {
+        const mailOptions = donorDonationSuccessMail(
+            receiver,
+            name,
+            projectTitle,
+            projectUrl,
+            amount
+        );
+        await this.sendEmail(mailOptions);
+    }
+
+    // Send donors an email for new project
+    static async sendDonorProjectCreatedEmail(
+        receiver,
+        name,
+        projectTitle,
+        projectUrl,
+        projectRegion,
+        projectCategory,
+        projectDescription,
+        projectGoal
+    ) {
+        const mailOptions = donorProjectCreatedMail(
+            receiver,
+            name,
+            projectTitle,
+            projectUrl,
+            projectRegion,
+            projectCategory,
+            projectDescription,
+            projectGoal
+        );
+        await this.sendEmail(mailOptions);
+    }
+
+    // Send donors an email for halted project
+    static async sendDonorProjectHaltedEmail(
+        receiver,
+        name,
+        projectTitle,
+        projectUrl,
+        haltReason
+    ) {
+        const mailOptions = donorProjectHaltedMail(
+            receiver,
+            name,
+            projectTitle,
+            projectUrl,
+            haltReason
+        );
+        await this.sendEmail(mailOptions);
+    }
+
     // Generic function to send emails
     static async sendEmail(mailOptions) {
-		const info = await transporter.sendMail(mailOptions);
-		console.log("Email sent:", info.response);
+        const info = await transporter.sendMail(mailOptions);
+        console.log("Email sent:", info.response);
     }
 }
 
