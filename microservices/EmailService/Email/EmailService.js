@@ -5,6 +5,9 @@ const {
     donorDonationSuccessMail,
     donorProjectCreatedMail,
     donorProjectHaltedMail,
+    charityProjectCreatedMail,
+    charityProjectHaltedMail,
+    charityProjectCompletedMail,
 } = require("../resources/emailTemplates");
 
 class EmailService {
@@ -76,6 +79,64 @@ class EmailService {
             projectTitle,
             projectUrl,
             haltReason
+        );
+        await this.sendEmail(mailOptions);
+    }
+
+    // Send charity an email on project creation
+    static async sendCharityProjectCreatedEmail(
+        receiver,
+        name,
+        projectTitle,
+        projectUrl,
+        projectRegion,
+        projectCategory,
+        projectDescription,
+        projectGoal
+    ) {
+        const mailOptions = charityProjectCreatedMail(
+            receiver,
+            name,
+            projectTitle,
+            projectUrl,
+            projectRegion,
+            projectCategory,
+            projectDescription,
+            projectGoal
+        );
+        await this.sendEmail(mailOptions);
+    }
+
+    // Send charity an email on project halt
+    static async sendCharityProjectHaltedEmail(
+        receiver,
+        name,
+        projectTitle,
+        projectUrl,
+        haltReason
+    ) {
+        const mailOptions = charityProjectHaltedMail(
+            receiver,
+            name,
+            projectTitle,
+            projectUrl,
+            haltReason
+        );
+        await this.sendEmail(mailOptions);
+    }
+
+    // Send charity an email on project completion
+    static async sendCharityProjectCompletedEmail(
+        receiver,
+        name,
+        projectTitle,
+        projectUrl
+    ) {
+        const mailOptions = charityProjectCompletedMail(
+            receiver,
+            name,
+            projectTitle,
+            projectUrl
         );
         await this.sendEmail(mailOptions);
     }

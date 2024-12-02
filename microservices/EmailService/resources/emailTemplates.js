@@ -198,11 +198,11 @@ const donorDonationSuccessMail = (
                     <p><strong>Donation Amount:</strong> $${amount}</p>
                 </div>
 
-                <p>Your contribution will go a long way in supporting our shared mission to create positive change.
-                Thank you for being part of this global effort to uplift communities and those in need.</p>
+                <p>Your contribution will go a long way in supporting our shared mission to create positive change.</p>
             </div>
 
             <div class="footer">
+                <p>Thank you for being part of this global effort to uplift communities and those in need.</p>
     ${footer}
     `,
 });
@@ -280,11 +280,134 @@ const donorProjectHaltedMail = (
                     <p><strong>Reason for Halt:</strong> ${haltReason}</p>
                 </div>
 
-                <p>We will continue to monitor the situation and provide you with updates as soon as they become available.
+                <p>Your monthly donations for this project has been automatically paused.</p>
             </div>
 
             <div class="footer">
-                <p>Thank you for your continued support and understanding during this time.</p>
+                <p>Thank you for your continued support and understanding.</p>
+    ${footer}
+    `,
+});
+
+const charityProjectCreatedMail = (
+    receiver,
+    name,
+    projectTitle,
+    projectUrl,
+    projectRegion,
+    projectCategory,
+    projectDescription,
+    projectGoal
+) => ({
+    from: sender,
+    to: receiver,
+    subject: "Your Project Is Created and Awaiting Approval!",
+    html: `
+    ${header}
+        <div class="container">
+            <div class="header">
+                Your Project Is Created and Awaiting Approval!
+            </div>
+            <div class="content">
+                <p>Dear ${name},</p>
+                <p>We're excited to inform you that your project, <strong>${projectTitle}</strong>,
+                has been successfully created on Charitan!
+                Your project is now in the review stage and will go live once it is approved by our team.</p>
+                <p>During the approval process, we will review the details of your project to ensure
+                everything is in line with our platform's guidelines and mission.</p>
+
+                <p>Here are the details of your project:</p>
+                <div class="details">
+                    <p><strong>Project Name:</strong> <a href="${projectUrl}">${projectTitle}</a></p>
+                    <p><strong>Region:</strong> ${projectRegion}</p>
+                    <p><strong>Category:</strong> ${projectCategory}</p>
+                    <p><strong>Description:</strong> ${projectDescription}</p>
+                    <p><strong>Goal:</strong> $${projectGoal}</p>
+                </div>
+
+                <p>Share your project link with your network and encourage them to contribute to your cause.
+                Every donation, no matter how small, will help you reach your goal and make a positive impact.</p>
+            </div>
+
+            <div class="footer">
+                <p>Thank you for creating positive change and inspiring others to support your cause!</p>
+    ${footer}
+    `,
+});
+
+const charityProjectHaltedMail = (
+    receiver,
+    name,
+    projectTitle,
+    projectUrl,
+    haltReason
+) => ({
+    from: sender,
+    to: receiver,
+    subject: "Important Update About Your Project",
+    html: `
+    ${header}
+        <div class="container">
+            <div class="header">
+                Important Update About Your Project
+            </div>
+
+            <div class="content">
+                <p>Dear ${name},</p>
+                <p>We regret to inform you that your project,
+                <strong>${projectTitle}</strong>, has been temporarily halted</p>
+                <p>We understand that this news may be disappointing,
+                and we sincerely apologize for any inconvenience this may cause.</p>
+
+                <p>Here are the details of the halted project:</p>
+                <div class="details">
+                    <p><strong>Project Name:</strong> <a href="${projectUrl}">${projectTitle}</a></p>
+                    <p><strong>Reason for Halt:</strong> ${haltReason}</p>
+                </div>
+
+                <p>If you have any questions or need further clarification,
+                please don't hesitate to get in touch with our support team.</p>
+            </div>
+
+            <div class="footer">
+                <p>Thank you for your understanding and continued commitment to making a positive impact.
+    ${footer}
+    `,
+});
+
+const charityProjectCompletedMail = (
+    receiver,
+    name,
+    projectTitle,
+    projectUrl,
+) => ({
+    from: sender,
+    to: receiver,
+    subject: "Congratulations! Your Project Has Reached Its Donation Goal",
+    html: `
+    ${header}
+        <div class="container">
+            <div class="header">
+                Congratulations! Your Project Has Reached Its Donation Goal
+            </div>
+
+            <div class="content">
+                <p>Dear ${name},</p>
+                <p>We are thrilled to announce that your project, <strong>${projectTitle}]</strong>,
+                has successfully reached its fundraising goal!</p>
+                <p>Thanks to the generous support of donors and volunteers,
+                your project has achieved its goal! This is a major milestone,
+                and we want to take a moment to congratulate you on this achievement.
+                Your project is now one step closer to making a meaningful impact in your community and beyond.</p>
+
+                <p> We encourage you to keep the momentum going by sharing this achievement with your supporters
+                and thanking those who contributed to the cause.</p>
+
+                <a href="${projectUrl}" class="cta-button">View Your Project</a>
+            </div>
+
+            <div class="footer">
+                <p>Thank you for your hard work, and congratulations once again on this outstanding achievement!</p>
     ${footer}
     `,
 });
@@ -295,4 +418,7 @@ module.exports = {
     donorDonationSuccessMail,
     donorProjectCreatedMail,
     donorProjectHaltedMail,
+    charityProjectCreatedMail,
+    charityProjectHaltedMail,
+    charityProjectCompletedMail,
 };

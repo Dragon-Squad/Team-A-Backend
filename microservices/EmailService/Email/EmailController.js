@@ -165,6 +165,123 @@ class EmailController {
             });
         }
     }
+
+    // Send charity an email on project creation
+    static async sendCharityProjectCreatedEmail(req, res) {
+        try {
+            const {
+                receiver,
+                name,
+                projectTitle,
+                projectUrl,
+                projectRegion,
+                projectCategory,
+                projectDescription,
+                projectGoal,
+            } = req.body;
+            if (
+                !receiver ||
+                !name ||
+                !projectTitle ||
+                !projectUrl ||
+                !projectRegion ||
+                !projectCategory ||
+                !projectDescription ||
+                !projectGoal
+            ) {
+                return res.status(400).json({
+                    message: `Receiver, name, project title, project URL, project region, project category,
+						project description, and project goal are required`,
+                });
+            }
+
+            await EmailService.sendCharityProjectCreatedEmail(
+                receiver,
+                name,
+                projectTitle,
+                projectUrl,
+                projectRegion,
+                projectCategory,
+                projectDescription,
+                projectGoal
+            );
+            return res.status(200).json({
+                message: "Project created email sent successfully!",
+            });
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({
+                message: "Failed to send project created email",
+                error: error.message,
+            });
+        }
+    }
+
+    // Send charity an email on project halt
+    static async sendCharityProjectHaltedEmail(req, res) {
+        try {
+            const { receiver, name, projectTitle, projectUrl, haltReason } =
+                req.body;
+            if (
+                !receiver ||
+                !name ||
+                !projectTitle ||
+                !projectUrl ||
+                !haltReason
+            ) {
+                return res.status(400).json({
+                    message:
+                        "Receiver, name, project title, project URL, and halt reason are required",
+                });
+            }
+
+            await EmailService.sendCharityProjectHaltedEmail(
+                receiver,
+                name,
+                projectTitle,
+                projectUrl,
+                haltReason
+            );
+            return res.status(200).json({
+                message: "Project halted email sent successfully!",
+            });
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({
+                message: "Failed to send project halted email",
+                error: error.message,
+            });
+        }
+    }
+
+    // Send charity an email on project completion
+    static async sendCharityProjectCompletedEmail(req, res) {
+        try {
+            const { receiver, name, projectTitle, projectUrl } = req.body;
+            if (!receiver || !name || !projectTitle || !projectUrl) {
+                return res.status(400).json({
+                    message:
+                        "Receiver, name, project title, and project URL are required",
+                });
+            }
+
+            await EmailService.sendCharityProjectCompletedEmail(
+                receiver,
+                name,
+                projectTitle,
+                projectUrl
+            );
+            return res.status(200).json({
+                message: "Project completed email sent successfully!",
+            });
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({
+                message: "Failed to send project completed email",
+                error: error.message,
+            });
+        }
+    }
 }
 
 module.exports = EmailController;
