@@ -148,4 +148,4 @@ class EmailService {
     }
 }
 
-module.exports = EmailService;
+module.exports = new EmailService();
