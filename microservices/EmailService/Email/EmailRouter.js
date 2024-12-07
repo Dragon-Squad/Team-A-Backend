@@ -1,15 +1,38 @@
-const express = require('express');
-const EmailController = require('./EmailController');
+const express = require("express");
+const EmailController = require("./EmailController");
 
 const EmailRouter = express.Router();
 
-// Route for sending welcome email
-EmailRouter.post('/welcome-email', EmailController.sendWelcomeEmail);
+// Emails for new users
+EmailRouter.post("/new/verify", EmailController.sendVerifyEmail);
+EmailRouter.post("/new/welcome", EmailController.sendWelcomeEmail);
 
-// Route for sending verification email
-EmailRouter.post('/verify-email', EmailController.sendVerifyEmail);
+// Emails for donors
+EmailRouter.post(
+    "/donor/donation-success",
+    EmailController.sendDonorDonationSuccessEmail
+);
+EmailRouter.post(
+    "/donor/project-created",
+    EmailController.sendDonorProjectCreatedEmail
+);
+EmailRouter.post(
+    "/donor/project-halted",
+    EmailController.sendDonorProjectHaltedEmail
+);
 
-// Route for sending project creation email
-EmailRouter.post('/project-creation-email', EmailController.sendProjectCreationEmail);
+// Emails for charities
+EmailRouter.post(
+    "/charity/project-created",
+    EmailController.sendCharityProjectCreatedEmail
+);
+EmailRouter.post(
+    "/charity/project-halted",
+    EmailController.sendCharityProjectHaltedEmail
+);
+EmailRouter.post(
+    "/charity/project-completed",
+    EmailController.sendCharityProjectCompletedEmail
+);
 
 module.exports = EmailRouter;
