@@ -12,19 +12,19 @@ const {
 
 class EmailService {
     // Send a verification email
-    static async sendVerifyEmail(receiver, name, OTP) {
+    async sendVerifyEmail(receiver, name, OTP) {
         const mailOptions = verifyMail(receiver, name, OTP);
-        await this.sendEmail(mailOptions);
+        await EmailService.sendEmail(mailOptions);
     }
 
     // Send a welcome email
-    static async sendWelcomeEmail(receiver, name, role) {
+    async sendWelcomeEmail(receiver, name, role) {
         const mailOptions = welcomeMail(receiver, name, role);
-        await this.sendEmail(mailOptions);
+        await EmailService.sendEmail(mailOptions);
     }
 
     // Send an email for successful donation
-    static async sendDonorDonationSuccessEmail(
+    async sendDonorDonationSuccessEmail(
         receiver,
         name,
         projectTitle,
@@ -38,11 +38,11 @@ class EmailService {
             projectUrl,
             amount
         );
-        await this.sendEmail(mailOptions);
+        await EmailService.sendEmail(mailOptions);
     }
 
     // Send donors an email for new project
-    static async sendDonorProjectCreatedEmail(
+    async sendDonorProjectCreatedEmail(
         receiver,
         name,
         projectTitle,
@@ -62,11 +62,11 @@ class EmailService {
             projectDescription,
             projectGoal
         );
-        await this.sendEmail(mailOptions);
+        await EmailService.sendEmail(mailOptions);
     }
 
     // Send donors an email for halted project
-    static async sendDonorProjectHaltedEmail(
+    async sendDonorProjectHaltedEmail(
         receiver,
         name,
         projectTitle,
@@ -80,11 +80,11 @@ class EmailService {
             projectUrl,
             haltReason
         );
-        await this.sendEmail(mailOptions);
+        await EmailService.sendEmail(mailOptions);
     }
 
     // Send charity an email on project creation
-    static async sendCharityProjectCreatedEmail(
+    async sendCharityProjectCreatedEmail(
         receiver,
         name,
         projectTitle,
@@ -104,11 +104,11 @@ class EmailService {
             projectDescription,
             projectGoal
         );
-        await this.sendEmail(mailOptions);
+        await EmailService.sendEmail(mailOptions);
     }
 
     // Send charity an email on project halt
-    static async sendCharityProjectHaltedEmail(
+    async sendCharityProjectHaltedEmail(
         receiver,
         name,
         projectTitle,
@@ -122,11 +122,11 @@ class EmailService {
             projectUrl,
             haltReason
         );
-        await this.sendEmail(mailOptions);
+        await EmailService.sendEmail(mailOptions);
     }
 
     // Send charity an email on project completion
-    static async sendCharityProjectCompletedEmail(
+    async sendCharityProjectCompletedEmail(
         receiver,
         name,
         projectTitle,
@@ -138,7 +138,7 @@ class EmailService {
             projectTitle,
             projectUrl
         );
-        await this.sendEmail(mailOptions);
+        await EmailService.sendEmail(mailOptions);
     }
 
     // Generic function to send emails
