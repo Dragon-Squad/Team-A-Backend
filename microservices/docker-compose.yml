@@ -6,7 +6,7 @@ services:
     container_name: email_service
     hostname: email_service
     networks:
-      - test-network
+      - microservice-network
     ports:
       - 3001:3001  
 
@@ -15,7 +15,7 @@ services:
     container_name: auth_service
     hostname: auth_service
     networks:
-      - test-network
+      - microservice-network
     ports:
       - 3000:3000  
     depends_on:
@@ -26,7 +26,7 @@ services:
     container_name: charity_management_service
     hostname: charity_management_service
     networks:
-      - test-network
+      - microservice-network
     ports:
       - 3002:3002
     depends_on:
@@ -38,14 +38,14 @@ services:
     container_name: project_management_service
     hostname: project_management_service
     networks:
-      - test-network
+      - microservice-network
     ports:
       - 3003:3003
     depends_on:
       - charitymanagementservice
 
 networks:
-  test-network:
+  microservice-network:
     name: microservice-network
     driver: bridge
     external: true

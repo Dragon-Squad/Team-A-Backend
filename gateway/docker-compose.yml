@@ -1,0 +1,85 @@
+version: '3.8'
+
+services:
+  kong-database:
+    image: postgres:13
+    container_name: kong-database
+    environment:
+      POSTGRES_USER: kong
+      POSTGRES_DB: kong
+      POSTGRES_PASSWORD: kongpass
+    ports:
+      - "5432:5432"
+    networks:
+      - kong-net
+    restart: always
+
+  kong-migrations:
+    image: kong/kong-gateway:3.8.1.0
+    container_name: kong-migrations
+    environment:
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: kong-database
+      KONG_PG_PASSWORD: kongpass
+      KONG_PASSWORD: test
+    networks:
+      - kong-net
+    depends_on:
+      - kong-database
+    command: kong migrations bootstrap
+    restart: on-failure
+
+  kong-gateway:
+    image: kong/kong-gateway:3.8.1.0
+    container_name: kong-gateway
+    environment:
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: kong-database
+      KONG_PG_USER: kong
+      KONG_PG_PASSWORD: kongpass
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_LISTEN: "0.0.0.0:8001"
+      KONG_ADMIN_GUI_URL: "http://localhost:8002"
+      KONG_LICENSE_DATA: "<your_license_data>"
+    ports:
+      - "8000:8000"
+      - "8443:8443"
+      - "8001:8001"
+      - "8444:8444"
+      - "8002:8002"
+      - "8445:8445"
+      - "8003:8003"
+      - "8004:8004"
+    networks:
+      - kong-net
+    depends_on:
+      - kong-database
+    restart: always
+
+  kong-setup:
+    image: alpine:latest
+    container_name: kong-setup
+    environment:
+      KONG_ADMIN_API: "http://localhost:8001"
+    networks:
+      - kong-net
+    depends_on:
+      - kong-gateway
+    entrypoint: >
+      sh -c "
+        apk add --no-cache curl; 
+        sleep 15;
+        curl -s -X POST http://localhost:8001/services/ --data 'name=auth-service' --data 'url=http://auth_service:3000';
+        curl -s -X POST http://localhost:8001/routes --data 'paths[]=/auth' --data 'service.name=auth-service';
+        curl -s -X POST http://localhost:8001/services/ --data 'name=email-service' --data 'url=http://email_service:3001';
+        curl -s -X POST http://localhost:8001/routes --data 'paths[]=/email' --data 'service.name=email-service';
+        echo 'Setup completed!';
+      "
+    restart: "on-failure"
+
+networks:
+  kong-net:
+    driver: bridge
