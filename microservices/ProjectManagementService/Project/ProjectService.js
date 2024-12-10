@@ -1,6 +1,7 @@
 const ProjectRepository = require('./ProjectRepository');
 const ProjectValidator = require('./ProjectValidator');
-const MessageBroker = require('../broker/MessageBroker');
+const MessageProducer = require('../broker/MessageProducer');
+const MessageConsumer = require('../broker/MessageConsumer');
 
 class ProjectService {
   // Method to get all projects
@@ -52,14 +53,16 @@ class ProjectService {
     const search =  filters.search;
     let charityList, categoryId, regionId;
     if (search) {
-      await MessageBroker.publish({
-        topic: "SearchCharities",
-        event: "Request",
+      await MessageProducer.publish({
+        topic: "project_to_charity",
+        event: "search_charity",
         message: search,
       });
 
-      while(!charityList){
-        charityList = await MessageBroker.subscribe("SearchCharities");
+      if(!charityList){
+        console.log("Waiting for kafka response...");
+        charityList = await MessageConsumer.subscribe("charity_to_project");
+        console.log(charityList);
       }
     }
 

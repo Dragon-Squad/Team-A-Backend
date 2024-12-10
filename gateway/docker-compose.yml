@@ -11,7 +11,7 @@ services:
     ports:
       - "5432:5432"
     networks:
-      - kong-net
+      - microservice-network
     restart: always
 
   kong-migrations:
@@ -23,7 +23,7 @@ services:
       KONG_PG_PASSWORD: kongpass
       KONG_PASSWORD: test
     networks:
-      - kong-net
+      - microservice-network
     depends_on:
       - kong-database
     command: kong migrations bootstrap
@@ -54,32 +54,23 @@ services:
       - "8003:8003"
       - "8004:8004"
     networks:
-      - kong-net
+      - microservice-network
     depends_on:
       - kong-database
     restart: always
 
   kong-setup:
-    image: alpine:latest
+    build:
+      context: ./setup
     container_name: kong-setup
-    environment:
-      KONG_ADMIN_API: "http://localhost:8001"
     networks:
-      - kong-net
+      - microservice-network
     depends_on:
       - kong-gateway
-    entrypoint: >
-      sh -c "
-        apk add --no-cache curl; 
-        sleep 15;
-        curl -s -X POST http://localhost:8001/services/ --data 'name=auth-service' --data 'url=http://auth_service:3000';
-        curl -s -X POST http://localhost:8001/routes --data 'paths[]=/auth' --data 'service.name=auth-service';
-        curl -s -X POST http://localhost:8001/services/ --data 'name=email-service' --data 'url=http://email_service:3001';
-        curl -s -X POST http://localhost:8001/routes --data 'paths[]=/email' --data 'service.name=email-service';
-        echo 'Setup completed!';
-      "
     restart: "on-failure"
 
 networks:
-  kong-net:
+  microservice-network:
+    name: microservice-network
     driver: bridge
+    external: true
