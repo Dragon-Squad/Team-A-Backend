@@ -1,10 +1,19 @@
 const axios = require('axios');
 
+function transformPath(input) {
+    // Check if the input starts with a "/" and remove it
+    if (input.startsWith('/')) {
+        input = input.substring(1);
+    }
+    // Replace all remaining "/" with "_"
+    return input.replace(/\//g, '_');
+}
+
 // Function to create a route for a service
 async function createRoute(serviceId, path) {
     try {
         const response = await axios.post('http://kong-gateway:8001/routes/', {
-            name: `${serviceId}-route`, // Unique route name based on service ID
+            name: transformPath(path), 
             service: { id: serviceId },
             paths: [path]
         });

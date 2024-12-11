@@ -3,9 +3,9 @@ const axios = require('axios');
 async function enableRateLimitingPlugin(services) {
     try {
         // Apply the plugin to each service
-        for (const [serviceName, serviceUrl] of Object.entries(services)) {
+        for (const service of services) {
             try {
-                await axios.post(`http://kong-gateway:8001/services/${serviceName}/plugins`, {
+                await axios.post(`http://kong-gateway:8001/services/${service}/plugins`, {
                     name: 'rate-limiting',
                     config: {
                         minute: 10,
@@ -13,9 +13,9 @@ async function enableRateLimitingPlugin(services) {
                     }
                 });
 
-                console.log(`Rate limiting enabled for service: ${serviceName}`);
+                console.log(`Rate limiting enabled for service: ${service}`);
             } catch (serviceError) {
-                console.error(`Error enabling rate limiting for ${serviceName}:`, serviceError.message);
+                console.error(`Error enabling rate limiting for ${service}:`, serviceError.message);
             }
         }
     } catch (error) {

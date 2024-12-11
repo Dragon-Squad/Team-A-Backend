@@ -1,79 +1,89 @@
 const { createService, createRoute, enableRateLimitingPlugin } = require("./https");
 
-async function setupServicesAndRoutes() {
+const emailRoutes = [
+    '/email/new/verify',
+    '/email/new/welcome',
+    '/email/donor/donation-success',
+    '/email/donor/project-created',
+    '/email/donor/project-halted',
+    '/email/charity/project-created',
+    '/email/charity/project-halted',
+    '/email/charity/project-completed'
+];
+
+const projectRoutes = [
+    '/project/active'
+];
+
+const fileRoutes = ['/files/upload/', '/files'];
+
+const donationRoutes = ['/donation/new', '/donation/test'];
+
+const services = [
+    'EmailService',
+    'CharityManagementService',
+    'ProjectManagementService',
+    'FileUploadService',
+    'DonationService'
+];
+
+// Main function to create services and their corresponding routes
+async function setupServices() {
     try {
-        // Define services and their URLs
-        const services = {
-            EmailService: 'http://172.30.208.1:3001',
-            CharityManagementService: 'http://172.30.208.1:3002',
-            ProjectManagementService: 'http://172.30.208.1:3003',
-            FileUploadService: 'http://172.30.208.1:3004'
-        };
+        // Step 1: Create services
+        const emailServiceId = await createService('EmailService', 'http://172.30.208.1:3001');
+        // const charityManagementServiceId = await createService('EmailService', 'http://172.30.208.1:3002');
+        const projectManagementServiceId = await createService('ProjectManagementService', 'http://172.30.208.1:3003');
+        const fileUploadServiceId = await createService('FileUploadService', 'http://172.30.208.1:3004');
+        const donationServiceId = await createService('DonationService', 'http://172.30.208.1:3005');
 
-        // Step 1: Create services and collect their IDs
-        const serviceIds = {};
-        for (const [serviceName, serviceUrl] of Object.entries(services)) {
-            try {
-                serviceIds[serviceName] = await createService(serviceName, serviceUrl);
-                console.log(`${serviceName} created with ID: ${serviceIds[serviceName]}`);
-            } catch (serviceError) {
-                console.error(`Error creating service ${serviceName}:`, serviceError.message);
-            }
-        }
-
-        // Step 2: Enable Rate Limiting for all the services
-        await enableRateLimitingPlugin(services);
-
-        // Step 3: Create routes for each service
-        // Email Service Routes
-        const emailRoutes = [
-            '/email/new/verify',
-            '/email/new/welcome',
-            '/email/donor/donation-success',
-            '/email/donor/project-created',
-            '/email/donor/project-halted',
-            '/email/charity/project-created',
-            '/email/charity/project-halted',
-            '/email/charity/project-completed'
-        ];
+        // Step 2: Create routes for the created services
+        // Routes for Email Service
         for (const route of emailRoutes) {
             try {
-                await createRoute(serviceIds.EmailService, route);
+                await createRoute(emailServiceId, route);
                 console.log(`Route created for EmailService: ${route}`);
             } catch (routeError) {
                 console.error(`Error creating route ${route} for EmailService:`, routeError.message);
             }
         }
 
-        // Project Management Service Routes
-        const projectRoutes = [
-            '/project/active'
-        ];
+        // Routes for Project Management Service
         for (const route of projectRoutes) {
             try {
-                await createRoute(serviceIds.ProjectManagementService, route);
+                await createRoute(projectManagementServiceId, route);
                 console.log(`Route created for ProjectManagementService: ${route}`);
             } catch (routeError) {
                 console.error(`Error creating route ${route} for ProjectManagementService:`, routeError.message);
             }
         }
-
-        // File Upload Service Routes
-        const fileRoutes = ['/files/upload/', '/files'];
+        
+        // Routes for File Upload Service
         for (const route of fileRoutes) {
             try {
-                await createRoute(serviceIds.FileUploadService, route);
+                await createRoute(fileUploadServiceId, route);
                 console.log(`Route created for FileUploadService: ${route}`);
             } catch (routeError) {
                 console.error(`Error creating route ${route} for FileUploadService:`, routeError.message);
             }
         }
 
-        console.log("Services and Routes setup completed successfully.");
+        // Routes for Donation Service
+        for (const route of donationRoutes) {
+            try {
+                await createRoute(donationServiceId, route);
+                console.log(`Route created for DonationService: ${route}`);
+            } catch (routeError) {
+                console.error(`Error creating route ${route} for DonationService:`, routeError.message);
+            }
+        }
+
+        //Step 3: Enable Rate Limiting
+        await enableRateLimitingPlugin(services);
+
+        console.log("Services and Routes setup completed.");
     } catch (error) {
-        console.error("Error during setup:", error.message);
+        console.error("Error during setup:", error);
     }
 }
-
-
-setupServicesAndRoutes();
+setupServices();
