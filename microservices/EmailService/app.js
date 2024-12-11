@@ -36,7 +36,7 @@ const runApp = async () => {
     app.use(bodyParser.urlencoded({ extended: true })); // Parse URL-encoded bodies
     app.use(express.static(path.join(__dirname, 'public'))); // Serve static files
 
-    app.use(`/`, EmailRouter);
+    app.use(`/email`, EmailRouter);
 
     app.get('/test', (req, res) => {
       res.status(200).json({ message: 'Server is working!' });

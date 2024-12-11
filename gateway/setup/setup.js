@@ -1,48 +1,79 @@
-const axios = require('axios');
+const { createService, createRoute, enableRateLimitingPlugin } = require("./https");
 
-// Function to create a service
-async function createService(name, url) {
+async function setupServicesAndRoutes() {
     try {
-        const response = await axios.post('http://kong-gateway:8001/services/', {
-            name: name,
-            url: url
-        });
-        console.log(`Service created: ${name}`, response.data);
-        return response.data.id; // Return the service ID to use for creating a route
+        // Define services and their URLs
+        const services = {
+            EmailService: 'http://172.30.208.1:3001',
+            CharityManagementService: 'http://172.30.208.1:3002',
+            ProjectManagementService: 'http://172.30.208.1:3003',
+            FileUploadService: 'http://172.30.208.1:3004'
+        };
+
+        // Step 1: Create services and collect their IDs
+        const serviceIds = {};
+        for (const [serviceName, serviceUrl] of Object.entries(services)) {
+            try {
+                serviceIds[serviceName] = await createService(serviceName, serviceUrl);
+                console.log(`${serviceName} created with ID: ${serviceIds[serviceName]}`);
+            } catch (serviceError) {
+                console.error(`Error creating service ${serviceName}:`, serviceError.message);
+            }
+        }
+
+        // Step 2: Enable Rate Limiting for all the services
+        await enableRateLimitingPlugin(services);
+
+        // Step 3: Create routes for each service
+        // Email Service Routes
+        const emailRoutes = [
+            '/email/new/verify',
+            '/email/new/welcome',
+            '/email/donor/donation-success',
+            '/email/donor/project-created',
+            '/email/donor/project-halted',
+            '/email/charity/project-created',
+            '/email/charity/project-halted',
+            '/email/charity/project-completed'
+        ];
+        for (const route of emailRoutes) {
+            try {
+                await createRoute(serviceIds.EmailService, route);
+                console.log(`Route created for EmailService: ${route}`);
+            } catch (routeError) {
+                console.error(`Error creating route ${route} for EmailService:`, routeError.message);
+            }
+        }
+
+        // Project Management Service Routes
+        const projectRoutes = [
+            '/project/active'
+        ];
+        for (const route of projectRoutes) {
+            try {
+                await createRoute(serviceIds.ProjectManagementService, route);
+                console.log(`Route created for ProjectManagementService: ${route}`);
+            } catch (routeError) {
+                console.error(`Error creating route ${route} for ProjectManagementService:`, routeError.message);
+            }
+        }
+
+        // File Upload Service Routes
+        const fileRoutes = ['/files/upload/', '/files'];
+        for (const route of fileRoutes) {
+            try {
+                await createRoute(serviceIds.FileUploadService, route);
+                console.log(`Route created for FileUploadService: ${route}`);
+            } catch (routeError) {
+                console.error(`Error creating route ${route} for FileUploadService:`, routeError.message);
+            }
+        }
+
+        console.log("Services and Routes setup completed successfully.");
     } catch (error) {
-        console.error(`Error creating service ${name}:`, error);
-        throw error;
+        console.error("Error during setup:", error.message);
     }
 }
 
-// Function to create a route for a service
-async function createRoute(serviceId, path) {
-    try {
-        const response = await axios.post('http://kong-gateway:8001/routes/', {
-            name: `${serviceId}-route`, // Unique route name based on service ID
-            service: { id: serviceId },
-            paths: [path]
-        });
-        console.log(`Route created for service ${serviceId}:`, response.data);
-    } catch (error) {
-        console.error(`Error creating route for service ${serviceId}:`, error);
-    }
-}
 
-// Main function to create services and their corresponding routes
-async function setupServices() {
-    try {
-        // Step 1: Create services
-        const projectServiceId = await createService('ProjectManagementService', 'http://172.30.208.1:3003');
-        const emailServiceId = await createService('EmailService', 'http://172.30.208.1:3001');
-        
-        // Step 2: Create routes for the created services
-        await createRoute(projectServiceId, '/project/active');
-        
-        console.log("Services and Routes setup completed.");
-    } catch (error) {
-        console.error("Error during setup:", error);
-    }
-}
-
-setupServices();
+setupServicesAndRoutes();
