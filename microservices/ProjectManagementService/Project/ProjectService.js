@@ -12,6 +12,10 @@ class ProjectService {
   }
 
   async delete(id) {
+    const project = await ProjectRepository.getById(id);
+
+    if (!project || project.status != "halted") return false;
+
     return await ProjectRepository.delete(id);
   }
 
