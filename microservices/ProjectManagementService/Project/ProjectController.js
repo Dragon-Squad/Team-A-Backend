@@ -48,9 +48,9 @@ class ProjectController {
     try {
       const { id } = req.params;
       const haltedProject = await ProjectService.updateStatus(id, "halted");
-      if (!haltedProject) {
+      if (!haltedProject)
         return res.status(404).json({ message: "Project not found" });
-      }
+
       res.status(200).json(haltedProject);
     } catch (error) {
       res.status(500).json({ message: error.message });
@@ -62,9 +62,9 @@ class ProjectController {
     try {
       const { id } = req.params;
       const resumedProject = await ProjectService.updateStatus(id, "active");
-      if (!resumedProject) {
+      if (!resumedProject)
         return res.status(404).json({ message: "Project not found" });
-      }
+
       res.status(200).json(resumedProject);
     } catch (error) {
       res.status(500).json({ message: error.message });
