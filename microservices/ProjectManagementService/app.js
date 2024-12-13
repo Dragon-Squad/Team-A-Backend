@@ -1,7 +1,6 @@
 const { app, SERVER_PORT, configureApp, errorHandler } = require("./Config/AppConfig");
 const { connectDB } = require("./Config/DBConfig");
 const ProjectRouter = require("./Project/ProjectRouter");
-const MessageBroker = require("./broker/MessageBroker");
 
 const runApp = async () => {
   try {
@@ -11,20 +10,12 @@ const runApp = async () => {
     // Configure the app
     configureApp();
 
-    // connect to the producer and consumer
-    const producer = await MessageBroker.connectProducer();
-    producer.on("producer.connect", () => {
-      console.log("producer connected");
-    });
-
-    const consumer = await MessageBroker.connectConsumer();
-    consumer.on("consumer.connect", () => {
-      console.log("consumer connected");
-    });
-
     // Add routes
-    app.use(`/charitan/api/v1/project/`, ProjectRouter);
-
+    app.use(`/project`, ProjectRouter);
+    app.get(`/project/test`, (req, res) => {
+      res.status(200).json("OK");
+    });
+    
     // Add error handler
     app.use(errorHandler);
 

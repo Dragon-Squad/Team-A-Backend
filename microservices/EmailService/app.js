@@ -36,7 +36,11 @@ const runApp = async () => {
     app.use(bodyParser.urlencoded({ extended: true })); // Parse URL-encoded bodies
     app.use(express.static(path.join(__dirname, 'public'))); // Serve static files
 
-    app.use(`/charitan/api/v1/send/`, EmailRouter);
+    app.use(`/email`, EmailRouter);
+
+    app.get('/test', (req, res) => {
+      res.status(200).json({ message: 'Server is working!' });
+    });
 
     const errorHandler = (err, req, res, next) => {
       console.error(err);

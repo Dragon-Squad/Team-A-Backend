@@ -36,7 +36,7 @@ const runApp = async () => {
     app.use(bodyParser.urlencoded({ extended: true })); // Parse URL-encoded bodies
     app.use(express.static(path.join(__dirname, 'public'))); // Serve static files
 
-    app.use(`/charitan/api/v1/files/`, UploadRouter);
+    app.use(`/files`, UploadRouter);
 
     const errorHandler = (err, req, res, next) => {
       console.error(err); 
