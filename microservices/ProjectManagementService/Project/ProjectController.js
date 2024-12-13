@@ -1,134 +1,98 @@
-const ProjectService = require('./ProjectService');
+const ProjectService = require("./ProjectService");
 
 class ProjectController {
-  // Method to get all projects 
-  async getAllProjects(req, res) {
+  // Create a Project
+  async create(req, res) {
     try {
-      const page = parseInt(req.query.page) || 1; 
-      const limit = parseInt(req.query.limit) || 10; 
-      const filters = {
-        month: req.query.month,
-        region: req.query.region,
-        country: req.query.country,
-        category: req.query.category,
-        search: req.query.search
-      };
-      const donorCountry = req.query.donorCountry || 'Vietnam';
-
-      const projects = await ProjectService.getAllProjects(page, limit, filters, donorCountry);
-      return res.status(200).json(projects);
-    } catch (err) {
-      return res.status(400).json({ error: err.message });
+      const projectData = req.body;
+      const newProject = await ProjectService.create(projectData);
+      res.status(201).json(newProject);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
     }
   }
 
-  async getActiveProjects(req, res) {
+  // Update Project Details
+  async update(req, res) {
     try {
-      console.log("Controller Executes");
-      const page = parseInt(req.query.page) || 1; 
-      const limit = parseInt(req.query.limit) || 10; 
-      const filters = {
-        month: req.query.month,
-        region: req.query.region,
-        country: req.query.country,
-        category: req.query.category,
-        search: req.query.search
-      };
-      const donorCountry = req.query.donorCountry || 'Vietnam';
-      const projects = await ProjectService.getActiveProjects(page, limit, filters, donorCountry);
-      return res.status(200).json(projects);
-    } catch (err) {
-      return res.status(400).json({ error: err.message });
+      const { id } = req.params;
+      const projectData = req.body;
+      const updatedProject = await ProjectService.update(id, projectData);
+      if (!updatedProject) {
+        return res.status(404).json({ message: "Project not found" });
+      }
+      res.status(200).json(updatedProject);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
     }
   }
 
-  // Method to get a project by ID
-  async getProjectById(req, res) {
+  // Delete a Project
+  async delete(req, res) {
     try {
-      const projectId = req.params.id; 
-      const project = await ProjectService.getProjectById(projectId);
-      return res.status(200).json(project);
-    } catch (err) {
-      return res.status(404).json({ error: err.message });
+      const { id } = req.params;
+      const deleted = await ProjectService.delete(id);
+      if (!deleted) {
+        return res
+          .status(404)
+          .json({ message: "Project not found or status isn't halted" });
+      }
+      res.status(200).json({ message: "Project deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
     }
   }
 
-  async getProjectsByCharity(req, res) {
+  // Halt a Project
+  async halt(req, res) {
     try {
-      const userId = req.params.id; 
-      const page = parseInt(req.query.page) || 1; 
-      const limit = parseInt(req.query.limit) || 10; 
-      getProjectsByCharity
-      const results = await ProjectService.getMyProjects(userId, page, limit);
-      return res.status(200).json(results);
-    } catch (err) {
-      return res.status(400).json({ error: err.message });
+      const { id } = req.params;
+      const haltedProject = await ProjectService.updateStatus(id, "halted");
+      if (!haltedProject)
+        return res.status(404).json({ message: "Project not found" });
+
+      res.status(200).json(haltedProject);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
     }
   }
 
-  // Method to create a new project
-  async createProject(req, res) {
+  // Resume a Project
+  async resume(req, res) {
     try {
-      const projectData = req.body; 
-      const role = req.role; 
-      const userId = req.id; 
+      const { id } = req.params;
+      const resumedProject = await ProjectService.updateStatus(id, "active");
+      if (!resumedProject)
+        return res.status(404).json({ message: "Project not found" });
 
-      const newProject = await ProjectService.createProject(projectData, role, userId);
-      return res.status(201).json({ message: 'Project created successfully', project: newProject });
-    } catch (err) {
-      return res.status(400).json({ error: err.message });
+      res.status(200).json(resumedProject);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
     }
   }
 
-  // Method to update a project
-  async updateProject(req, res) {
+  // Read a Project by ID
+  async getById(req, res) {
     try {
-      const projectId = req.params.id; 
-      const projectData = req.body; 
-      const userId = req.id; 
-      const role = req.role; 
-
-      const updatedProject = await ProjectService.updateProject(projectId, projectData, userId, role);
-      return res.status(200).json({ message: 'Project updated successfully', project: updatedProject });
-    } catch (err) {
-      return res.status(400).json({ error: err.message });
+      const { id } = req.params;
+      const project = await ProjectService.getById(id);
+      if (!project) {
+        return res.status(404).json({ message: "Project not found" });
+      }
+      res.status(200).json(project);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
     }
   }
 
-  // Method for admin to activate a pending project
-  async activateProject(req, res) {
+  // Get All Projects
+  async getAll(req, res) {
     try {
-      const projectId = req.params.id; 
-      await ProjectService.activateProject(projectId);
-      return res.status(200).json({ message: 'Project activated successfully' });
-    } catch (err) {
-      return res.status(400).json({ error: err.message });
-    }
-  }
-
-  // Method for charity owner to halt an active project
-  async haltProject(req, res) {
-    try {
-      const projectId = req.params.id; 
-      const userId = req.id; 
-
-      await ProjectService.haltProject(projectId, userId);
-      return res.status(200).json({ message: 'Project halted successfully' });
-    } catch (err) {
-      return res.status(400).json({ error: err.message });
-    }
-  }
-
-  // Method for admin to delete a project
-  async deleteProject(req, res) {
-    try {
-      const projectId = req.params.id; 
-      const role = req.role;
-      const userId = req.id;
-      await ProjectService.deleteProject(projectId, role, userId);
-      return res.status(200).json({ message: 'Project deleted successfully' });
-    } catch (err) {
-      return res.status(400).json({ error: err.message });
+      const filters = req.query; // Extract query params
+      const projects = await ProjectService.getAll(filters);
+      res.status(200).json(projects);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
     }
   }
 }

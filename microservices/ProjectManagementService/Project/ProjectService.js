@@ -1,196 +1,95 @@
-const ProjectRepository = require('./ProjectRepository');
-const ProjectValidator = require('./ProjectValidator');
-const MessageBroker = require('../broker/MessageBroker');
+const validators = require("../utils/requestValidators");
+const ProjectRepository = require("./ProjectRepository");
+const ProjectValidator = require("./ProjectValidator");
+const MessageBroker = require("../broker/MessageBroker");
 
 class ProjectService {
-  // Method to get all projects
-  async getAllProjects( page, limit, filters, donorCountry) {
-    const search =  filters.search;
-    if (search) {
-        try {
-            // Wait for the fetch response to complete
-            const response = await fetch(`http://172.18.0.4:3002/charitan/api/v1/charity?search=${encodeURIComponent(search)}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                credentials: 'include'
-            });
+  async create(projectData) {
+    const errors = [];
 
-            // Check if the response is okay (status 200)
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
+    // Use validation helpers
+    validators.isRequired(projectData.charityId, "charityId", errors);
+    validators.isString(projectData.charityId, "charityId", errors);
 
-            // Wait for the response body to be parsed as JSON
-            const data = await response.json();
-            charityList = data;
+    validators.isRequired(projectData.categoryId, "categoryId", errors);
+    validators.isString(projectData.categoryId, "categoryId", errors);
 
-        } catch (error) {
-            console.error('Error fetching charity list:', error);
-        }
+    validators.isRequired(projectData.regionId, "regionId", errors);
+    validators.isString(projectData.regionId, "regionId", errors);
+
+    validators.isRequired(projectData.title, "title", errors);
+    validators.isString(projectData.title, "title", errors);
+
+    validators.isString(projectData.description, "description", errors);
+
+    validators.isRequired(projectData.goalAmount, "goalAmount", errors);
+    validators.isPositiveNumber(projectData.goalAmount, "goalAmount", errors);
+
+    if (typeof projectData.raisedAmount !== "undefined") {
+      validators.isNonNegativeNumber(
+        projectData.raisedAmount,
+        "raisedAmount",
+        errors
+      );
     }
 
-    // Now update the filters with the fetched charity list
-    filters = {...filters, charityList: charityList};
+    validators.isRequired(projectData.status, "status", errors);
+    validators.isEnumValue(
+      projectData.status,
+      "status",
+      ["pending", "active", "halted", "closed"],
+      errors
+    );
 
-    const { results, totalProjects } = await ProjectRepository.getAll(page, limit, filters, donorCountry);
-    const totalPages = Math.ceil(totalProjects / limit);
-    const isLast = page >= totalPages; 
-  
-    return {
-      currentPage: page,
-      totalPages: totalPages,
-      pageSize: limit,
-      isLast: isLast,
-      data: results,
-    };
-  }  
+    validators.isValidDate(projectData.endDate, "endDate", errors);
 
-   // Method to get all active projects with optional filtering and search
-  async getActiveProjects(page, limit, filters, donorCountry) {
-    const search =  filters.search;
-    let charityList, categoryId, regionId;
-    if (search) {
-      await MessageBroker.publish({
-        topic: "SearchCharities",
-        event: "Request",
-        message: search,
-      });
+    validators.isArrayOfStrings(projectData.images, "images", errors);
+    validators.isArrayOfStrings(projectData.videos, "videos", errors);
 
-      while(!charityList){
-        charityList = await MessageBroker.subscribe("SearchCharities");
-      }
+    validators.isString(projectData.account, "account", errors);
+
+    // Throw if there are errors
+    if (errors.length > 0) {
+      throw new Error(`Validation error: ${errors.join(" ")}`);
     }
 
-    // Now update the filters with the fetched charity list
-    filters = {...filters, charityList: charityList};
-
-    // const category = filters.category;
-    // if (category){
-    //   categoryId = await CategoryService.getIdByName(category);
-    // }
-
-    // const region = filters.region;
-    // if (region){
-    //   regionId = await RegionService.getIdByName(region);
-    // }
-
-    filters = {
-      month: filters.month, 
-      region: regionId || null, 
-      country: filters.country, 
-      category: categoryId, 
-      search: search, 
-      charityList: filters.charityList
-    }
-
-    const { results, totalProjects } = await ProjectRepository.getActiveProjects(page, limit, filters, donorCountry);
-    const totalPages = Math.ceil(totalProjects / limit);
-
-    const isLast = page >= totalPages;
-
-    return {
-      currentPage: page,
-      totalPages: totalPages,
-      pageSize: limit,
-      isLast: isLast,
-      data: results,
-    };
+    // Proceed with project creation
+    return await ProjectRepository.create(projectData);
   }
 
-  // Method to get a project by ID
-  async getProjectById(projectId) {
-    const project = await ProjectRepository.findById(projectId);
-    if (!project) {
-      throw new Error('Project not found');
-    }
-    return project;
+  async update(id, projectData) {
+    return await ProjectRepository.update(id, projectData);
   }
 
-  // Method to get projects based on user type (charity or donor)
-  async getProjectsByCharity(id, page, limit) {
-    const totalProjects = await ProjectRepository.countProjectsByCharity(id);
-    const totalPages = Math.ceil(totalProjects / limit); 
-  
-    const projects = await ProjectRepository.getProjectsByCharity(query, page, limit); 
-  
-    const isLast = page >= totalPages; 
-  
-    return {
-      currentPage: page,
-      totalPages: totalPages,
-      pageSize: limit,
-      isLast: isLast,
-      data: projects 
-    };
+  async delete(id) {
+    const project = await ProjectRepository.getById(id);
+
+    if (!project || project.status != "halted") return false;
+
+    return await ProjectRepository.delete(id);
   }
 
-  // Method to create a new project based on user role
-  async createProject(projectData, role, id) {
-    const newProjectData = {
-      ...projectData,
-      status: role === 'admin' ? 'active' : 'pending',
-      charity: id,
-      raisedAmount: 0,
-      createAt: Date.now,
-    };
+  async updateStatus(id, status) {
+    const project = await ProjectRepository.getById(id);
+    if (!project) return false;
 
-    const { error } = ProjectValidator.validateProjectCreationRequest(newProjectData);
-    if (error) {
-      throw new Error(error.details[0].message);
-    }
+    // To halt, Only Active Projects can be halted
+    // To resume, Only Halted Projects can be resumed
+    if (
+      (project.status == "active" && status == "halted") ||
+      (project.status == "halted" && status == "active")
+    )
+      return await ProjectRepository.update(id, { status });
 
-    const success = await ProjectRepository.create(newProjectData);
-    // if(success) {
-    //   const user = await UserService.getUserById(id);
-    //   await sendProjectCreationEmail(user.email, newProjectData.title);
-    // }
+    return false;
   }
 
-  // Method to update a project by the charity owner
-  async updateProject(projectId, data, userId, role) {
-    const project = await ProjectRepository.findById(projectId);
-    if (!project || project.charity.toString() !== userId || role != 'Admin') {
-      throw new Error('Project not found or access denied');
-    }
-    return await ProjectRepository.update(projectId, data);
+  async getById(id) {
+    return await ProjectRepository.getById(id);
   }
 
-  // Method for admin to set a pending project to active
-  async activateProject(projectId) {
-    const project = await ProjectRepository.findById(projectId);
-    if (!project) {
-      throw new Error('Project not found or access denied');
-    }
-
-    if (project.status != 'pending') {
-      throw new Error('You cannot active non-pending project');
-    }
-
-    return await ProjectRepository.update(projectId, { status: 'active' });
-  }
-
-  // Method for charity owner to halt an active project
-  async haltProject(projectId, userId) {
-    const project = await ProjectRepository.findById(projectId);
-    if (!project || project.charity.toString() !== userId || project.status !== 'active') {
-      throw new Error('Project not found or invalid status');
-    }
-    return await ProjectRepository.update(projectId, { status: 'halt' });
-  }
-
-  // Method for admin to delete a project
-  async deleteProject(projectId, role, userId) {
-    if (role == 'Admin') {
-      return await ProjectRepository.update(projectId, { status: 'deleted' });
-    }
-
-    const project = await ProjectRepository.findById(projectId);
-    if(!project || project.charity.toString() !== userId || project.status !== 'halted'){
-      throw new Error('Project not found or invalid status');
-    }
-    return await ProjectRepository.update(projectId, { status: 'deleted' });
+  async getAll(filters) {
+    return await ProjectRepository.getAll(filters);
   }
 }
 
