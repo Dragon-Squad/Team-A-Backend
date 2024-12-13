@@ -1,4 +1,7 @@
+const axios = require('axios');
 const { createService, createRoute, enableRateLimitingPlugin } = require("./https");
+
+const IPAdr = process.env.IP_ADR || "172.30.208.1";
 
 const emailRoutes = [
     '/email/new/verify',
@@ -27,15 +30,37 @@ const services = [
     'DonationService'
 ];
 
+// Function to check if the service is up
+async function waitForKongAdminAPI() {
+    const url = 'http://kong-gateway:8001';
+    const timeout = 5000; // 5 seconds
+  
+    while (true) {
+      try {
+        const response = await axios.get(url);
+        if (response.status === 200) {
+          console.log('Kong Admin API is ready.');
+          break;
+        }
+      } catch (error) {
+      }
+  
+      await new Promise(resolve => setTimeout(resolve, timeout));
+      console.log('Waiting for Kong Admin API to be ready...');
+    }
+  }
+
 // Main function to create services and their corresponding routes
 async function setupServices() {
     try {
+        await waitForKongAdminAPI();
+
         // Step 1: Create services
-        const emailServiceId = await createService('EmailService', 'http://172.30.208.1:3001');
+        const emailServiceId = await createService('EmailService', `http://${IPAdr}:3001`);
         // const charityManagementServiceId = await createService('EmailService', 'http://172.30.208.1:3002');
-        const projectManagementServiceId = await createService('ProjectManagementService', 'http://172.30.208.1:3003');
-        const fileUploadServiceId = await createService('FileUploadService', 'http://172.30.208.1:3004');
-        const donationServiceId = await createService('DonationService', 'http://172.30.208.1:3005');
+        const projectManagementServiceId = await createService('ProjectManagementService', `http://${IPAdr}:3003`);
+        const fileUploadServiceId = await createService('FileUploadService', `http://${IPAdr}:3004`);
+        const donationServiceId = await createService('DonationService', `http://${IPAdr}:3005`);
 
         // Step 2: Create routes for the created services
         // Routes for Email Service
