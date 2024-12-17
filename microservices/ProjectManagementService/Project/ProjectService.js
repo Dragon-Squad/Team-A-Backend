@@ -1,7 +1,6 @@
 const validators = require("../utils/requestValidators");
 const ProjectRepository = require("./ProjectRepository");
 const ProjectValidator = require("./ProjectValidator");
-const MessageBroker = require("../broker/MessageBroker");
 
 class ProjectService {
   async create(projectData) {

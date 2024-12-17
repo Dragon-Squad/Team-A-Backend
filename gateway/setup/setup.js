@@ -15,12 +15,19 @@ const emailRoutes = [
 ];
 
 const projectRoutes = [
-    '/project/active'
+    '/projects/all',
+    '/projects/',
+    '/projects/halted/',
+    '/projects/resume/',
 ];
 
 const fileRoutes = ['/files/upload/', '/files'];
 
-const donationRoutes = ['/donation/new', '/donation/test'];
+const donationRoutes = [
+    '/donation/new', 
+    '/donation/webhook/handle',
+    '/donation/test'
+];
 
 const services = [
     'EmailService',

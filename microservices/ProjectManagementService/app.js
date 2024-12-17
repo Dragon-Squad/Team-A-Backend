@@ -11,10 +11,7 @@ const runApp = async () => {
     configureApp();
 
     // Add routes
-    app.use(`/project`, ProjectRouter);
-    app.get(`/project/test`, (req, res) => {
-      res.status(200).json("OK");
-    });
+    app.use(`/projects`, ProjectRouter);
     
     // Add error handler
     app.use(errorHandler);

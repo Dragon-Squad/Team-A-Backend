@@ -35,7 +35,12 @@ const configureApp = () => {
     })
   );
   app.use(cookieParser()); // Parse cookies
-  app.use(bodyParser.json()); // Parse JSON bodies
+  app.use((req, res, next) => {
+    if (req.url.startsWith('/donation/webhook/handle')) {
+      return next(); // Skip bodyParser.json() for this route
+    }
+    bodyParser.json()(req, res, next);
+  });
   app.use(bodyParser.urlencoded({ extended: true })); // Parse URL-encoded bodies
   app.use(express.static(path.join(__dirname, "../public"))); // Serve static files
 };

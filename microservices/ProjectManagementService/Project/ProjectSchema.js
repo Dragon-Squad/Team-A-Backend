@@ -19,6 +19,7 @@ const projectSchema = new Schema({
   images: { type: [String] },
   videos: { type: [String] },
   account: { type: String },
+  stripeId: { type: String },
 });
 
 module.exports = mongoose.model("Project", projectSchema);

@@ -12,9 +12,6 @@ const runApp = async () => {
 
     // Add routes
     app.use(`/donation`, DonationRouter);
-    app.get(`/donation/test`, (req, res) => {
-      res.status(200).json("OK");
-    });
     
     // Add error handler
     app.use(errorHandler);
