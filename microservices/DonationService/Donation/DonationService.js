@@ -1,3 +1,6 @@
+const DonationRepository = require('./DonationRepository');
+const DonationSchema = require('./DonationSchema');
+
 require('dotenv').config();
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY); 
 
@@ -5,13 +8,18 @@ class DonationService {
     async donate(data) {
         const email = data.email;
         const personalMessage = data.message || null;
+        const projectId = data.projectId;
         let stripeCustomer;
         let customerId = "cus_RPk3Q0QY3NFMwo";
     
         if (!email) {
             throw new Error('No Email provided');
         }
-    
+        
+        if(!projectId){
+            throw new Error('No Project provided');
+        }
+
         // try {
         //     // Check for existing Stripe customer
         //     const customers = await stripe.customers.list({
@@ -63,6 +71,7 @@ class DonationService {
                 cancel_url: 'http://localhost:5500/cancel',
                 metadata: {
                     personal_message: personalMessage || 'No message provided',
+                    productId: projectId,
                 },
             };
     
@@ -98,10 +107,16 @@ class DonationService {
                 //     //TODO: Handle logic here
                 // }
 
-                // const project = await projectRepository.findByStripeId(session.metadata.productId);
-                // if (!project) {
-                //     throw new Error(`Project not found!`)
-                // }
+                const projectId = session.metadata.productId;
+                const message = session.metadata.personal_message;
+                const donationType = session.mode === "payment" ? "one-time" : "monthly";
+
+                const donation = DonationRepository.create({
+                    projectId: projectId,
+                    donationType: donationType,
+                    message: message
+                });
+                
                 // await projectRepository.update(project.id, { raisedAmount: project.raisedAmount + session.amount_total });
                 // break;
             default:

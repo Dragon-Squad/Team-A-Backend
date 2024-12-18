@@ -17,4 +17,4 @@ RUN ngrok config add-authtoken 2qIXJmZmfbafahDA6qTkdoZzKmv_4xS9wp3sHzAMfSDjfzWJr
 EXPOSE 8000
 
 # Command to run ngrok with the desired settings
-CMD ["ngrok", "http", "--domain=crack-rightly-cow.ngrok-free.app", "8000"]
+CMD ["ngrok", "http", "--url=crack-rightly-cow.ngrok-free.app", "8000"]
