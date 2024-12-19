@@ -1,11 +1,10 @@
-//redisConfig.js
 const { createClient } = require("redis");
 require("dotenv").config();
 
 let redisClient1 = undefined;
 
 async function initializeRedisClient() {
-  let redisURL = process.env.REDIS_URL_INSTANCE_1;
+  let redisURL = process.env.REDIS_URL_INSTANCE_1 || "redis://localhost:6379";
   console.log("redisURL: " + redisURL);
   if (redisURL) {
     // create the Redis client object

@@ -1,4 +1,6 @@
 const ProjectService = require("./ProjectService");
+const RedisMiddleware = require("../redisMiddleware");
+const hash = require("object-hash");
 
 class ProjectController {
   // Create a Project
@@ -75,10 +77,24 @@ class ProjectController {
   async getById(req, res) {
     try {
       const { id } = req.params;
+      const cacheKey = `project:${id}`;
+
+      // Check Redis cache
+      const cachedProject = await RedisMiddleware.readData(cacheKey);
+      if (cachedProject) {
+        console.log("Cache hit for project ID:", id);
+        return res.status(200).json(cachedProject);
+      }
+
+      // Fetch from database if not cached
       const project = await ProjectService.getById(id);
       if (!project) {
         return res.status(404).json({ message: "Project not found" });
       }
+
+      // Cache the result
+      await RedisMiddleware.writeData(cacheKey, project);
+
       res.status(200).json(project);
     } catch (error) {
       res.status(500).json({ message: error.message });
@@ -88,8 +104,22 @@ class ProjectController {
   // Get All Projects
   async getAll(req, res) {
     try {
-      const filters = req.query; // Extract query params
+      const filters = req.query;
+      const cacheKey = `projects:${hash.sha1(filters)}`; // Generate a unique key for filters
+
+      // Check Redis cache
+      const cachedProjects = await RedisMiddleware.readData(cacheKey);
+      if (cachedProjects) {
+        console.log("Cache hit for project list with filters:", filters);
+        return res.status(200).json(cachedProjects);
+      }
+
+      // Fetch from database if not cached
       const projects = await ProjectService.getAll(filters);
+
+      // Cache the result
+      await RedisMiddleware.writeData(cacheKey, projects);
+
       res.status(200).json(projects);
     } catch (error) {
       res.status(500).json({ message: error.message });

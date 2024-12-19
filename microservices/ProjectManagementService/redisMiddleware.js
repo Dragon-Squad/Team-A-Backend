@@ -1,5 +1,4 @@
-//redisMiddleware.js
-const { initializeRedisClient } = require("../config/redisConfig");
+const { initializeRedisClient } = require("./redisConfig");
 const hash = require("object-hash");
 
 class RedisMiddleware {
@@ -14,43 +13,51 @@ class RedisMiddleware {
   }
 
   requestToKey(req) {
+    console.log("Request to key input:", req); // Debug request input
     const reqDataToHash = {
       query: req.query,
       body: req.body,
     };
-    return `${req.path}@${hash.sha1(reqDataToHash)}`;
+
+    console.log("Hashing request data:", reqDataToHash); // Debug data before hashing
+    const key = `${req.path}@${hash(reqDataToHash, {
+      algorithm: "sha1",
+    })}`;
+    console.log("Generated key:", key); // Debug generated key
+    return key;
   }
 
   async isRedisClientWorking() {
     const status = this.redisClient1?.isOpen;
-    console.log("redisClient1 isOpen status:", !!status);
+    console.log("Redis client is open:", !!status);
     return !!status;
   }
 
-  //write Data to redis
-  async writeData(key, data, options) {}
-
-  //read Data from redis
-  async readData(key) {
-    let cachedValue = undefined;
-
+  async writeData(key, data, options = { EX: 3600 }) {
     if (await this.isRedisClientWorking()) {
-      // Try to get the cached response from Redis
-      cachedValue = await this.redisClient1.get(key);
-      if (cachedValue) {
-        return cachedValue;
+      try {
+        const stringifiedData = JSON.stringify(data);
+        await this.redisClient1.set(key, stringifiedData, options);
+        console.log(`Data written to Redis with key: ${key}`);
+      } catch (error) {
+        console.error(`Failed to write data to Redis with key ${key}:`, error);
+      }
+    }
+  }
+
+  async readData(key) {
+    if (await this.isRedisClientWorking()) {
+      try {
+        const cachedValue = await this.redisClient1.get(key);
+        if (cachedValue) {
+          return JSON.parse(cachedValue);
+        }
+      } catch (error) {
+        console.error(`Failed to read data from Redis with key ${key}:`, error);
       }
     }
     return undefined;
   }
-
-  //appproach: when an api is called check the redis first
-  // 					if the redis dont have the data yet,
-  //						then call the controller to get the data
-  //						and write to the redis
-  //					else the redis has the data
-  //						return that data
-  // );
 }
 
 module.exports = new RedisMiddleware();
