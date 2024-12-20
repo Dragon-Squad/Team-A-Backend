@@ -1,17 +1,30 @@
 const express = require('express');
 const DonationController = require('./DonationController');
 const DonationRouter = express.Router();
-const bodyParser = require('body-parser');
 
 DonationRouter.post(
   '/new',
   DonationController.donate
 );
 
-DonationRouter.post(
-  '/webhook/handle', 
-  bodyParser.raw({ type: 'application/json' }), 
-  DonationController.handleWebhook
-);
+DonationRouter.get(
+  '/all',
+  DonationController.getAllDonations
+)
+
+DonationRouter.get(
+  '/:id',
+  DonationController.getDonationById
+)
+
+DonationRouter.get(
+  '/donor/:id',
+  DonationController.getDonationsByDonor
+)
+
+DonationRouter.get(
+  '/project/:id',
+  DonationController.getDonationsByProject
+)
 
 module.exports = DonationRouter;

@@ -1,6 +1,8 @@
 const { app, SERVER_PORT, configureApp, errorHandler } = require("./Config/AppConfig");
 const { connectDB } = require("./Config/DBConfig");
 const DonationRouter = require("./Donation/DonationRoute");
+const WebhookRouter = require("./Webhook/WebhookRoute");
+const MonthlyDonationRouter = require("./MonthlyDonation/MonthlyDonationRouter");
 
 const runApp = async () => {
   try {
@@ -12,7 +14,9 @@ const runApp = async () => {
 
     // Add routes
     app.use(`/donation`, DonationRouter);
-    
+    app.use(`/donation/webhook`, WebhookRouter);
+    app.use(`/donation/monthly/`, MonthlyDonationRouter);
+
     // Add error handler
     app.use(errorHandler);
 

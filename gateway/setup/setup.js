@@ -24,9 +24,15 @@ const projectRoutes = [
 const fileRoutes = ['/files/upload/', '/files'];
 
 const donationRoutes = [
+    '/donation/',     
     '/donation/new', 
+    '/donation/donor/',
+    '/donation/project/',
+    '/donation/monthly/',  
+    '/donation/monthly/new', 
+    '/donation/monthly/donor/',
+    '/donation/monthly/cancel/',  
     '/donation/webhook/handle',
-    '/donation/test'
 ];
 
 const services = [

@@ -14,25 +14,70 @@ class DonationRepository {
     return await Donation.findById(id);
   }
 
-  async getAll(page, limit) {
-    const offset = (page - 1) * limit;
-    return await Donation.find() 
-      .skip(offset)  
-      .limit(limit);
-  }
+  async getAll(limit, page) {
+    const totalCount = await Donation.countDocuments();  
+    const totalPages = Math.ceil(totalCount / limit);     
+    const currentPage = page;                             
+    const isLast = currentPage >= totalPages;            
 
-  async getAllByDonor(donorId, page, limit) {
     const offset = (page - 1) * limit;
-    return await Donation.find({ donor: donorId })
+    const data = await Donation.find()
       .skip(offset)
       .limit(limit);
+
+    return {
+      meta: {       
+        totalPages: totalPages,          
+        currentPage: currentPage,        
+        pageSize: limit,                
+        isLast: isLast                   
+      },
+      data: data                         
+    };
   }
 
-  async getAllByProject(projectId, page, limit) {
+  async getAllByDonor(limit, page, donorId) {
+    const totalCount = await Donation.countDocuments({ donor: donorId });  
+    const totalPages = Math.ceil(totalCount / limit);                       
+    const currentPage = page;                                          
+    const isLast = currentPage >= totalPages;                             
+
     const offset = (page - 1) * limit;
-    return await Donation.find({ project: projectId })
+    const data = await Donation.find({ donor: donorId })
       .skip(offset)
       .limit(limit);
+
+    return {
+      meta: {
+        totalPages: totalPages,         
+        currentPage: currentPage,        
+        pageSize: limit,               
+        isLast: isLast                  
+      },
+      data: data                        
+    };
+  }
+
+  async getAllByProject(limit, page, projectId) {
+    const totalCount = await Donation.countDocuments({ project: projectId }); 
+    const totalPages = Math.ceil(totalCount / limit);                         
+    const currentPage = page;                                               
+    const isLast = currentPage >= totalPages;                                
+
+    const offset = (page - 1) * limit;
+    const data = await Donation.find({ project: projectId })
+      .skip(offset)
+      .limit(limit);
+
+    return {
+      meta: {
+        totalPages: totalPages,        
+        currentPage: currentPage,       
+        pageSize: limit,                
+        isLast: isLast                 
+      },
+      data: data                        
+    };
   }
 
   async countByDonor(donorId) {

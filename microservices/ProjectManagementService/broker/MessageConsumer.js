@@ -70,7 +70,7 @@ const subscribe = async (topic) => {
               ]);
               console.info(`Committed offset for partition ${partition}: ${Number(message.offset) + 1}`);
             }
-            
+            setupShutdownHooks();
             return value;
           } else {
             console.warn("Empty message received");

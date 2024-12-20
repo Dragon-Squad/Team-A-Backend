@@ -1,6 +1,7 @@
 const validators = require("../utils/requestValidators");
 const ProjectRepository = require("./ProjectRepository");
-const ProjectValidator = require("./ProjectValidator");
+const MessageProducer = require("../broker/MessageProducer");
+const MessageConsumer = require("../broker/MessageConsumer");
 
 class ProjectService {
   async create(projectData) {
@@ -88,7 +89,47 @@ class ProjectService {
   }
 
   async getAll(filters) {
-    return await ProjectRepository.getAll(filters);
+    const search = filters.search;
+    let charityList, categoryId, regionId;
+  
+    if (search) {
+      await MessageProducer.publish({
+        topic: "project_to_charity",
+        event: "search_charity",
+        message: search,
+      });
+  
+      // Subscribe to the topic once before sending the message
+      const consumer = await MessageConsumer.connectConsumer();
+      await consumer.subscribe({ topic: "charity_to_project", fromBeginning: true });
+      console.info(`Subscribed to topic: charity_to_project`);
+  
+      consumer.run({
+        onmessage: async ({ topic, partition, message }) => {
+          try {
+            const value = message.value ? JSON.parse(message.value.toString()) : null;
+            if (value) {
+              charityList = value; 
+              console.info({ topic, partition, key, offset: message.offset }, "Message received");
+            } else {
+              console.warn("Empty message received");
+            }
+          } catch (error) {
+            console.error("Error processing message:", error);
+          }
+        },
+      });
+  
+      // Wait for the loop to break when charityList is set
+      while (!charityList) {
+        console.log("Waiting for kafka response...");
+        await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait for 1 second before checking again
+      }
+    }
+  
+    const projectData = await ProjectRepository.getAll(filters);
+    // ... (rest of your logic)
+    return projectData;
   }
 }
 
