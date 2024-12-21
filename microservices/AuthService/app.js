@@ -7,11 +7,10 @@ const path = require("path");
 const helmet = require("helmet");
 const httpStatus = require("http-status"); 
 const { connectDB } = require('./config/DBConfig');
-// const { initializeData } = require('./utils/initializeData/initData');
 const AuthRouter = require('./Auth/AuthRouter');
-
 const app = express();
-const SERVER_PORT = 3000;
+const SERVER_PORT = process.env.AUTH_SERVER_PORT || 3000;
+const CLIENT_PORT = process.env.CLIENT_PORT || 2582;
 
 const runApp = async () => {
   try {
@@ -26,7 +25,7 @@ const runApp = async () => {
     // CORS setup
     const whitelistedCors = [
       `http://localhost:${SERVER_PORT}`,
-      'http://localhost:5173',
+      `http://localhost:${CLIENT_PORT}`,
     ];
 
     // Middleware setup
@@ -46,7 +45,7 @@ const runApp = async () => {
     app.use(bodyParser.urlencoded({ extended: true })); // Parse URL-encoded bodies
     app.use(express.static(path.join(__dirname, 'public'))); // Serve static files
 
-    app.use(`/charitan/api/v1/auth`, AuthRouter);
+    app.use(`/auth`, AuthRouter);
 
     const errorHandler = (err, req, res, next) => {
       console.error(err); 

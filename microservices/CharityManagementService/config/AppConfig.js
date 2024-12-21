@@ -8,12 +8,13 @@ const helmet = require("helmet");
 const httpStatus = require("http-status");
 
 // Application settings
-const SERVER_PORT = process.env.SERVER_PORT || 3002;
+const SERVER_PORT = process.env.CHARITY_SERVER_PORT || 3002;
+const CLIENT_PORT = process.env.CLIENT_PORT || 2582;
 
 // Whitelisted CORS origins
 const whitelistedCors = [
   `http://localhost:${SERVER_PORT}`,
-  "http://localhost:3000",
+  `http://localhost:${CLIENT_PORT}`,
 ];
 
 // Initialize Express App

@@ -9,14 +9,15 @@ const httpStatus = require("http-status");
 const UploadRouter = require('./module/UploadRouter');
 
 const app = express();
-const SERVER_PORT = 3004;
+const SERVER_PORT = process.env.FILE_SERVER_PORT || 3004;
+const CLIENT_PORT = process.env.CLIENT_PORT || 2582;
 
 const runApp = async () => {
   try {
     // CORS setup
     const whitelistedCors = [
       `http://localhost:${SERVER_PORT}`,
-      'http://localhost:3000',
+      `http://localhost:${CLIENT_PORT}`,
     ];
 
     // Middleware setup

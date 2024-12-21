@@ -6,6 +6,10 @@ class CharityRepository {
     const charityIds = await Charity.find(query).select('_id');
     return charityIds.map(charity => charity._id);
   }
+
+  async findById(id) {
+    return await Charity.findById(id);
+  }
 }
 
 module.exports = new CharityRepository();

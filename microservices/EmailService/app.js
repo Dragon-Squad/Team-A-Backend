@@ -9,14 +9,15 @@ const httpStatus = require("http-status");
 const EmailRouter = require('./Email/EmailRouter');
 
 const app = express();
-const SERVER_PORT = 3001;
+const SERVER_PORT = process.env.EMAIL_SERVER_PORT || 3001;
+const CLIENT_PORT = process.env.CLIENT_PORT || 2582;
 
 const runApp = async () => {
   try {
     // CORS setup
     const whitelistedCors = [
       `http://localhost:${SERVER_PORT}`,
-      'http://localhost:3000',
+      `http://localhost:${CLIENT_PORT}`,
     ];
 
     // Middleware setup

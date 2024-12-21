@@ -3,6 +3,12 @@ const { createService, createRoute, enableRateLimitingPlugin } = require("./http
 
 const IPAdr = process.env.IP_ADR || "172.30.208.1";
 
+const authRoutes = [
+    'auth/new',
+    'auth/login',
+    'auth/logout'
+];
+
 const emailRoutes = [
     '/email/new/verify',
     '/email/new/welcome',
@@ -24,7 +30,8 @@ const projectRoutes = [
 const fileRoutes = ['/files/upload/', '/files'];
 
 const donationRoutes = [
-    '/donation/',     
+    '/donation/',   
+    '/donation/all',   
     '/donation/new', 
     '/donation/donor/',
     '/donation/project/',
@@ -35,7 +42,12 @@ const donationRoutes = [
     '/donation/webhook/handle',
 ];
 
+const charityRoutes = [
+    '/charity/payment-method/'
+];
+
 const services = [
+    'AuthService',
     'EmailService',
     'CharityManagementService',
     'ProjectManagementService',
