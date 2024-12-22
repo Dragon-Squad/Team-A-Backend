@@ -16,9 +16,11 @@
     "express": "^4.21.2",
     "helmet": "^8.0.0",
     "http-status": "^2.0.0",
+    "kafkajs": "^2.2.4",
     "mongoose": "^8.8.4",
     "node-cron": "^3.0.3",
     "path": "^0.12.7",
-    "stripe": "^17.4.0"
+    "stripe": "^17.4.0",
+    "uuid": "^11.0.3"
   }
 }

@@ -1,17 +1,37 @@
 const DonationRepository = require('./DonationRepository');
 const { createDonationSession } = require('../utils/StripeUtils');
+const { publish } = require("../broker/Producer");
+const { subscribe } = require("../broker/Consumer");
+const { v4: uuidv4 } = require("uuid");
+const MonthlyDonationService = require('../MonthlyDonation/MonthlyDonationService');
 
 class DonationService {
     async donation(data) {
-        const { email, message: personalMessage = null, projectId, monthlyDonationId, amount } = data;
+        const { email, message: personalMessage = null, projectId, donationType, amount } = data;
         let customerId = "cus_RPk3Q0QY3NFMwo";  // Replace with dynamic customer ID if needed
         
         if (!email) throw new Error('No Email provided');
         if (!projectId) throw new Error('No Project provided');
         if (typeof amount !== 'number' || isNaN(amount) || amount <= 0) throw new Error('Amount must be a valid positive number');
+
+        // const correlationId = uuidv4();
+        // await publish({
+        //     topic: "donation_to_project",
+        //     event: "verify_project",
+        //     message: { 
+        //         projectId: projectId,
+        //         correlationId: correlationId,
+        //     }
+        // });
+
+        // const project = await subscribe("project_to_donation", correlationId);
+        // if(!project) throw new Error('No Project found');
+        // if(project.status != "active") throw new Error('Non-active Project can not be donated');
         
         const unitAmount = Math.round(amount * 100); // Convert to cents
-    
+        const monthlyDonation = await MonthlyDonationService.create();
+        const monthlyDonationId =  monthlyDonation._id.toString();
+        console.log(monthlyDonationId);
         try {
             const session = await createDonationSession(customerId, monthlyDonationId, unitAmount, personalMessage, projectId);
             return { checkoutUrl: session.url };

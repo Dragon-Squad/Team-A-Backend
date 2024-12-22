@@ -1,24 +1,22 @@
 const CharityRepository = require('./CharityRepository');
-const {disconnectConsumer} = require("../broker/MessageConsumer");
-const MessageProducer = require("../broker/MessageProducer");
 require('dotenv').config();
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY); 
 
 class CharityService {
   async searchByName(search) {
-    const result = await CharityRepository.searchByName(search);
+    // const result = await CharityRepository.searchByName(search);
   
-    // Convert each ObjectId in the result to a string
-    const stringifiedResult = result.map(id => id.toString());
+    // // Convert each ObjectId in the result to a string
+    // const stringifiedResult = result.map(id => id.toString());
 
-    console.log("Send back the result");
-    await MessageProducer.publish({
-      topic: "charity_to_project",
-      event: "search_charity_response",
-      message: stringifiedResult,
-    });
+    // console.log("Send back the result");
+    // await MessageProducer.publish({
+    //   topic: "charity_to_project",
+    //   event: "search_charity_response",
+    //   message: stringifiedResult,
+    // });
 
-    return stringifiedResult;
+    // return stringifiedResult;
   }
 
   async updatePaymentMethod(id, paymentMethodId) {

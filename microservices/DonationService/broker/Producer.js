@@ -7,7 +7,7 @@ const BROKERS = ["172.18.0.4:9092"];
 const kafka = new Kafka({
   clientId: CLIENT_ID,
   brokers: BROKERS,
-  logLevel: logLevel.INFO,
+  logLevel: logLevel.WARN, 
 });
 
 let producer;
@@ -27,32 +27,24 @@ const connectProducer = async () => {
   return producer;
 };
 
-const disconnectProducer = async () => {
-  if (producer) {
-    await producer.disconnect();
-    console.log("Producer disconnected successfully.");
+const publish = async (data) => {
+  const producer = await connectProducer();
+  try {
+    await producer.send({
+      topic: data.topic,
+      messages: [
+        {
+          key: data.event,
+          value: JSON.stringify(data.message), 
+        },
+      ],
+    });
+
+    console.log(`Message successfully published to topic ${data.topic}`);
+  } catch (error){
+    console.log("Error publishing message to Kafka:", error);
   }
 };
 
-const publish = async (data) => {
-  const producer = await connectProducer();
+module.exports = { publish };
 
-  const result = await producer.send({
-    topic: data.topic, 
-    messages: [
-      {
-        key: data.event,
-        value: JSON.stringify(data.message), 
-      },
-    ],
-  });
-  
-  console.log("Publishing result:", result);
-  return result.length > 0;
-};
-
-module.exports = {
-  connectProducer,
-  disconnectProducer,
-  publish,
-};

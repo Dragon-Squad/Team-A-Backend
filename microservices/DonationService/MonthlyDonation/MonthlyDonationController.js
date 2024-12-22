@@ -1,15 +1,6 @@
 const MonthlyDonationService = require('./MonthlyDonationService');
 
 class MonthlyDonationController {
-  async create(req, res) {
-    try {
-      const newDonation = await MonthlyDonationService.create(req.body);
-      res.status(201).json(newDonation);
-    } catch (error) {
-      res.status(500).json({ message: error.message });
-    }
-  }
-
   async getAllMonthlyDonations(req, res) {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;

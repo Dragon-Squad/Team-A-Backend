@@ -1,5 +1,5 @@
 const { waitForKongAdminAPI, createService, createRoute, enableRateLimitingPlugin } = require("./https");
-const { authRoutes, emailRoutes, projectRoutes,fileRoutes, donationRoutes, charityRoutes, deleteShardRoutes, services } = require("./resources/servicesAndRoutes");
+const { authRoutes, emailRoutes, projectRoutes, fileRoutes, donationRoutes, charityRoutes, deleteShardRoutes, services } = require("./resources/servicesAndRoutes");
 const IPAdr = process.env.IP_ADR || "172.30.208.1";
 
 // Main function to create services and their corresponding routes

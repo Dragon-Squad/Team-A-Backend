@@ -1,10 +1,10 @@
 const MonthlyDonationRepository = require('./MonthlyDonationRepository');
-const DonationService = require('../Donation/DonationService');
+const { cancelSubscription } = require("../utils/StripeUtils");
 
 class MonthlyDonationService {
-  async create(data) {
+  async create() {
     try {
-      const newMonthlyDonation = await MonthlyDonationRepository.create(data);
+      const newMonthlyDonation = await MonthlyDonationRepository.create();
       return newMonthlyDonation;
     } catch (error) {
       throw new Error('Error creating Monthly Donation: ' + error.message);
@@ -41,6 +41,18 @@ class MonthlyDonationService {
     }
   }
 
+  async getByStripeSubscriptionId(stripeSubscriptionId) {
+    try {
+      const monthlyDonation = await MonthlyDonationRepository.getByStripeSubscriptionId(stripeSubscriptionId);
+      if (!monthlyDonation) {
+        throw new Error('Monthly Donation not found');
+      }
+      return monthlyDonation;
+    } catch (error) {
+      throw new Error('Error finding Monthly Donation: ' + error.message);
+    }
+  }
+
   async update(id, data) {
     try {
       const updatedMonthlyDonation = await MonthlyDonationRepository.update(id, data);
@@ -55,6 +67,11 @@ class MonthlyDonationService {
 
   async cancel(id) {
     try {
+      const monthlyDonation = await MonthlyDonationRepository.findById(id);
+      const stripeSubscriptionId = monthlyDonation.stripeSubscriptionId;
+      console.log("Cancelling...");
+      const canceledSubscription =  await cancelSubscription(stripeSubscriptionId);
+
       const cancelledMonthlyDonation = await MonthlyDonationRepository.cancel(id);
       if (!cancelledMonthlyDonation) {
         throw new Error('Monthly Donation not found or failed to cancel');
@@ -62,20 +79,6 @@ class MonthlyDonationService {
       return cancelledMonthlyDonation;
     } catch (error) {
       throw new Error('Error cancelling Monthly Donation: ' + error.message);
-    }
-  }
-
-  async autoChargeMonthlyDonations() {
-    const today = new Date();
-    
-    const donationsToProcess = await MonthlyDonationRepository.getAllMonthlyDonationsOnRenewDate(today);
-  
-    for (const donation of donationsToProcess) {
-      // const donor = await DonorRepository.findById(donation.donorId);
-      
-      const amount = donation.amount;
-  
-      
     }
   }
 }

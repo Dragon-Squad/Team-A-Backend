@@ -1,5 +1,6 @@
 require('dotenv').config();
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY); 
+const { publish } = require('../broker/Producer');
 const DonationService = require("../Donation/DonationService");
 const MonthlyDonationService = require('../MonthlyDonation/MonthlyDonationService');
 const PaymentTransactionService = require('../PaymentTransaction/PaymentTransactionService');
@@ -40,7 +41,7 @@ class WebhookService {
 
         switch (event.type) {
             case 'checkout.session.completed':
-                console.log('Payment was successful:', session);
+                const amount = session.amount_total/100;
                 // const donor = await donorRepository.findByStripeId(session.customer);
                 // //TODO: there is 2 cases where donor is not found, or donor is a guest 
                 // if (donor) {
@@ -51,33 +52,42 @@ class WebhookService {
 
                 transaction = PaymentTransactionService.create({
                     donationId: (await donation)._id,
-                    amount: session.amount_total/100,
+                    amount: amount,
                     status: "success",
                     paymentProvider: selectedPaymentMethods
                 });
 
                 // const paymentType = session.metadata.paymentType;
                 // if (paymentType & paymentType === "monthly"){
-                //     const monthlyDonationId = session.metadata.monthlyDonationId;
+                const monthlyDonationId = session.metadata.monthlyDonationId;
+                try{
+                    const monthlyDonation = await MonthlyDonationService.getMonthlyDonationById(monthlyDonationId);
+                    
+                    const updatedMonthlyDonation = {
+                        donorId: session.customer,
+                        projectId: projectId,
+                        stripeSubscriptionId: session.subscription,
+                        amount: session.metadata.amount,
+                        renewDate: session.metadata.renewDate,
+                        cancelledAt: null,
+                        isActive: true,
+                    };
 
-                //     try{
-                //         await MonthlyDonationService.getMonthlyDonationById(monthlyDonationId);
-                        
-                //         const currentDate = new Date();
-                //         let nextRenewalDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 15); 
-                  
-                //         const updatedDonation = await MonthlyDonationService.update(monthlyDonationId, {
-                //           renewDate: nextRenewalDate
-                //         });
-                  
-                //         console.log('Successfully updated the renewDate for Monthly Donation:', updatedDonation);
-                //     } catch(err){
-                //         throw new Error('Failed to update renew date: ' + err.message);
-                //     }
-                // }
+                    await MonthlyDonationService.update(monthlyDonationId,updatedMonthlyDonation);
                 
-                // await projectRepository.update(project.id, { raisedAmount: project.raisedAmount + session.amount_total });
-                // break;
+                } catch(err){
+                    throw new Error('Failed to update renew date: ' + err.message);
+                }
+                
+                await publish({
+                    topic: "donation_to_project",
+                    event: "update_project",
+                    message: {
+                        projectId: projectId,
+                        amount: amount,
+                    },
+                  });
+                break;
 
             case 'checkout.session.expired':
                 transaction = PaymentTransactionService.create({
@@ -86,6 +96,28 @@ class WebhookService {
                     status: "failed",
                     paymentProvider: selectedPaymentMethods
                 });
+                break;
+            
+            case 'invoice.payment_succeeded':
+                const subscriptionId = session.subscription;
+                
+                // Retrieve the monthly donation document
+                const monthlyDonation = await MonthlyDonationService.getByStripeSubscriptionId(subscriptionId);
+            
+                if (!monthlyDonation) {
+                    console.error(`No monthly donation found for subscription ID: ${subscriptionId}`);
+                    return;
+                }
+            
+                const currentRenewDate = monthlyDonation.renewDate || new Date();
+                const nextRenewDate = new Date(currentRenewDate.getFullYear(), currentRenewDate.getMonth() + 1, 15);
+            
+                monthlyDonation.renewDate = nextRenewDate;
+                await MonthlyDonationService.update(monthlyDonation._id, monthlyDonation);
+                break;
+            
+            case 'invoice.payment_failed':
+                break;
 
             default:
                 console.log(`Unhandled event type ${event.type}`);
