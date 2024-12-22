@@ -1,7 +1,7 @@
 const { Kafka, logLevel, Partitioners } = require("kafkajs");
 
 // Configuration properties
-const CLIENT_ID = process.env.CLIENT_ID || "charity-service";
+const CLIENT_ID = process.env.CLIENT_ID || "project-service";
 const BROKERS = ["172.18.0.4:9092"]; 
 
 const kafka = new Kafka({
@@ -27,18 +27,11 @@ const connectProducer = async () => {
   return producer;
 };
 
-const disconnectProducer = async () => {
-  if (producer) {
-    await producer.disconnect();
-    console.log("Producer disconnected successfully.");
-  }
-};
-
 const publish = async (data) => {
   const producer = await connectProducer();
-  try{
+  try {
     await producer.send({
-      topic: data.topic, 
+      topic: data.topic,
       messages: [
         {
           key: data.event,
@@ -50,11 +43,8 @@ const publish = async (data) => {
     console.log(`Message successfully published to topic ${data.topic}`);
   } catch (error){
     console.log("Error publishing message to Kafka:", error);
-  } 
+  }
 };
 
-module.exports = {
-  connectProducer,
-  disconnectProducer,
-  publish,
-};
+module.exports = { publish };
+

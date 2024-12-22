@@ -2,8 +2,7 @@ const validators = require("../utils/requestValidators");
 const ProjectRepository = require("./ProjectRepository");
 const CategoryService = require("../Category/CategoryService");
 const RegionService = require("../Region/RegionService");
-const MessageProducer = require("../broker/MessageProducer");
-const MessageConsumer = require("../broker/MessageConsumer");
+const { publish } = require("../broker/Producer");
 
 class ProjectService {
   async create(projectData) {
@@ -81,11 +80,11 @@ class ProjectService {
     const result = await ProjectRepository.delete(id);
 
     if(result){
-      await MessageProducer.publish({
-          topic: "project_to_delete_shard",
-          event: "delete_project",
-          message: project,
-        });
+      await publish({
+        topic: "project_to_delete_shard",
+        event: "delete_project",
+        message: project,
+      });
     }
   }
 

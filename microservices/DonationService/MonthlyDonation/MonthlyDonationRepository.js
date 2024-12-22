@@ -1,8 +1,8 @@
 const MonthlyDonation = require('./MonthlyDonationSchema');
 
 class MonthlyDonationRepository {
-  async create(data) {
-    const monthlyDonation = new MonthlyDonation(data);
+  async create() {
+    const monthlyDonation = new MonthlyDonation();
     return await monthlyDonation.save();
   }
 
@@ -85,7 +85,10 @@ class MonthlyDonationRepository {
       data: data
     };
   }
-
+  
+  async getByStripeSubscriptionId(stripeSubscriptionId){
+    return await MonthlyDonation.findOne({ stripeSubscriptionId }).exec();
+  }
 
   async update(id, data) {
     return await MonthlyDonation.findByIdAndUpdate(id, data, { new: true });
@@ -96,13 +99,6 @@ class MonthlyDonationRepository {
       isActive: false,
       cancelledAt: new Date()
     }, { new: true });
-  }
-
-  async getAllMonthlyDonationsOnRenewDate(today){
-    return await MonthlyDonation.find({
-        isActive: true,
-        renewDate: { $lte: today }
-      });
   }
 }
 
