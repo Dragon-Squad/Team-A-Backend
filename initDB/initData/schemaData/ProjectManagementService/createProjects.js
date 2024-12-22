@@ -24,6 +24,13 @@ const createProjects = async (Project, charityDocs, categoryDocs, regionDocs) =>
             return map;
         }, {});
 
+        const calculateEndDate = (duration) => {
+            const today = new Date();
+            const endDate = new Date(today);
+            endDate.setMonth(today.getMonth() + duration);
+            return endDate;
+        };
+
         // Prepare global projects
         console.log('Creating global projects...');
         const globalProjects = globalProjectsData.map((project) => {
@@ -31,11 +38,12 @@ const createProjects = async (Project, charityDocs, categoryDocs, regionDocs) =>
             const categoryId = categoryMap[project.category];
             const regionId = regionMap[project.region];
             
-            // Skip the project if any data is missing
             if (!charityId || !categoryId || !regionId) {
                 console.warn(`Missing data for global project: ${project.title}`);
                 return null;  
             }
+
+            const today = new Date();
 
             return {
                 title: project.title,
@@ -46,10 +54,11 @@ const createProjects = async (Project, charityDocs, categoryDocs, regionDocs) =>
                 categoryId: categoryId,
                 regionId: regionId,
                 status: 'active',
+                createdAt: today,
+                endDate: calculateEndDate(project.duration),
             };
-        }).filter(project => project !== null);  // Remove any null values
+        }).filter(project => project !== null);
 
-        // Insert global projects into the database
         if (globalProjects.length > 0) {
             await Project.insertMany(globalProjects);
         } else {
@@ -64,11 +73,12 @@ const createProjects = async (Project, charityDocs, categoryDocs, regionDocs) =>
             const categoryId = categoryMap[project.category];
             const regionId = regionMap[project.region];
 
-            // Skip the project if any data is missing
             if (!charityId || !categoryId || !regionId) {
                 console.warn(`Missing data for local project: ${project.title}`);
                 return null;  
             }
+
+            const today = new Date();
 
             return {
                 title: project.title,
@@ -79,10 +89,11 @@ const createProjects = async (Project, charityDocs, categoryDocs, regionDocs) =>
                 categoryId: categoryId,
                 regionId: regionId,
                 status: 'pending',
+                createdAt: today,
+                endDate: calculateEndDate(project.duration),
             };
-        }).filter(project => project !== null);  // Remove any null values
+        }).filter(project => project !== null);
 
-        // Insert local projects into the database
         if (localProjects.length > 0) {
             await Project.insertMany(localProjects);
         } else {

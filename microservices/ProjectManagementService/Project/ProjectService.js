@@ -1,7 +1,9 @@
 const validators = require("../utils/requestValidators");
 const ProjectRepository = require("./ProjectRepository");
-const ProjectValidator = require("./ProjectValidator");
-const MessageBroker = require("../broker/MessageBroker");
+const CategoryService = require("../Category/CategoryService");
+const RegionService = require("../Region/RegionService");
+const MessageProducer = require("../broker/MessageProducer");
+const MessageConsumer = require("../broker/MessageConsumer");
 
 class ProjectService {
   async create(projectData) {
@@ -54,7 +56,17 @@ class ProjectService {
     }
 
     // Proceed with project creation
-    return await ProjectRepository.create(projectData);
+    const project = await ProjectRepository.create(projectData);
+
+    //get the notification list from category and region
+    const category = await CategoryService.getCategoryById(project.categoryId);
+    const region = await RegionService.getRegionById(project.regionId);
+    const mergedNotificationList = new Set([
+      ...region.notificationList.map(String),
+      ...category.notificationList
+    ]);
+
+    return project;
   }
 
   async update(id, projectData) {
@@ -66,7 +78,15 @@ class ProjectService {
 
     if (!project || project.status != "halted") return false;
 
-    return await ProjectRepository.delete(id);
+    const result = await ProjectRepository.delete(id);
+
+    if(result){
+      await MessageProducer.publish({
+          topic: "project_to_delete_shard",
+          event: "delete_project",
+          message: project,
+        });
+    }
   }
 
   async updateStatus(id, status) {
@@ -84,12 +104,61 @@ class ProjectService {
     return false;
   }
 
+  async activeProject(id){
+    const project = await ProjectRepository.getById(id);
+    if (!project) throw new Error("No Project Found");
+
+    if (project.status != "pending") throw new Error("Cannot active non-pending Project");
+
+    return await ProjectRepository.update(id, "active");
+  }
+
   async getById(id) {
     return await ProjectRepository.getById(id);
   }
 
   async getAll(filters) {
-    return await ProjectRepository.getAll(filters);
+    // const search = filters.search;
+    // let charityList, categoryId, regionId;
+  
+    // if (search) {
+    //   await MessageProducer.publish({
+    //     topic: "project_to_charity",
+    //     event: "search_charity",
+    //     message: search,
+    //   });
+  
+    //   // Subscribe to the topic once before sending the message
+    //   const consumer = await MessageConsumer.connectConsumer();
+    //   await consumer.subscribe({ topic: "charity_to_project", fromBeginning: true });
+    //   console.info(`Subscribed to topic: charity_to_project`);
+  
+    //   consumer.run({
+    //     onmessage: async ({ topic, partition, message }) => {
+    //       try {
+    //         const value = message.value ? JSON.parse(message.value.toString()) : null;
+    //         if (value) {
+    //           charityList = value; 
+    //           console.info({ topic, partition, key, offset: message.offset }, "Message received");
+    //         } else {
+    //           console.warn("Empty message received");
+    //         }
+    //       } catch (error) {
+    //         console.error("Error processing message:", error);
+    //       }
+    //     },
+    //   });
+  
+    //   // Wait for the loop to break when charityList is set
+    //   while (!charityList) {
+    //     console.log("Waiting for kafka response...");
+    //     await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait for 1 second before checking again
+    //   }
+    // }
+  
+    const projectData = await ProjectRepository.getAll(filters);
+    // ... (rest of your logic)
+    return projectData;
   }
 }
 

@@ -15,7 +15,9 @@ async function createRoute(serviceId, path) {
         const response = await axios.post('http://kong-gateway:8001/routes/', {
             name: transformPath(path), 
             service: { id: serviceId },
-            paths: [path]
+            paths: [path],
+            path_handling: 'v1',
+            strip_path: false
         });
         console.log(`Route created for service ${serviceId}:`, response.data);
     } catch (error) {

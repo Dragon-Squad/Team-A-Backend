@@ -5,32 +5,23 @@ services:
     build: ./EmailService
     container_name: email_service
     hostname: email_service
-    environment:
-      - SERVER_PORT=3001
-      - EMAIL_USER = EEET2582.Charitan@gmail.com
-      - EMAIL_PASSWORD = EEET2582.Charitan.password
-      - GG_APP_PASSWORD_1 = bwkq vnxc wuva juua
-      - GG_APP_PASSWORD = airm zuch aktl tpqb
-      - TMP_EMAIL = ddm135.aut@gmail.com
-      - TMP_PASS = joqd mqrb knfa jvdq
+    env_file:
+      - .env
     networks:
       - microservice-network
     ports:
-      - 3001:3001  
+      - 3001:3001
 
   authservice:
     build: ./AuthService
     container_name: auth_service
     hostname: auth_service
-    environment:
-      - SERVER_PORT=3000
-      - SECRET_KEY = eeet2582_2024_app_secret_key
-      - ACCESS_TOKEN_SECRET = eeet2582_2024_app_access_token_secret
-      - MONGO_URI_AUTH=mongodb+srv://viphilongnguyen:bu6tLDBzcTbNYwFb@charitan.shpum.mongodb.net/auth_service?retryWrites=true&w=majority&appName=Charitan
+    env_file:
+      - .env
     networks:
       - microservice-network
     ports:
-      - 3000:3000  
+      - 3000:3000
     depends_on:
       - emailservice
 
@@ -38,9 +29,8 @@ services:
     build: ./CharityManagementService
     container_name: charity_management_service
     hostname: charity_management_service
-    environment:
-      - SERVER_PORT=3002
-      - MONGO_URI_CHARITY=mongodb+srv://viphilongnguyen:bu6tLDBzcTbNYwFb@charitan.shpum.mongodb.net/charity_management_service?retryWrites=true&w=majority&appName=Charitan
+    env_file:
+      - .env
     networks:
       - microservice-network
     ports:
@@ -53,11 +43,10 @@ services:
     build: ./ProjectManagementService
     container_name: project_management_service
     hostname: project_management_service
+    env_file:
+      - .env
     networks:
       - microservice-network
-    environment:
-      - SERVER_PORT=3003
-      - MONGO_URI_PROJECT=mongodb+srv://viphilongnguyen:bu6tLDBzcTbNYwFb@charitan.shpum.mongodb.net/project_management_service?retryWrites=true&w=majority&appName=Charitan
     ports:
       - 3003:3003
     depends_on:
@@ -68,11 +57,10 @@ services:
     build: ./FileUploadService
     container_name: file_upload_service
     hostname: file_upload_service
+    env_file:
+      - .env
     networks:
       - microservice-network
-    environment:
-      - SERVER_PORT=3004
-      - MONGO_URI_FILE=mongodb+srv://viphilongnguyen:bu6tLDBzcTbNYwFb@charitan.shpum.mongodb.net/file_upload_service?retryWrites=true&w=majority&appName=Charitan
     ports:
       - 3004:3004
     depends_on:
@@ -82,17 +70,47 @@ services:
     build: ./DonationService
     container_name: donation_service
     hostname: donation_service
+    env_file:
+      - .env
     networks:
       - microservice-network
-    environment:
-      - SERVER_PORT=3005
-      - STRIPE_SECRET_KEY=sk_test_51QUolyLEoapv71xSTAK0WPzNt9ho47xNxMdE4ysGNIktMFowz5NJQF7vSpjxjH11EJiKcZSzQArJIyc6KdpXAE3v0079W9ql7D
-      - MONGO_URI_DONATION=mongodb+srv://viphilongnguyen:bu6tLDBzcTbNYwFb@charitan.shpum.mongodb.net/donation_service?retryWrites=true&w=majority&appName=Charitan
     ports:
       - 3005:3005
     depends_on:
       - projectmanagementservice
 
+  deleteshardservice:
+    build: ./DeleteShardService
+    container_name: delete_shard_service
+    hostname: delete_shard_service
+    env_file:
+      - .env
+    networks:
+      - microservice-network
+    ports:
+      - 3006:3006
+    depends_on:
+      - projectmanagementservice
+
+  documentationservice:
+    build: ./DocumentationService
+    container_name: documentation_service
+    hostname: documentation_service
+    env_file:
+      - .env
+    networks:
+      - microservice-network
+    ports:
+      - 3007:3007
+    depends_on:
+      - emailservice
+      - authservice
+      - charitymanagementservice
+      - projectmanagementservice
+      - fileuploadservice
+      - donationservice
+      - deleteshardservice
+      
 networks:
   microservice-network:
     name: microservice-network

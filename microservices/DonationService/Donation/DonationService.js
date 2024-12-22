@@ -1,62 +1,74 @@
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY); 
+const DonationRepository = require('./DonationRepository');
+const { createDonationSession } = require('../utils/StripeUtils');
 
 class DonationService {
-    async donate(id, data) {
-        const donor = data.donor;
-        const project = data.project;
-
-        // Check if data.amount is a number and if it's an integer or a double
-        if (typeof data.amount !== 'number' || isNaN(data.amount)) {
-            throw new Error('Amount must be a valid number');
+    async donation(data) {
+        const { email, message: personalMessage = null, projectId, monthlyDonationId, amount } = data;
+        let customerId = "cus_RPk3Q0QY3NFMwo";  // Replace with dynamic customer ID if needed
+        
+        if (!email) throw new Error('No Email provided');
+        if (!projectId) throw new Error('No Project provided');
+        if (typeof amount !== 'number' || isNaN(amount) || amount <= 0) throw new Error('Amount must be a valid positive number');
+        
+        const unitAmount = Math.round(amount * 100); // Convert to cents
+    
+        try {
+            const session = await createDonationSession(customerId, monthlyDonationId, unitAmount, personalMessage, projectId);
+            return { checkoutUrl: session.url };
+        } catch (err) {
+            throw new Error('Failed to create Stripe Checkout session: ' + err.message);
         }
+    }
 
-        // Determine if donation is monthly
-        const isMonthly = data.paymentType === 'monthly';
-        // Configure session
-        const sessionConfig = {
-            customer: donor.stripeId,
-            line_items: [
-                {
-                    price_data: {
-                        currency: 'usd',
-                        product: project.stripeId,
-                        unit_amount: data.amount,
-                        recurring: isMonthly ? { interval: 'month' } : undefined,
-                    },
-                    quantity: 1,
-                },
-            ],
-            custom_fields: [
-                {
-                    key: 'message',
-                    label: {
-                        type: 'custom',
-                        custom: 'Leave your message',
-                    },
-                    type: 'text',
-                    optional: true,
-                },
-            ],
-            metadata: {
-                productId: project.stripeId,
-            },
-            mode: isMonthly ? 'subscription' : 'payment',
-            subscription_data: isMonthly
-                ? {
-                    billing_cycle_anchor: billingCycleAnchorTimestamp,
-                    proration_behavior: 'none',
-                }
-                : undefined,
-            // Change the url later
-            success_url: 'http://localhost:5500/success',
-            cancel_url: 'http://localhost:5500/cancel',
-            saved_payment_method_options: {
-                payment_method_save: 'enabled',
-            },
-        };
+    async create(data){
+        try{
+            const result = await DonationRepository.create(data);
+            return result;
+        } catch (error){
+            throw new Error('Error: ' + error.message);
+        }
+    }
 
-        const session = await stripe.checkout.sessions.create(sessionConfig);
-        return session.url;
+    async getAllDonations(limit, page){
+        try{
+            const result = await DonationRepository.getAll(limit, page);
+            return result;
+        } catch (error){
+            throw new Error('Error: ' + error.message);
+        }
+    }
+
+    async getDonationById(donationId){
+        try{
+            if(!donationId) throw new Error('No Donation Id provided');
+
+            const result = await DonationRepository.findById(donationId);
+            return result;
+        } catch (error){
+            throw new Error('Error: ' + error.message);
+        }
+    }
+
+    async getDonationsByDonor(limit, page, donorId){
+        try{
+            if(!donorId) throw new Error('No Donor Id provided');
+
+            const result = await DonationRepository.getAllByDonor(limit, page, donorId);
+            return result;
+        } catch (error){
+            throw new Error('Error: ' + error.message);
+        }
+    }
+
+    async getDonationsByProject(limit, page, projectId){
+        try{
+            if(!projectId) throw new Error('No Project Id provided');
+
+            const result = await DonationRepository.getAllByProject(limit, page, projectId);
+            return result;
+        } catch (error){
+            throw new Error('Error: ' + error.message);
+        }
     }
 }
 

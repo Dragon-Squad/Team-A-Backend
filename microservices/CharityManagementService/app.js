@@ -2,6 +2,7 @@ const { app, SERVER_PORT, configureApp, errorHandler } = require("./config/AppCo
 const { connectDB } = require("./config/DBconfig");
 const CharityService = require("./Charity/CharityService");
 const MessageConsumer = require("./broker/MessageConsumer");
+const CharityRouter = require("./Charity/CharityRouter");
 
 const runApp = async () => {
   try {
@@ -11,7 +12,9 @@ const runApp = async () => {
     // Configure the app
     configureApp();
 
-    await MessageConsumer.subscribe("project_to_charity", CharityService.searchByName);
+    app.use(`/charity`, CharityRouter);
+
+    // await MessageConsumer.subscribe("project_to_charity", CharityService.searchByName);
 
     // Add error handler
     app.use(errorHandler);

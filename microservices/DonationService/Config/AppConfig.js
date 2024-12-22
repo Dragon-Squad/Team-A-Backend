@@ -8,12 +8,13 @@ const helmet = require("helmet");
 const httpStatus = require("http-status");
 
 // Application settings
-const SERVER_PORT = process.env.SERVER_PORT || 3005;
+const SERVER_PORT = process.env.DONATION_SERVER_PORT || 3005;
+const CLIENT_PORT = process.env.CLIENT_PORT || 2582;
 
 // Whitelisted CORS origins
 const whitelistedCors = [
   `http://localhost:${SERVER_PORT}`,
-  "http://localhost:3000",
+  `http://localhost:${CLIENT_PORT}`,
 ];
 
 // Initialize Express App
@@ -35,7 +36,12 @@ const configureApp = () => {
     })
   );
   app.use(cookieParser()); // Parse cookies
-  app.use(bodyParser.json()); // Parse JSON bodies
+  app.use((req, res, next) => {
+    if (req.url.startsWith('/donation/webhook/handle')) {
+      return next(); // Skip bodyParser.json() for this route
+    }
+    bodyParser.json()(req, res, next);
+  });
   app.use(bodyParser.urlencoded({ extended: true })); // Parse URL-encoded bodies
   app.use(express.static(path.join(__dirname, "../public"))); // Serve static files
 };

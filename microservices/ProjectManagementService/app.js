@@ -1,6 +1,8 @@
 const { app, SERVER_PORT, configureApp, errorHandler } = require("./Config/AppConfig");
 const { connectDB } = require("./Config/DBConfig");
 const ProjectRouter = require("./Project/ProjectRouter");
+const CategoryRouter = require("./Category/CategoryRouter");
+const RegionRouter = require("./Region/RegionRouter");
 
 const runApp = async () => {
   try {
@@ -11,10 +13,9 @@ const runApp = async () => {
     configureApp();
 
     // Add routes
-    app.use(`/project`, ProjectRouter);
-    app.get(`/project/test`, (req, res) => {
-      res.status(200).json("OK");
-    });
+    app.use(`/projects`, ProjectRouter);
+    app.use(`/category`, CategoryRouter);
+    app.use(`/region`, RegionRouter);
     
     // Add error handler
     app.use(errorHandler);

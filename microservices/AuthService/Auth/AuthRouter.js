@@ -9,11 +9,11 @@ const {
   verifyUser,
 } = require("./AuthController");
 
-AuthRouter.post("/verify/:id", verifyUser);
+// AuthRouter.post("/verify/:id", verifyUser);
 
 AuthRouter.post("/new", register);
 
-AuthRouter.post("/new/admin", authenticate, authorize([UserType.ADMIN]), register);
+// AuthRouter.post("/new/admin", authenticate, authorize([UserType.ADMIN]), register);
 
 AuthRouter.post("/login", login);
 
