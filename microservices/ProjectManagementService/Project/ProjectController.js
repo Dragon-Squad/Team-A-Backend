@@ -43,6 +43,17 @@ class ProjectController {
     }
   }
 
+  // Active a Project
+  async active(req, res) {
+    try {
+      const id = req.params;
+      const result = await ProjectService.activeProject(id);
+      res.status(200).json("The Project is set to Active successfully");
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+
   // Halt a Project
   async halt(req, res) {
     try {

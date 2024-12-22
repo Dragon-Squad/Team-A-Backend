@@ -79,6 +79,19 @@ services:
     depends_on:
       - projectmanagementservice
 
+  deleteshardservice:
+    build: ./DeleteShardService
+    container_name: delete_shard_service
+    hostname: delete_shard_service
+    env_file:
+      - .env
+    networks:
+      - microservice-network
+    ports:
+      - 3006:3006
+    depends_on:
+      - projectmanagementservice
+
   documentationservice:
     build: ./DocumentationService
     container_name: documentation_service
@@ -88,7 +101,7 @@ services:
     networks:
       - microservice-network
     ports:
-      - 3006:3006
+      - 3007:3007
     depends_on:
       - emailservice
       - authservice
@@ -96,6 +109,7 @@ services:
       - projectmanagementservice
       - fileuploadservice
       - donationservice
+      - deleteshardservice
       
 networks:
   microservice-network:

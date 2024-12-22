@@ -40,6 +40,8 @@ class DonationService {
 
     async getDonationById(donationId){
         try{
+            if(!donationId) throw new Error('No Donation Id provided');
+
             const result = await DonationRepository.findById(donationId);
             return result;
         } catch (error){
@@ -49,6 +51,8 @@ class DonationService {
 
     async getDonationsByDonor(limit, page, donorId){
         try{
+            if(!donorId) throw new Error('No Donor Id provided');
+
             const result = await DonationRepository.getAllByDonor(limit, page, donorId);
             return result;
         } catch (error){
@@ -58,6 +62,8 @@ class DonationService {
 
     async getDonationsByProject(limit, page, projectId){
         try{
+            if(!projectId) throw new Error('No Project Id provided');
+
             const result = await DonationRepository.getAllByProject(limit, page, projectId);
             return result;
         } catch (error){

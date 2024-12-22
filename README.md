@@ -19,7 +19,15 @@ npm install
 node scripts.js
 ````
 
-#### 3. Create the network
+#### 3. Run Kafka
+Kafka is required for messaging between the services. To start the Kafka broker, use Docker Compose to bring up the necessary containers. Ensure you are in the root directory of the project, then execute the following command:
+```` sh
+cd ../Team-A-Backend
+docker-compose -f broker/docker-compose.yml up -d
+````
+This command will start the Kafka broker and ensure it's running in detached mode.
+
+#### 4. Create the network
 Next, create a custom Docker network to enable communication between different microservices. This step is essential for setting up a network environment for the services to interact securely.
 ```` sh
 docker network create microservice-network
@@ -33,14 +41,6 @@ You should see an output similar to the following, confirming that the microserv
 NETWORK ID     NAME                   DRIVER    SCOPE
 68b9bdb5ccb0   microservice-network   bridge    local
 ```
-
-#### 4. Run Kafka
-Kafka is required for messaging between the services. To start the Kafka broker, use Docker Compose to bring up the necessary containers. Ensure you are in the root directory of the project, then execute the following command:
-```` sh
-cd ../Team-A-Backend
-docker-compose -f broker/docker-compose.yml up -d
-````
-This command will start the Kafka broker and ensure it's running in detached mode.
 
 #### 5. Run the Microservices
 Modify the front end port number inside the ./microservices/.env if the port is different from 2582

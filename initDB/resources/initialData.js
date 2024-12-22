@@ -18,16 +18,17 @@ const initialData = {
       {
         title: 'Middle East Crisis',
         description: 'Aid for Middle East Crisis',
-        duration: '6 months',
+        duration: 6,
         goalAmount: 1000000,
         charityCompanyName: 'Non-profit IL',
         category: 'Health',
-        region: 'Africa' 
+        region: 'Africa',
+
       },
       {
         title: 'Ukraine - Russia War',
         description: 'Support for Ukraine in the Russia-Ukraine conflict',
-        duration: '12 months',
+        duration: 12,
         goalAmount: 2000000,
         charityCompanyName: 'Non-profit UA',
         category: 'Humanitarian', 
@@ -36,7 +37,7 @@ const initialData = {
       {
         title: 'Food Program in South Africa',
         description: 'Food aid in Southern Africa',
-        duration: '3 months',
+        duration: 3,
         goalAmount: 500000,
         charityCompanyName: 'Company SA',
         category: 'Food', 
@@ -48,7 +49,7 @@ const initialData = {
       {
         title: 'Yagi Typhoon Support',
         description: 'Support for Yagi Typhoon victims in Vietnam',
-        duration: '3 months',
+        duration: 3,
         goalAmount: 300000,
         charityCompanyName: 'Individual VN',
         category: 'Humanitarian',
@@ -58,7 +59,7 @@ const initialData = {
       {
         title: 'Milton Hurricane Support',
         description: 'Support for Milton Hurricane victims in the USA',
-        duration: '3 months',
+        duration: 3,
         goalAmount: 300000,
         charityCompanyName: 'Individual USA',
         category: 'Humanitarian', 
@@ -68,7 +69,7 @@ const initialData = {
       {
         title: 'Helping Ukrainian Refugee',
         description: 'Aid for Ukrainian refugees in Germany',
-        duration: '3 months',
+        duration: 3,
         goalAmount: 300000,
         charityCompanyName: 'Company DE',
         category: 'Humanitarian', 
@@ -78,7 +79,7 @@ const initialData = {
       {
         title: "Supporting SOS Children’s Village",
         description: "Support for SOS Children's Village in China",
-        duration: '3 months',
+        duration: 3,
         goalAmount: 300000,
         charityCompanyName: 'Company DE',
         category: 'Education', 

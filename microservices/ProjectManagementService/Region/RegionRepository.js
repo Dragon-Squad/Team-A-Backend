@@ -1,9 +1,9 @@
-const Category = require("./CategorySchema");
+const Region = require("./RegionSchema");
 
-class CategoryRepository {
+class RegionRepository {
   async push(id, object, destination) {
     try {
-      const updatedCategory = await Category.findByIdAndUpdate(
+      const updatedRegion = await Region.findByIdAndUpdate(
         id, 
         { $push: { [destination]: object } }, 
         { new: true } 
@@ -18,13 +18,13 @@ class CategoryRepository {
 
   async pull(id, object, destination) {
     try {
-      const updatedCategory = await Category.findByIdAndUpdate(
+      const updatedRegion = await Region.findByIdAndUpdate(
         id, 
         { $pull: { [destination]: object } }, 
         { new: true } 
       );
 
-      return updatedCategory;
+      return updatedRegion;
     } catch (error) {
       console.error(`Error popping from ${destination}:`, error);
       throw new Error('Failed to pop from the list');
@@ -32,8 +32,8 @@ class CategoryRepository {
   }
 
   async findById(id){
-    return await Category.findById(id);
+    return await Region.findById(id);
   }
 }
 
-module.exports = new CategoryRepository();
+module.exports = new RegionRepository();

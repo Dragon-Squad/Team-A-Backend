@@ -1,79 +1,6 @@
-const axios = require('axios');
-const { createService, createRoute, enableRateLimitingPlugin } = require("./https");
-
+const { waitForKongAdminAPI, createService, createRoute, enableRateLimitingPlugin } = require("./https");
+const { authRoutes, emailRoutes, projectRoutes,fileRoutes, donationRoutes, charityRoutes, deleteShardRoutes, services } = require("./resources/servicesAndRoutes");
 const IPAdr = process.env.IP_ADR || "172.30.208.1";
-
-const authRoutes = [
-    'auth/new',
-    'auth/login',
-    'auth/logout'
-];
-
-const emailRoutes = [
-    '/email/new/verify',
-    '/email/new/welcome',
-    '/email/donor/donation-success',
-    '/email/donor/project-created',
-    '/email/donor/project-halted',
-    '/email/charity/project-created',
-    '/email/charity/project-halted',
-    '/email/charity/project-completed'
-];
-
-const projectRoutes = [
-    '/projects/all',
-    '/projects/',
-    '/projects/halted/',
-    '/projects/resume/',
-];
-
-const fileRoutes = ['/files/upload/', '/files'];
-
-const donationRoutes = [
-    '/donation/',   
-    '/donation/all',   
-    '/donation/new', 
-    '/donation/donor/',
-    '/donation/project/',
-    '/donation/monthly/',  
-    '/donation/monthly/new', 
-    '/donation/monthly/donor/',
-    '/donation/monthly/cancel/',  
-    '/donation/webhook/handle',
-];
-
-const charityRoutes = [
-    '/charity/payment-method/'
-];
-
-const services = [
-    'AuthService',
-    'EmailService',
-    'CharityManagementService',
-    'ProjectManagementService',
-    'FileUploadService',
-    'DonationService'
-];
-
-// Function to check if the service is up
-async function waitForKongAdminAPI() {
-    const url = 'http://kong-gateway:8001';
-    const timeout = 5000; // 5 seconds
-  
-    while (true) {
-      try {
-        const response = await axios.get(url);
-        if (response.status === 200) {
-          console.log('Kong Admin API is ready.');
-          break;
-        }
-      } catch (error) {
-      }
-  
-      await new Promise(resolve => setTimeout(resolve, timeout));
-      console.log('Waiting for Kong Admin API to be ready...');
-    }
-  }
 
 // Main function to create services and their corresponding routes
 async function setupServices() {
@@ -81,13 +8,25 @@ async function setupServices() {
         await waitForKongAdminAPI();
 
         // Step 1: Create services
+        const authServiceId = await createService('AuthService', `http://${IPAdr}:3000`);
         const emailServiceId = await createService('EmailService', `http://${IPAdr}:3001`);
-        // const charityManagementServiceId = await createService('EmailService', 'http://172.30.208.1:3002');
+        const charityManagementServiceId = await createService('CharityManagementService', `http://${IPAdr}:3002`);
         const projectManagementServiceId = await createService('ProjectManagementService', `http://${IPAdr}:3003`);
         const fileUploadServiceId = await createService('FileUploadService', `http://${IPAdr}:3004`);
         const donationServiceId = await createService('DonationService', `http://${IPAdr}:3005`);
+        const deleteShardServiceId = await createService('DeleteShardService', `http://${IPAdr}:3006`)
 
         // Step 2: Create routes for the created services
+        // Routes for Auth Service
+        for (const route of authRoutes) {
+            try {
+                await createRoute(authServiceId, route);
+                console.log(`Route created for AuthService: ${route}`);
+            } catch (routeError) {
+                console.error(`Error creating route ${route} for AuthService:`, routeError.message);
+            }
+        }
+
         // Routes for Email Service
         for (const route of emailRoutes) {
             try {
@@ -125,6 +64,26 @@ async function setupServices() {
                 console.log(`Route created for DonationService: ${route}`);
             } catch (routeError) {
                 console.error(`Error creating route ${route} for DonationService:`, routeError.message);
+            }
+        }
+
+        // Routes for Charity Service
+        for (const route of charityRoutes) {
+            try {
+                await createRoute(charityManagementServiceId, route);
+                console.log(`Route created for CharityManagementService: ${route}`);
+            } catch (routeError) {
+                console.error(`Error creating route ${route} for CharityManagementService:`, routeError.message);
+            }
+        }
+
+        // Routes for Delete Shard Service
+        for (const route of deleteShardRoutes) {
+            try {
+                await createRoute(deleteShardServiceId, route);
+                console.log(`Route created for DeleteShardService: ${route}`);
+            } catch (routeError) {
+                console.error(`Error creating route ${route} for DeleteShardService:`, routeError.message);
             }
         }
 

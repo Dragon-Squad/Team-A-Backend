@@ -1,5 +1,7 @@
 const validators = require("../utils/requestValidators");
 const ProjectRepository = require("./ProjectRepository");
+const CategoryService = require("../Category/CategoryService");
+const RegionService = require("../Region/RegionService");
 const MessageProducer = require("../broker/MessageProducer");
 const MessageConsumer = require("../broker/MessageConsumer");
 
@@ -54,7 +56,17 @@ class ProjectService {
     }
 
     // Proceed with project creation
-    return await ProjectRepository.create(projectData);
+    const project = await ProjectRepository.create(projectData);
+
+    //get the notification list from category and region
+    const category = await CategoryService.getCategoryById(project.categoryId);
+    const region = await RegionService.getRegionById(project.regionId);
+    const mergedNotificationList = new Set([
+      ...region.notificationList.map(String),
+      ...category.notificationList
+    ]);
+
+    return project;
   }
 
   async update(id, projectData) {
@@ -66,7 +78,15 @@ class ProjectService {
 
     if (!project || project.status != "halted") return false;
 
-    return await ProjectRepository.delete(id);
+    const result = await ProjectRepository.delete(id);
+
+    if(result){
+      await MessageProducer.publish({
+          topic: "project_to_delete_shard",
+          event: "delete_project",
+          message: project,
+        });
+    }
   }
 
   async updateStatus(id, status) {
@@ -82,6 +102,15 @@ class ProjectService {
       return await ProjectRepository.update(id, { status });
 
     return false;
+  }
+
+  async activeProject(id){
+    const project = await ProjectRepository.getById(id);
+    if (!project) throw new Error("No Project Found");
+
+    if (project.status != "pending") throw new Error("Cannot active non-pending Project");
+
+    return await ProjectRepository.update(id, "active");
   }
 
   async getById(id) {

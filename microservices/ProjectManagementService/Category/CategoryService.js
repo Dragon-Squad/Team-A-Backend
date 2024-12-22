@@ -8,10 +8,12 @@ const ListType = Object.freeze({
 class CategoryService {
     async subscribe(categoryId, donorId){
         try {
+            if(!categoryId) throw new Error("No Category Id provided ");
+
+            if(!donorId) throw new Error("No Donor Id provided ");
+
             const category = await CategoryRepository.findById(categoryId);
-            if(!category){
-                throw new Error("Category not found");
-            }
+            if(!category) throw new Error("Category not found");
 
             if (!category.subscriptionList.includes(donorId)) {
                 await CategoryRepository.push(categoryId, donorId, ListType.SUBSCRIPTION); 
@@ -26,18 +28,20 @@ class CategoryService {
 
     async notificationOn(categoryId, donorId){
         try {
+            if(!categoryId) throw new Error("No Category Id provided ");
+
+            if(!donorId) throw new Error("No Donor Id provided ");
+
             const category = await CategoryRepository.findById(categoryId);
-            if(!category){
-                throw new Error("Category not found");
-            }
+            if(!category) throw new Error("Category not found");
 
             if (!category.subscriptionList.includes(donorId)) {
                 await CategoryRepository.push(categoryId, donorId, ListType.SUBSCRIPTION); 
                 throw new Error(`You have not subscribed to the ${category.name} Category`);
             }
 
-            if (!category.notificationList.includes(donorEmail)) {
-                await CategoryRepository.push(categoryId, donorEmail, ListType.NOTIFICATION); 
+            if (!category.notificationList.includes(donorId)) {
+                await CategoryRepository.push(categoryId, donorId, ListType.NOTIFICATION); 
                 return `Notification for the ${category.name} is turned on`;
             }
 
@@ -49,10 +53,12 @@ class CategoryService {
 
     async unsubscribe(categoryId, donorId){
         try {
+            if(!categoryId) throw new Error("No Category Id provided ");
+
+            if(!donorId) throw new Error("No Donor Id provided ");
+
             const category = await CategoryRepository.findById(categoryId);
-            if(!category){
-                throw new Error("Category not found");
-            }
+            if(!category) throw new Error("Category not found");
 
             if (category.subscriptionList.includes(donorId)) {
                 await CategoryRepository.pull(categoryId, donorId, ListType.SUBSCRIPTION); 
@@ -67,23 +73,34 @@ class CategoryService {
 
     async notificationOff(categoryId, donorId){
         try {
+            if(!categoryId) throw new Error("No Category Id provided ");
+
+            if(!donorId) throw new Error("No Donor Id provided ");
+
             const category = await CategoryRepository.findById(categoryId);
-            if(!category){
-                throw new Error("Category not found");
-            }
+            if(!category) throw new Error("Category not found");
 
             if (!category.subscriptionList.includes(donorId)) {
                 await CategoryRepository.push(categoryId, donorId, ListType.SUBSCRIPTION); 
                 throw new Error(`You have not subscribed to the ${category.name} Category`);
             }
 
-            if (category.notificationList.includes(donorEmail)) {
-                await CategoryRepository.pull(categoryId, donorEmail, ListType.NOTIFICATION); 
+            if (category.notificationList.includes(donorId)) {
+                await CategoryRepository.pull(categoryId, donorId, ListType.NOTIFICATION); 
                 return `Notification for the ${category.name} is turned off`;
             }
 
             return `The Notification is already off`;
         } catch (error){
+            throw new Error(error.message);
+        }
+    }
+
+    async getCategoryById(id){
+        try {
+            const category = await CategoryRepository.findById(id);
+            return category;
+        } catch(error){
             throw new Error(error.message);
         }
     }
