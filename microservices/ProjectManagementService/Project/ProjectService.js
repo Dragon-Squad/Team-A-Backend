@@ -1,7 +1,7 @@
 const ProjectValidator = require("./ProjectValidator");
-
 const ProjectRepository = require("./ProjectRepository");
 const CategoryService = require("../Category/CategoryService");
+const CharityRepository = require("../Charity/CharityRepository");
 const RegionService = require("../Region/RegionService");
 const { publish } = require("../broker/Producer");
 
@@ -77,48 +77,33 @@ class ProjectService {
     return await ProjectRepository.getById(id);
   }
 
+  // Service: Get All Projects
   async getAll(filters) {
-    // const search = filters.search;
-    // let charityList, categoryId, regionId;
+    // Check if charity name is present in the filters
+    if (filters.charityName) {
+      // Use the CharityRepository to search by charity name and get the charityId(s)
+      const charityIds = await CharityRepository.searchByName(
+        filters.charityName
+      );
 
-    // if (search) {
-    //   await MessageProducer.publish({
-    //     topic: "project_to_charity",
-    //     event: "search_charity",
-    //     message: search,
-    //   });
+      // If charityIds are found, set the charityId filter to use the charityIds array
+      if (charityIds.length > 0) {
+        filters.charityId = { $in: charityIds }; // Update the charityId filter with an array of charityIds
+      } else {
+        // If no matching charity is found, return an empty result
+        return {
+          total: 0,
+          page: filters.page || 1,
+          limit: filters.limit || 10,
+          projects: [],
+        };
+      }
+      // Remove charityName from filters to prevent it being used in the query
+      delete filters.charityName;
+    }
 
-    //   // Subscribe to the topic once before sending the message
-    //   const consumer = await MessageConsumer.connectConsumer();
-    //   await consumer.subscribe({ topic: "charity_to_project", fromBeginning: true });
-    //   console.info(`Subscribed to topic: charity_to_project`);
-
-    //   consumer.run({
-    //     onmessage: async ({ topic, partition, message }) => {
-    //       try {
-    //         const value = message.value ? JSON.parse(message.value.toString()) : null;
-    //         if (value) {
-    //           charityList = value;
-    //           console.info({ topic, partition, key, offset: message.offset }, "Message received");
-    //         } else {
-    //           console.warn("Empty message received");
-    //         }
-    //       } catch (error) {
-    //         console.error("Error processing message:", error);
-    //       }
-    //     },
-    //   });
-
-    //   // Wait for the loop to break when charityList is set
-    //   while (!charityList) {
-    //     console.log("Waiting for kafka response...");
-    //     await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait for 1 second before checking again
-    //   }
-    // }
-
-    const projectData = await ProjectRepository.getAll(filters);
-    // ... (rest of your logic)
-    return projectData;
+    // Pass the modified filters to the repository function
+    return await ProjectRepository.getAll(filters);
   }
 }
 
