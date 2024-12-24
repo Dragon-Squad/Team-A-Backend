@@ -15,6 +15,7 @@ const projectSchema = new Schema({
     enum: ["pending", "active", "halted", "completed", "deleted"],
     required: true,
   },
+  startDate: { type: Date, required: true },
   endDate: { type: Date, required: true },
   images: { type: [String] },
   videos: { type: [String] },

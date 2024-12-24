@@ -34,7 +34,11 @@ class ProjectService {
       errors
     );
 
+    validators.isValidDate(projectData.startDate, "startDate", errors);
     validators.isValidDate(projectData.endDate, "endDate", errors);
+
+    if (new Date(projectData.endDate) <= new Date(projectData.startDate))
+      errors.push("endDate must be later than startDate.");
 
     validators.isArrayOfStrings(projectData.images, "images", errors);
     validators.isArrayOfStrings(projectData.videos, "videos", errors);
@@ -42,9 +46,8 @@ class ProjectService {
     validators.isString(projectData.account, "account", errors);
 
     // Throw if there are errors
-    if (errors.length > 0) {
+    if (errors.length > 0)
       throw new Error(`Validation error: ${errors.join(" ")}`);
-    }
 
     // Proceed with project creation
     const project = await ProjectRepository.create(projectData);
