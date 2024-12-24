@@ -4,12 +4,14 @@ const Schema = mongoose.Schema;
 const userSchema = new Schema({
   email: { type: String, required: true, unique: true },
   hashedPassword: { type: String, required: true },
-  role: { type: String, enum: ['Admin', 'Donor', 'Charity'], required: true },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date },
+  isActive: { type: Boolean },
   avatar: { type: String },
   introVideo: { type: String },
-  address: { type: Schema.Types.ObjectId, ref: 'Address' }
+  opt: { type: String },
+  otpExpiry: { type: Date },
+  refreshToken: { String }
 });
 
 const createUserModel = (dbConnection) => dbConnection.model('User', userSchema);

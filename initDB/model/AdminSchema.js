@@ -5,6 +5,7 @@ const adminSchema = new Schema({
   email: { type: String, required: true, unique: true },
   hashedPassword: { type: String, required: true },
   createdAt: { type: Date, default: Date.now },
+  permissionLevel: { type: String },
 });
 
 const createAdminModel = (dbConnection) => dbConnection.model('Admin', adminSchema);

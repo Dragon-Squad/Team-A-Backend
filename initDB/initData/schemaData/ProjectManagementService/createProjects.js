@@ -4,9 +4,6 @@ const localProjectsData = initialData.localProjects;
 
 const createProjects = async (Project, charityDocs, categoryDocs, regionDocs) => {
     try {
-        console.log('Clearing existing project data...');
-        await Project.deleteMany();
-
         // Create a map for charity lookups based on companyName
         const charityMap = charityDocs.reduce((map, charity) => {
             map[charity.companyName] = charity._id;
@@ -48,13 +45,13 @@ const createProjects = async (Project, charityDocs, categoryDocs, regionDocs) =>
             return {
                 title: project.title,
                 description: project.description,
-                duration: project.duration,
                 goalAmount: project.goalAmount,
                 charityId: charityId,
                 categoryId: categoryId,
                 regionId: regionId,
                 status: 'active',
                 createdAt: today,
+                startDate: today,
                 endDate: calculateEndDate(project.duration),
             };
         }).filter(project => project !== null);
@@ -83,13 +80,13 @@ const createProjects = async (Project, charityDocs, categoryDocs, regionDocs) =>
             return {
                 title: project.title,
                 description: project.description,
-                duration: project.duration,
                 goalAmount: project.goalAmount,
                 charityId: charityId,
                 categoryId: categoryId,
                 regionId: regionId,
                 status: 'pending',
                 createdAt: today,
+                startDate: today,
                 endDate: calculateEndDate(project.duration),
             };
         }).filter(project => project !== null);

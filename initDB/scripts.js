@@ -29,6 +29,19 @@ const { createBuckets, initImageFiles } = require('./initData/fileData');
     const MonthlyDonation = createMonthlyDonationModel(donationDB);
     const PaymentTransaction = createPaymentTransactionModel(donationDB);
 
+    console.log('Clearing existing data...');
+    await Admin.deleteMany();
+    await User.deleteMany();
+    await Charity.deleteMany();
+    await Address.deleteMany();
+    await Donor.deleteMany();
+    await Category.deleteMany();
+    await Region.deleteMany();
+    await Project.deleteMany();
+    await Donation.deleteMany();
+    await MonthlyDonation.deleteMany();
+    await PaymentTransaction.deleteMany();
+
     console.log('Creating collections for buckets...');
     await createBuckets();  
 

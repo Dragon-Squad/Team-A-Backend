@@ -6,10 +6,6 @@ const adminData = initialData.admin;
 
 const createAdminAccount = async (Admin) => {
     try {
-      // Clear existing admin data
-      console.log('Clearing existing admin data...');
-      await Admin.deleteMany();
-  
       // Create the new admin account
       console.log('Creating admin account...');
       const admin = new Admin({

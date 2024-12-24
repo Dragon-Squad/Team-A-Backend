@@ -11,11 +11,13 @@ const projectSchema = new Schema({
   raisedAmount: { type: Number, default: 0 },
   createdAt: { type: Date, default: Date.now },
   status: { type: String, enum: ['pending', 'active', 'halted', 'inactive', 'closed'], required: true },
+  startDate: { type: Date },
   endDate: { type: Date },
+  updateAt: { type: Date },
   images: { type: [String] },
   videos: { type: [String] },
   country: { type: String },
-  stripeId: { type: String }
+  hashedStripeId: { type: String }
 });
 
 const createProjectModel = (dbConnection) => dbConnection.model('Project', projectSchema);

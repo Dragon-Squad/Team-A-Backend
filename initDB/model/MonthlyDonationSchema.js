@@ -4,6 +4,7 @@ const Schema = mongoose.Schema;
 const monthlyDonationSchema = new Schema({
   donorId: { type: Schema.Types.ObjectId, ref: 'Donor' },
   amount: { type: Number, required: true },
+  stripeSubscriptionId: { type: String },
   isActive: { type: Boolean, required: true },
   startedDate: { type: Date, required: true },
   renewDate: { type: Date, required: true },
