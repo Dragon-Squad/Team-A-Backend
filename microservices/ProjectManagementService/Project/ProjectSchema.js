@@ -12,7 +12,7 @@ const projectSchema = new Schema({
   createdAt: { type: Date, default: Date.now },
   status: {
     type: String,
-    enum: ["pending", "active", "halted", "closed"],
+    enum: ["pending", "active", "halted", "completed", "deleted"],
     required: true,
   },
   endDate: { type: Date, required: true },

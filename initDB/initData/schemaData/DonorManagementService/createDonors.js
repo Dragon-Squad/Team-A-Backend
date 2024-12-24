@@ -1,33 +1,32 @@
 const bcrypt = require('bcryptjs');
+const { faker } = require ('@faker-js/faker');
 
 const createDonors= async (User, Donor, Address) => {
     try {
-        // Clear existing charity data
-        console.log('Clearing existing donor data...');
-        await Donor.deleteMany();
-
         // Process each charity entry
         console.log('Creating donor accounts...');
         const donors = [];
 
         for (let i = 0; i < 30; i++) {
+            const countries = ['Vietnam', 'Germany', 'Qatar', 'USA', 'Cameroon'];
             const address = new Address({
-                street: `Address ${i}`,
+                country: countries[i%5],
             });
             await address.save();
 
+            const email = faker.internet.email({provider: 'gmail.com'});
+
             const donorUser = new User({
-                email: `donor${i}@gmail.com`,
+                email: email,
                 hashedPassword: await bcrypt.hash('donorpassword', 10),
-                role: 'Donor',
-                address: address._id
+                isActive: true
             });
             await donorUser.save();
 
             const donor = new Donor({
                 userId: donorUser._id,
-                firstName: `First${i}`,
-                lastName: `Last${i}`,
+                firstName: faker.person.firstName(),
+                lastName: faker.person.lastName(),
             });
             donors.push(await donor.save());
         }
