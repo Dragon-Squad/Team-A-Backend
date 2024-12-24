@@ -1,4 +1,4 @@
-const Joi = require('joi');
+const Joi = require("joi");
 
 class ProjectValidator {
   constructor() {
@@ -10,12 +10,15 @@ class ProjectValidator {
       description: Joi.string().optional(),
       goalAmount: Joi.number().positive().required(),
       duration: Joi.string().required(),
-      endDate: Joi.date().optional(),
-      status: Joi.string().valid('pending', 'active').required(),
+      startDate: Joi.date().required(),
+      endDate: Joi.date().required(),
+      status: Joi.string()
+        .valid("pending", "active", "halted", "completed", "deleted")
+        .required(),
       account: Joi.string().optional(),
       country: Joi.string().optional(),
-      image: Joi.array().items(Joi.string()),
-      video: Joi.array().items(Joi.string())
+      images: Joi.array().items(Joi.string()),
+      videos: Joi.array().items(Joi.string()),
     });
   }
 

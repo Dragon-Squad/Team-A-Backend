@@ -26,14 +26,6 @@ class ProjectService {
     validators.isRequired(projectData.goalAmount, "goalAmount", errors);
     validators.isPositiveNumber(projectData.goalAmount, "goalAmount", errors);
 
-    validators.isRequired(projectData.status, "status", errors);
-    validators.isEnumValue(
-      projectData.status,
-      "status",
-      ["pending", "active", "halted", "closed"],
-      errors
-    );
-
     validators.isValidDate(projectData.startDate, "startDate", errors);
     validators.isValidDate(projectData.endDate, "endDate", errors);
 

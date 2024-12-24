@@ -14,6 +14,7 @@ const projectSchema = new Schema({
     type: String,
     enum: ["pending", "active", "halted", "completed", "deleted"],
     required: true,
+    default: "pending",
   },
   startDate: { type: Date, required: true },
   endDate: { type: Date, required: true },
