@@ -26,14 +26,6 @@ class ProjectService {
     validators.isRequired(projectData.goalAmount, "goalAmount", errors);
     validators.isPositiveNumber(projectData.goalAmount, "goalAmount", errors);
 
-    if (typeof projectData.raisedAmount !== "undefined") {
-      validators.isNonNegativeNumber(
-        projectData.raisedAmount,
-        "raisedAmount",
-        errors
-      );
-    }
-
     validators.isRequired(projectData.status, "status", errors);
     validators.isEnumValue(
       projectData.status,
@@ -62,7 +54,7 @@ class ProjectService {
     const region = await RegionService.getRegionById(project.regionId);
     const mergedNotificationList = new Set([
       ...region.notificationList.map(String),
-      ...category.notificationList
+      ...category.notificationList,
     ]);
 
     return project;
@@ -79,7 +71,7 @@ class ProjectService {
 
     const result = await ProjectRepository.delete(id);
 
-    if(result){
+    if (result) {
       await publish({
         topic: "project_to_delete_shard",
         event: "delete_project",
@@ -103,11 +95,12 @@ class ProjectService {
     return false;
   }
 
-  async activeProject(id){
+  async activeProject(id) {
     const project = await ProjectRepository.getById(id);
     if (!project) throw new Error("No Project Found");
 
-    if (project.status != "pending") throw new Error("Cannot active non-pending Project");
+    if (project.status != "pending")
+      throw new Error("Cannot active non-pending Project");
 
     return await ProjectRepository.update(id, "active");
   }
@@ -119,25 +112,25 @@ class ProjectService {
   async getAll(filters) {
     // const search = filters.search;
     // let charityList, categoryId, regionId;
-  
+
     // if (search) {
     //   await MessageProducer.publish({
     //     topic: "project_to_charity",
     //     event: "search_charity",
     //     message: search,
     //   });
-  
+
     //   // Subscribe to the topic once before sending the message
     //   const consumer = await MessageConsumer.connectConsumer();
     //   await consumer.subscribe({ topic: "charity_to_project", fromBeginning: true });
     //   console.info(`Subscribed to topic: charity_to_project`);
-  
+
     //   consumer.run({
     //     onmessage: async ({ topic, partition, message }) => {
     //       try {
     //         const value = message.value ? JSON.parse(message.value.toString()) : null;
     //         if (value) {
-    //           charityList = value; 
+    //           charityList = value;
     //           console.info({ topic, partition, key, offset: message.offset }, "Message received");
     //         } else {
     //           console.warn("Empty message received");
@@ -147,14 +140,14 @@ class ProjectService {
     //       }
     //     },
     //   });
-  
+
     //   // Wait for the loop to break when charityList is set
     //   while (!charityList) {
     //     console.log("Waiting for kafka response...");
     //     await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait for 1 second before checking again
     //   }
     // }
-  
+
     const projectData = await ProjectRepository.getAll(filters);
     // ... (rest of your logic)
     return projectData;
