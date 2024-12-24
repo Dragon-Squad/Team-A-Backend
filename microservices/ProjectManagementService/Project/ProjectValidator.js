@@ -1,29 +1,120 @@
-const Joi = require("joi");
+const validators = require("../utils/requestValidators");
 
 class ProjectValidator {
-  constructor() {
-    this.createProjectRequestSchema = Joi.object({
-      charityId: Joi.string().required(),
-      categoryId: Joi.string().required(),
-      regionId: Joi.string().required(),
-      title: Joi.string().required(),
-      description: Joi.string().optional(),
-      goalAmount: Joi.number().positive().required(),
-      duration: Joi.string().required(),
-      startDate: Joi.date().required(),
-      endDate: Joi.date().required(),
-      status: Joi.string()
-        .valid("pending", "active", "halted", "completed", "deleted")
-        .required(),
-      account: Joi.string().optional(),
-      country: Joi.string().optional(),
-      images: Joi.array().items(Joi.string()),
-      videos: Joi.array().items(Joi.string()),
-    });
+  validateProjectCreationRequest(projectData) {
+    const errors = [];
+    validators.isRequired(projectData.charityId, "charityId", errors);
+    validators.isString(projectData.charityId, "charityId", errors);
+
+    validators.isRequired(projectData.categoryId, "categoryId", errors);
+    validators.isString(projectData.categoryId, "categoryId", errors);
+
+    validators.isRequired(projectData.regionId, "regionId", errors);
+    validators.isString(projectData.regionId, "regionId", errors);
+
+    validators.isRequired(projectData.title, "title", errors);
+    validators.isString(projectData.title, "title", errors);
+
+    validators.isString(projectData.description, "description", errors);
+
+    validators.isRequired(projectData.goalAmount, "goalAmount", errors);
+    validators.isPositiveNumber(projectData.goalAmount, "goalAmount", errors);
+
+    validators.isValidDate(projectData.startDate, "startDate", errors);
+    validators.isValidDate(projectData.endDate, "endDate", errors);
+
+    if (new Date(projectData.endDate) <= new Date(projectData.startDate)) {
+      errors.push("endDate must be later than startDate.");
+    }
+
+    validators.isArrayOfStrings(projectData.images, "images", errors);
+    validators.isArrayOfStrings(projectData.videos, "videos", errors);
+
+    validators.isString(projectData.account, "account", errors);
+
+    if (errors.length > 0) {
+      throw new Error(`Validation error: ${errors.join(" ")}`);
+    }
   }
 
-  validateProjectCreationRequest(projectData) {
-    return this.createProjectRequestSchema.validate(projectData);
+  validateProjectUpdateRequest(id, projectData) {
+    const errors = [];
+
+    // Ensure the ID is provided
+    if (!id) {
+      errors.push("Project ID is required.");
+    }
+
+    if (projectData.charityId !== undefined) {
+      validators.isString(projectData.charityId, "charityId", errors);
+    }
+
+    if (projectData.categoryId !== undefined) {
+      validators.isString(projectData.categoryId, "categoryId", errors);
+    }
+
+    if (projectData.regionId !== undefined) {
+      validators.isString(projectData.regionId, "regionId", errors);
+    }
+
+    if (projectData.title !== undefined) {
+      validators.isString(projectData.title, "title", errors);
+    }
+
+    if (projectData.description !== undefined) {
+      validators.isString(projectData.description, "description", errors);
+    }
+
+    if (projectData.goalAmount !== undefined) {
+      validators.isPositiveNumber(projectData.goalAmount, "goalAmount", errors);
+    }
+
+    if (projectData.raisedAmount !== undefined) {
+      validators.isNonNegativeNumber(
+        projectData.raisedAmount,
+        "raisedAmount",
+        errors
+      );
+    }
+
+    if (projectData.status !== undefined) {
+      validators.isEnumValue(
+        projectData.status,
+        "status",
+        ["pending", "active", "halted", "completed", "deleted"],
+        errors
+      );
+    }
+
+    if (projectData.startDate !== undefined) {
+      validators.isValidDate(projectData.startDate, "startDate", errors);
+    }
+
+    if (projectData.endDate !== undefined) {
+      validators.isValidDate(projectData.endDate, "endDate", errors);
+    }
+
+    if (projectData.startDate && projectData.endDate) {
+      if (new Date(projectData.endDate) <= new Date(projectData.startDate)) {
+        errors.push("endDate must be later than startDate.");
+      }
+    }
+
+    if (projectData.images !== undefined) {
+      validators.isArrayOfStrings(projectData.images, "images", errors);
+    }
+
+    if (projectData.videos !== undefined) {
+      validators.isArrayOfStrings(projectData.videos, "videos", errors);
+    }
+
+    if (projectData.account !== undefined) {
+      validators.isString(projectData.account, "account", errors);
+    }
+
+    if (errors.length > 0) {
+      throw new Error(`Validation error: ${errors.join(" ")}`);
+    }
   }
 }
 
