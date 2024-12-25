@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const projectSchema = new Schema({
+const deletedProjectSchema = new Schema({
   charityId: { type: Schema.Types.ObjectId, ref: "Charity", required: true },
   categoryId: { type: Schema.Types.ObjectId, ref: "Category", required: true },
   regionId: { type: Schema.Types.ObjectId, ref: "Region", required: true },
@@ -22,4 +22,4 @@ const projectSchema = new Schema({
   stripeId: { type: String },
 });
 
-module.exports = mongoose.model("Project", projectSchema);
+module.exports = mongoose.model(" DeletedProject", deletedProjectSchema);

@@ -5,15 +5,15 @@ class ProjectService {
   async getProjectById(value) {
     try{
         const project = await ProjectRepository.getById(value.projectId);
-
         await publish({
             topic: "project_to_donation",
             event: "verify_project",
             message: {
                 project: project,
-                correlationId: value.correlationId,
             },
         });
+
+        console.log(`public message response: ${project}`);
     } catch (error){
         throw new Error(error.message);
     }
@@ -24,22 +24,38 @@ class ProjectService {
         console.log(value);
         const project = await ProjectRepository.getById(value.projectId);
         if (!project) {
-        throw new Error("Project not found");
+            throw new Error("Project not found");
         }
 
         // Calculate the new raised amount
         const updatedAmount = project.raisedAmount + value.amount;
+        console.log(`updated amount: ${updatedAmount}`);
+        console.log(`goal amount: ${project.goalAmount}`);
 
-        // Determine the new status
-        let status = project.status;
+        // Move the project to shard if it is completed
         if (updatedAmount >= project.goalAmount) {
-            status = "closed";
+            console.log(`project ${value.projectId} completed`)
+            const updatedProjectData = {
+                raisedAmount: updatedAmount,
+                status: "completed",
+            };
+
+            const result = await ProjectRepository.delete(value.projectId);
+
+            if(result){
+                await publish({
+                  topic: "project_to_shard",
+                  event: "completed_project",
+                  message: updatedProjectData,
+                });
+            }
+
+            return;
         }
 
-        // Update the project data
+        // Update the project data if it is still not completed
         const updatedProjectData = {
             raisedAmount: updatedAmount,
-            status: status,
         };
 
         // Update the project using the repository

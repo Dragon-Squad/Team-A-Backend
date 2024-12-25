@@ -57,26 +57,26 @@ class WebhookService {
                     paymentProvider: selectedPaymentMethods
                 });
 
-                // const paymentType = session.metadata.paymentType;
-                // if (paymentType & paymentType === "monthly"){
                 const monthlyDonationId = session.metadata.monthlyDonationId;
-                try{
-                    const monthlyDonation = await MonthlyDonationService.getMonthlyDonationById(monthlyDonationId);
-                    
-                    const updatedMonthlyDonation = {
-                        donorId: session.customer,
-                        projectId: projectId,
-                        stripeSubscriptionId: session.subscription,
-                        amount: session.metadata.amount,
-                        renewDate: session.metadata.renewDate,
-                        cancelledAt: null,
-                        isActive: true,
-                    };
+                if(monthlyDonationId){
+                    try{
+                        const monthlyDonation = await MonthlyDonationService.getMonthlyDonationById(monthlyDonationId);
+                        
+                        const updatedMonthlyDonation = {
+                            donorId: session.customer,
+                            projectId: projectId,
+                            stripeSubscriptionId: session.subscription,
+                            amount: session.metadata.amount,
+                            renewDate: session.metadata.renewDate,
+                            cancelledAt: null,
+                            isActive: true,
+                        };
 
-                    await MonthlyDonationService.update(monthlyDonationId,updatedMonthlyDonation);
-                
-                } catch(err){
-                    throw new Error('Failed to update renew date: ' + err.message);
+                        await MonthlyDonationService.update(monthlyDonationId,updatedMonthlyDonation);
+                    
+                    } catch(err){
+                        throw new Error('Failed to update renew date: ' + err.message);
+                    }
                 }
                 
                 await publish({

@@ -1,17 +1,17 @@
-const Project = require("./ProjectSchema");
+const DeletedProject = require("./DeletedProjectSchema");
 
-class ProjectRepository {
-  async create(projectData) {
-    const project = new Project(projectData);
-    return await project.save();
+class DeletedProjectRepository {
+  async create(DeletedProjectData) {
+    const deletedProject = new DeletedProject(DeletedProjectData);
+    return await deletedProject.save();
   }
 
   async getById(id) {
-    return await Project.findById(id);
+    return await DeletedProject.findById(id);
   }
 
   async delete(id) {
-    const result = await Project.findByIdAndDelete(id);
+    const result = await DeletedProject.findByIdAndDelete(id);
     return result !== null; // Returns true if deleted, false if not found
   }
 
@@ -37,20 +37,20 @@ class ProjectRepository {
     // Pagination settings
     const skip = (page - 1) * limit;
 
-    // Find projects and return paginated results
-    const projects = await Project.find(query)
+    // Find DeletedProjects and return paginated results
+    const DeletedProjects = await DeletedProject.find(query)
       .skip(skip)
       .limit(parseInt(limit));
 
-    const total = await Project.countDocuments(query); // Total count for pagination
+    const total = await DeletedProject.countDocuments(query); // Total count for pagination
 
     return {
       total,
       page: parseInt(page),
       limit: parseInt(limit),
-      projects,
+      DeletedProjects,
     };
   }
 }
 
-module.exports = new ProjectRepository();
+module.exports = new DeletedProjectRepository();

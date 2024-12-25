@@ -270,7 +270,6 @@ ProjectRouter.put("/:id", ProjectController.update);
  *     summary: Delete a project
  *     description: Deletes an existing project by ID.
  *     tags: [Project]
- *     tags: [Project]
  *     parameters:
  *       - in: path
  *         name: id

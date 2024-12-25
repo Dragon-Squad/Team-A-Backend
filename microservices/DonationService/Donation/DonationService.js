@@ -1,44 +1,70 @@
 const DonationRepository = require('./DonationRepository');
 const { createDonationSession } = require('../utils/StripeUtils');
 const { publish } = require("../broker/Producer");
-const { subscribe } = require("../broker/Consumer");
+const { subscribe, connectConsumer } = require("../broker/Consumer");
 const { v4: uuidv4 } = require("uuid");
 const MonthlyDonationService = require('../MonthlyDonation/MonthlyDonationService');
 
 class DonationService {
     async donation(data) {
         const { email, message: personalMessage = null, projectId, donationType, amount } = data;
-        let customerId = "cus_RPk3Q0QY3NFMwo";  // Replace with dynamic customer ID if needed
-        
+        const customerId = "cus_RPk3Q0QY3NFMwo"; // Replace with dynamic customer ID if needed
+    
         if (!email) throw new Error('No Email provided');
         if (!projectId) throw new Error('No Project provided');
+        if (!donationType) throw new Error('No Donation Type provided');
         if (typeof amount !== 'number' || isNaN(amount) || amount <= 0) throw new Error('Amount must be a valid positive number');
-
-        // const correlationId = uuidv4();
-        // await publish({
-        //     topic: "donation_to_project",
-        //     event: "verify_project",
-        //     message: { 
-        //         projectId: projectId,
-        //         correlationId: correlationId,
-        //     }
-        // });
-
-        // const project = await subscribe("project_to_donation", correlationId);
-        // if(!project) throw new Error('No Project found');
-        // if(project.status != "active") throw new Error('Non-active Project can not be donated');
-        
-        const unitAmount = Math.round(amount * 100); // Convert to cents
-        const monthlyDonation = await MonthlyDonationService.create();
-        const monthlyDonationId =  monthlyDonation._id.toString();
-        console.log(monthlyDonationId);
+    
+        await publish({
+            topic: "donation_to_project",
+            event: "verify_project",
+            message: { projectId: projectId }
+        });
+    
+        const consumer = await connectConsumer("project_to_donation");
+        const timeout = 10000; 
+    
         try {
+            const result = await new Promise((resolve, reject) => {
+                const timer = setTimeout(() => {
+                    reject(new Error("No Project Found"));
+                }, timeout);
+    
+                consumer.run({
+                    eachMessage: async ({ message }) => {
+                        const value = message.value ? JSON.parse(message.value.toString()) : null;
+                        if (value.project._id === projectId) {
+                            if (value.project.status !== "active") {
+                                clearTimeout(timer);
+                                reject(new Error('Non-active Project cannot be donated to'));
+                            } else {
+                                clearTimeout(timer);
+                                resolve();
+                            }
+                        }
+                    }
+                });
+            });
+    
+            const unitAmount = Math.round(amount * 100);
+            let monthlyDonationId = null;
+    
+            if (donationType === "monthly") {
+                const monthlyDonation = await MonthlyDonationService.create();
+                monthlyDonationId = monthlyDonation._id.toString();
+            }
+    
             const session = await createDonationSession(customerId, monthlyDonationId, unitAmount, personalMessage, projectId);
             return { checkoutUrl: session.url };
+    
         } catch (err) {
-            throw new Error('Failed to create Stripe Checkout session: ' + err.message);
+            console.error('Error during donation process:', err.message);
+            throw err;
+        } finally {
+            await consumer.disconnect();
         }
     }
+    
 
     async create(data){
         try{
