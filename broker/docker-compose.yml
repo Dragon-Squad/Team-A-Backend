@@ -40,7 +40,7 @@ services:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
       KAFKA_LISTENERS: "PLAINTEXT://0.0.0.0:9092"
-      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://192.168.1.137:9092"
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://host.docker.internal:9092"
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_MESSAGE_MAX_BYTES: 2000000
       KAFKA_CREATE_TOPICS: "project_to_charity:1:1,project_to_delete_shard:1:1,project_to_donation:1:1,charity_to_project:1:1,donation_to_project:1:1"

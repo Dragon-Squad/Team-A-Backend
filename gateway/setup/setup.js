@@ -1,6 +1,6 @@
 const { waitForKongAdminAPI, createService, createRoute, enableRateLimitingPlugin } = require("./https");
-const { authRoutes, emailRoutes, projectRoutes, fileRoutes, donationRoutes, charityRoutes, deleteShardRoutes, services } = require("./resources/servicesAndRoutes");
-const IPAdr = process.env.IP_ADR || "172.30.208.1";
+const { authRoutes, cryptRoutes, emailRoutes, projectRoutes, fileRoutes, donationRoutes, charityRoutes, deleteShardRoutes, services } = require("./resources/servicesAndRoutes");
+const IPAdr = process.env.IP_ADR || "host.docker.internal";
 
 // Main function to create services and their corresponding routes
 async function setupServices() {
@@ -14,7 +14,8 @@ async function setupServices() {
         const projectManagementServiceId = await createService('ProjectManagementService', `http://${IPAdr}:3003`);
         const fileUploadServiceId = await createService('FileUploadService', `http://${IPAdr}:3004`);
         const donationServiceId = await createService('DonationService', `http://${IPAdr}:3005`);
-        const deleteShardServiceId = await createService('DeleteShardService', `http://${IPAdr}:3006`)
+        const deleteShardServiceId = await createService('DeleteShardService', `http://${IPAdr}:3006`);
+        const cryptServiceId = await createService('CryptService', `http://${IPAdr}:3008`);
 
         // Step 2: Create routes for the created services
         // Routes for Auth Service
@@ -24,6 +25,16 @@ async function setupServices() {
                 console.log(`Route created for AuthService: ${route}`);
             } catch (routeError) {
                 console.error(`Error creating route ${route} for AuthService:`, routeError.message);
+            }
+        }
+
+        // Routes for Crypt Service
+        for (const route of cryptRoutes) {
+            try {
+                await createRoute(cryptServiceId, route);
+                console.log(`Route created for CryptService: ${route}`);
+            } catch (routeError) {
+                console.error(`Error creating route ${route} for CryptService:`, routeError.message);
             }
         }
 

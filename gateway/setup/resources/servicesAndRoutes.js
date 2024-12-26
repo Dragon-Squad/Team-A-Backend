@@ -1,8 +1,13 @@
 const authRoutes = [
-    'auth/new',
-    'auth/login',
-    'auth/logout'
+    '/auth/new',
+    '/auth/login',
+    '/auth/logout'
 ];
+
+const cryptRoutes = [
+    '/crypt/public-key',
+    '/crypt/decrypt'
+]
 
 const emailRoutes = [
     '/email/new/verify',
@@ -35,15 +40,15 @@ const projectRoutes = [
 const fileRoutes = ['/files/upload/', '/files'];
 
 const donationRoutes = [
-    '/donation/',   
-    '/donation/all',   
-    '/donation/new', 
+    '/donation/',
+    '/donation/all',
+    '/donation/new',
     '/donation/donor/',
     '/donation/project/',
-    '/donation/monthly/',  
-    '/donation/monthly/new', 
+    '/donation/monthly/',
+    '/donation/monthly/new',
     '/donation/monthly/donor/',
-    '/donation/monthly/cancel/',  
+    '/donation/monthly/cancel/',
     '/donation/webhook/handle',
 ];
 
@@ -52,22 +57,24 @@ const charityRoutes = [
 ];
 
 const deleteShardRoutes = [
-    'deleted/projects/all',
-    'deleted/projects/',
+    '/deleted/projects/all',
+    '/deleted/projects/',
 ];
 
 const services = [
     'AuthService',
+    'CryptService',
     'EmailService',
     'CharityManagementService',
     'ProjectManagementService',
     'FileUploadService',
     'DonationService',
-    'DeletedShardService'
+    'DeleteShardService'
 ];
 
 module.exports = {
     authRoutes,
+    cryptRoutes,
     emailRoutes,
     projectRoutes,
     fileRoutes,
