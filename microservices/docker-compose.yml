@@ -110,7 +110,18 @@ services:
       - fileuploadservice
       - donationservice
       - deleteshardservice
-      
+
+  cryptservice:
+    build: ./CryptService
+    container_name: crypt_service
+    hostname: crypt_service
+    env_file:
+      - .env
+    networks:
+      - microservice-network
+    ports:
+      - 3008:3008
+
 networks:
   microservice-network:
     name: microservice-network
