@@ -5,8 +5,11 @@ const authRoutes = [
 ];
 
 const cryptRoutes = [
-    '/crypt/public-key',
-    '/crypt/decrypt'
+    '/crypt/asym/public',
+    '/crypt/asym/decrypt',
+    '/crypt/jwe/public',
+    '/crypt/jwe/certificate',
+    '/crypt/jwe/decrypt',
 ]
 
 const emailRoutes = [
