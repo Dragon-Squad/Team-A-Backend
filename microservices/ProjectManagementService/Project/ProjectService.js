@@ -74,7 +74,13 @@ class ProjectService {
   }
 
   async getById(id) {
-    return await ProjectRepository.getById(id);
+    // Get the project by ID and populate related fields (charity, category, region)
+    const project = await ProjectRepository.getById(id);
+    if (!project) {
+      throw new Error("Project not found");
+    }
+
+    return project;
   }
 
   // Service: Get All Projects
@@ -102,7 +108,6 @@ class ProjectService {
       delete filters.charityName;
     }
 
-    // Pass the modified filters to the repository function
     return await ProjectRepository.getAll(filters);
   }
 }
