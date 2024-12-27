@@ -1,17 +1,23 @@
 require("dotenv").config();
-const fs = require("fs").promises;
-const crypto = require("crypto");
-const jose = require("jose");
+const { readFile } = require("fs").promises;
+const { privateDecrypt } = require("crypto");
+const { compactDecrypt, importPKCS8 } = require("jose");
 
 class CryptService {
     async getAsymmetricPublicKey() {
-        const publicKey = await fs.readFile(process.env.ASYM_PUBLIC_KEY, "utf8");
+        const publicKey = await readFile(
+            process.env.ASYM_PUBLIC_KEY,
+            "utf8"
+        );
         return publicKey;
     }
 
     async decryptAsymmetric(data) {
-        const privateKey = await fs.readFile(process.env.ASYM_PRIVATE_KEY, "utf8");
-        const decrypted = crypto.privateDecrypt(
+        const privateKey = await readFile(
+            process.env.ASYM_PRIVATE_KEY,
+            "utf8"
+        );
+        const decrypted = privateDecrypt(
             {
                 key: privateKey,
                 passphrase: process.env.ASYM_PASSPHRASE,
@@ -22,19 +28,25 @@ class CryptService {
     }
 
     async getJwePublicKey() {
-        const publicKey = await fs.readFile(process.env.JWE_PUBLIC_KEY, "utf8");
+        const publicKey = await readFile(process.env.JWE_PUBLIC_KEY, "utf8");
         return publicKey;
     }
 
     async getJweCertificate() {
-        const certificate = await fs.readFile(process.env.JWE_CERTIFICATE, "utf8");
+        const certificate = await readFile(
+            process.env.JWE_CERTIFICATE,
+            "utf8"
+        );
         return certificate;
     }
 
     async decryptJwe(data) {
-        const privateKey = await fs.readFile(process.env.JWE_PRIVATE_KEY, "utf8");
-        const privateKeyObject = await jose.importPKCS8(privateKey, "RS256");
-        const { plaintext } = await jose.compactDecrypt(data, privateKeyObject);
+        const privateKey = await readFile(
+            process.env.JWE_PRIVATE_KEY,
+            "utf8"
+        );
+        const privateKeyObject = await importPKCS8(privateKey, "RS256");
+        const { plaintext } = await compactDecrypt(data, privateKeyObject);
         return plaintext.toString();
     }
 }
