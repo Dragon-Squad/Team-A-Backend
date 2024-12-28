@@ -1,6 +1,6 @@
 const { app, SERVER_PORT, configureApp, errorHandler } = require("./Config/AppConfig");
 const { connectDB } = require("./Config/DBConfig");
-const ProjectRouter = require("./Project/DeletedProjectRouter");
+const DeletedProjectRouter = require("./DeletedProject/DeletedProjectRouter");
 const Consumer = require("./broker/Consumer");
 
 const runApp = async () => {
@@ -14,7 +14,7 @@ const runApp = async () => {
     await Consumer.subscribe("project_to_shard");
 
     // Add routes
-    app.use(`/deleted/projects`, ProjectRouter);
+    app.use(`/deleted/projects`, DeletedProjectRouter);
     
     // Add error handler
     app.use(errorHandler);
