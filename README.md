@@ -75,7 +75,7 @@ Create Cluster
    - Click to Cluster View
    - Click on the number next to Topic
    - Verify if you can see all the topics registered
-    ![Image Description](./Image/topics.png)
+    ![Image Description](./image/topics.png)
 
 Register Kafka with Consul
 ```` sh
