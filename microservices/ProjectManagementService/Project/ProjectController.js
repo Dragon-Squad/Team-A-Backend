@@ -45,10 +45,10 @@ class ProjectController {
     }
   }
 
-  // Active a Project
+  // Activate a Project
   async active(req, res) {
     try {
-      const id = req.params;
+      const { id } = req.params;
       const result = await ProjectService.activeProject(id);
       res.status(200).json("The Project is set to Active successfully");
     } catch (error) {
@@ -88,10 +88,11 @@ class ProjectController {
   async getById(req, res) {
     try {
       const { id } = req.params;
+      const clientId = req.headers["x-client-id"] || req.ip; // Use client ID or IP for hashing
       const cacheKey = `project:${id}`;
 
       // Check Redis cache
-      const cachedProject = await RedisMiddleware.readData(cacheKey);
+      const cachedProject = await RedisMiddleware.readData(clientId, cacheKey);
       if (cachedProject) {
         console.log("Cache hit for project ID:", id);
         return res.status(200).json(cachedProject);
@@ -104,7 +105,7 @@ class ProjectController {
       }
 
       // Cache the result
-      await RedisMiddleware.writeData(cacheKey, project);
+      await RedisMiddleware.writeData(clientId, cacheKey, project);
 
       res.status(200).json(project);
     } catch (error) {
@@ -116,10 +117,11 @@ class ProjectController {
   async getAll(req, res) {
     try {
       const filters = req.query;
+      const clientId = req.headers["x-client-id"] || req.ip; // Use client ID or IP for hashing
       const cacheKey = `projects:${hash.sha1(filters)}`; // Generate a unique key for filters
 
       // Check Redis cache
-      const cachedProjects = await RedisMiddleware.readData(cacheKey);
+      const cachedProjects = await RedisMiddleware.readData(clientId, cacheKey);
       if (cachedProjects) {
         console.log("Cache hit for project list with filters:", filters);
         return res.status(200).json(cachedProjects);
@@ -129,7 +131,7 @@ class ProjectController {
       const projects = await ProjectService.getAll(filters);
 
       // Cache the result
-      await RedisMiddleware.writeData(cacheKey, projects);
+      await RedisMiddleware.writeData(clientId, cacheKey, projects);
 
       res.status(200).json(projects);
     } catch (error) {
