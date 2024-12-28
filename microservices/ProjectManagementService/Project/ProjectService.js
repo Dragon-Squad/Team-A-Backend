@@ -1,74 +1,34 @@
-const validators = require("../utils/requestValidators");
+const ProjectValidator = require("./ProjectValidator");
 const ProjectRepository = require("./ProjectRepository");
 const CategoryService = require("../Category/CategoryService");
+const CharityRepository = require("../Charity/CharityRepository");
 const RegionService = require("../Region/RegionService");
 const { publish } = require("../broker/Producer");
 
 class ProjectService {
   async create(projectData) {
-    const errors = [];
-
-    // Use validation helpers
-    validators.isRequired(projectData.charityId, "charityId", errors);
-    validators.isString(projectData.charityId, "charityId", errors);
-
-    validators.isRequired(projectData.categoryId, "categoryId", errors);
-    validators.isString(projectData.categoryId, "categoryId", errors);
-
-    validators.isRequired(projectData.regionId, "regionId", errors);
-    validators.isString(projectData.regionId, "regionId", errors);
-
-    validators.isRequired(projectData.title, "title", errors);
-    validators.isString(projectData.title, "title", errors);
-
-    validators.isString(projectData.description, "description", errors);
-
-    validators.isRequired(projectData.goalAmount, "goalAmount", errors);
-    validators.isPositiveNumber(projectData.goalAmount, "goalAmount", errors);
-
-    if (typeof projectData.raisedAmount !== "undefined") {
-      validators.isNonNegativeNumber(
-        projectData.raisedAmount,
-        "raisedAmount",
-        errors
-      );
-    }
-
-    validators.isRequired(projectData.status, "status", errors);
-    validators.isEnumValue(
-      projectData.status,
-      "status",
-      ["pending", "active", "halted", "closed"],
-      errors
-    );
-
-    validators.isValidDate(projectData.endDate, "endDate", errors);
-
-    validators.isArrayOfStrings(projectData.images, "images", errors);
-    validators.isArrayOfStrings(projectData.videos, "videos", errors);
-
-    validators.isString(projectData.account, "account", errors);
-
-    // Throw if there are errors
-    if (errors.length > 0) {
-      throw new Error(`Validation error: ${errors.join(" ")}`);
-    }
+    // Validate project creation data
+    ProjectValidator.validateProjectCreationRequest(projectData);
 
     // Proceed with project creation
     const project = await ProjectRepository.create(projectData);
 
-    //get the notification list from category and region
+    // Get the notification list from category and region
     const category = await CategoryService.getCategoryById(project.categoryId);
     const region = await RegionService.getRegionById(project.regionId);
     const mergedNotificationList = new Set([
       ...region.notificationList.map(String),
-      ...category.notificationList
+      ...category.notificationList,
     ]);
 
     return project;
   }
 
   async update(id, projectData) {
+    // Validate project update data
+    ProjectValidator.validateProjectUpdateRequest(id, projectData);
+
+    // Proceed with update
     return await ProjectRepository.update(id, projectData);
   }
 
@@ -79,7 +39,7 @@ class ProjectService {
 
     const result = await ProjectRepository.delete(id);
 
-    if(result){
+    if (result) {
       await publish({
         topic: "project_to_delete_shard",
         event: "delete_project",
@@ -103,61 +63,52 @@ class ProjectService {
     return false;
   }
 
-  async activeProject(id){
+  async activeProject(id) {
     const project = await ProjectRepository.getById(id);
     if (!project) throw new Error("No Project Found");
 
-    if (project.status != "pending") throw new Error("Cannot active non-pending Project");
+    if (project.status != "pending")
+      throw new Error("Cannot active non-pending Project");
 
     return await ProjectRepository.update(id, "active");
   }
 
   async getById(id) {
-    return await ProjectRepository.getById(id);
+    // Get the project by ID and populate related fields (charity, category, region)
+    const project = await ProjectRepository.getById(id);
+    if (!project) {
+      throw new Error("Project not found");
+    }
+
+    return project;
   }
 
+  // Service: Get All Projects
   async getAll(filters) {
-    // const search = filters.search;
-    // let charityList, categoryId, regionId;
-  
-    // if (search) {
-    //   await MessageProducer.publish({
-    //     topic: "project_to_charity",
-    //     event: "search_charity",
-    //     message: search,
-    //   });
-  
-    //   // Subscribe to the topic once before sending the message
-    //   const consumer = await MessageConsumer.connectConsumer();
-    //   await consumer.subscribe({ topic: "charity_to_project", fromBeginning: true });
-    //   console.info(`Subscribed to topic: charity_to_project`);
-  
-    //   consumer.run({
-    //     onmessage: async ({ topic, partition, message }) => {
-    //       try {
-    //         const value = message.value ? JSON.parse(message.value.toString()) : null;
-    //         if (value) {
-    //           charityList = value; 
-    //           console.info({ topic, partition, key, offset: message.offset }, "Message received");
-    //         } else {
-    //           console.warn("Empty message received");
-    //         }
-    //       } catch (error) {
-    //         console.error("Error processing message:", error);
-    //       }
-    //     },
-    //   });
-  
-    //   // Wait for the loop to break when charityList is set
-    //   while (!charityList) {
-    //     console.log("Waiting for kafka response...");
-    //     await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait for 1 second before checking again
-    //   }
-    // }
-  
-    const projectData = await ProjectRepository.getAll(filters);
-    // ... (rest of your logic)
-    return projectData;
+    // Check if charity name is present in the filters
+    if (filters.charityName) {
+      // Use the CharityRepository to search by charity name and get the charityId(s)
+      const charityIds = await CharityRepository.searchByName(
+        filters.charityName
+      );
+
+      // If charityIds are found, set the charityId filter to use the charityIds array
+      if (charityIds.length > 0) {
+        filters.charityId = { $in: charityIds }; // Update the charityId filter with an array of charityIds
+      } else {
+        // If no matching charity is found, return an empty result
+        return {
+          total: 0,
+          page: filters.page || 1,
+          limit: filters.limit || 10,
+          projects: [],
+        };
+      }
+      // Remove charityName from filters to prevent it being used in the query
+      delete filters.charityName;
+    }
+
+    return await ProjectRepository.getAll(filters);
   }
 }
 
