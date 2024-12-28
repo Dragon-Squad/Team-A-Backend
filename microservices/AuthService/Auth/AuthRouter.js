@@ -13,7 +13,12 @@ const {
 
 AuthRouter.post("/new", register);
 
-// AuthRouter.post("/new/admin", authenticate, authorize([UserType.ADMIN]), register);
+// AuthRouter.post(
+//   "/new/admin", 
+//   authenticate, 
+//   authorize([UserType.ADMIN]), 
+//   register
+// );
 
 AuthRouter.post("/login", login);
 

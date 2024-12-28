@@ -1,18 +1,23 @@
-# Use the official Node.js 18 image as the base
-FROM node:18-alpine
+# Use the official Node.js image from Docker Hub
+FROM node:18
 
-# Set the working directory in the container
+# Set the working directory inside the container
 WORKDIR /usr/src/app
 
-# Copy the package.json and package-lock.json files
+# Install bash
+RUN apt-get update && apt-get install -y bash
+
+# Install Docker CLI
+RUN apt-get update && apt-get install -y docker.io
+
+# Copy package.json and package-lock.json (if it exists) to the container
 COPY package*.json ./
 
-# Install dependencies
+# Install the dependencies defined in package.json
 RUN npm install
 
-# Copy the script into the container
+# Copy the rest of the application files into the container
 COPY . .
 
-
-# Set the default command to run the script
-CMD ["node", "setup.js"]
+# Command to run the app with bash
+CMD ["bash", "-c", "node setup.js"]

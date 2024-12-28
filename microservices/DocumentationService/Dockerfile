@@ -7,6 +7,9 @@ WORKDIR /usr/src/app
 # Install bash
 RUN apt-get update && apt-get install -y bash
 
+# Install iproute2 to get the 'ip' command
+RUN apt-get update && apt-get install -y iproute2
+
 # Copy package.json and package-lock.json (if it exists) to the container
 COPY package*.json ./
 
