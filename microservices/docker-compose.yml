@@ -51,20 +51,6 @@ services:
       - 3003:3003
     depends_on:
       - charitymanagementservice
-      - fileuploadservice
-
-  fileuploadservice:
-    build: ./FileUploadService
-    container_name: file_upload_service
-    hostname: file_upload_service
-    env_file:
-      - .env
-    networks:
-      - microservice-network
-    ports:
-      - 3004:3004
-    depends_on:
-      - charitymanagementservice
 
   donationservice:
     build: ./DonationService
@@ -79,10 +65,10 @@ services:
     depends_on:
       - projectmanagementservice
 
-  deleteshardservice:
-    build: ./DeleteShardService
-    container_name: delete_shard_service
-    hostname: delete_shard_service
+  shardedprojectservice:
+    build: ./ShardedProjectService
+    container_name: sharded_project_service
+    hostname: sharded_project_service
     env_file:
       - .env
     networks:
@@ -107,9 +93,8 @@ services:
       - authservice
       - charitymanagementservice
       - projectmanagementservice
-      - fileuploadservice
       - donationservice
-      - deleteshardservice
+      - shardedprojectservice
       
 networks:
   microservice-network:

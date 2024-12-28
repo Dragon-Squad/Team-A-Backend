@@ -1,14 +1,14 @@
 const { Kafka, logLevel } = require("kafkajs");
 
 // Configuration properties
-const CLIENT_ID = process.env.CLIENT_ID || "Donation";
-const GROUP_ID = process.env.GROUP_ID || "Donation";
-const BROKERS = process.env.BROKERS ? process.env.BROKERS.split(",") : ["172.18.0.4:9092"];
+const CLIENT_ID = "Donation";
+const GROUP_ID = "Donation";
+const BROKERS = process.env.BROKERS;
 const FROM_BEGINNING = process.env.FROM_BEGINNING === "true";
 
 const kafka = new Kafka({
   clientId: CLIENT_ID,
-  brokers: BROKERS,
+  brokers: [BROKERS],
   logLevel: logLevel.WARN,
 });
 
@@ -28,24 +28,4 @@ const connectConsumer = async (topic) => {
   return consumer;
 };
 
-const subscribe = async (topic, correlationId) => {
-  const consumer = await connectConsumer(topic);
-
-  return new Promise((resolve, reject) => {
-    if (!consumer.isRunning) {
-      consumer.isRunning = true;
-      consumer.run({
-        eachMessage: async ({ topic, partition, message }) => {
-          const value = message.value ? JSON.parse(message.value.toString()) : null;
-
-          if (correlationId === value.correlationId) {
-            resolve(value.project); 
-            return; 
-          }
-        },
-      });
-    }
-  });
-};
-
-module.exports = { subscribe };
+module.exports = { connectConsumer };

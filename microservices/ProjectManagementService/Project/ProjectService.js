@@ -41,8 +41,8 @@ class ProjectService {
 
     if (result) {
       await publish({
-        topic: "project_to_delete_shard",
-        event: "delete_project",
+        topic: "project_to_shard",
+        event: "deleted_project",
         message: project,
       });
     }
