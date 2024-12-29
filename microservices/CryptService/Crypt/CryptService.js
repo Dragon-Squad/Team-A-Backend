@@ -45,7 +45,7 @@ class CryptService {
             process.env.JWE_PRIVATE_KEY,
             "utf8"
         );
-        const privateKeyObject = await importPKCS8(privateKey, "RS256");
+        const privateKeyObject = await importPKCS8(privateKey, "RSA-OAEP-256");
         const { plaintext } = await compactDecrypt(data, privateKeyObject);
         return plaintext.toString();
     }
