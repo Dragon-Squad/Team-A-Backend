@@ -48,8 +48,13 @@ node scripts.js
 
 ###  3. Run Consul
 Consul is used for service discovery in this setup. Docker Compose is utilized to deploy Consul as a containerized service. Follow the steps below to start Consul:
+Navigate to Consul Directory
 ```` sh
-docker-compose -f consul/docker-compose.yml up -d
+cd ..\consul\
+````
+Execute docker compose
+```` sh
+docker-compose up -d --build
 ````
 Verify that Consul is running by checking if port 8005 is accessible. You can do this by visiting the following URL: https://localhost:8005
 
@@ -57,9 +62,13 @@ Verify that Consul is running by checking if port 8005 is accessible. You can do
 
 ### 4. Run Kafka
 Kafka is required for messaging between the services. Ensure you are in the root directory of the project, then execute the following commands:
+Navigate to broker directory
+```` sh
+cd ..\broker\
+````
 Start the Kafka broker and ensure it's running in detached mode.
 ```` sh
-docker-compose -f broker/docker-compose.yml up -d
+docker-compose up -d --build
 ````
 Create Cluster
    - Using the Kafka-Manager to create the cluster, Kafka Manager is available at: https://localhost:9000
@@ -104,13 +113,17 @@ NETWORK ID     NAME                   DRIVER    SCOPE
 
 ### 6. Run the Microservices
 Then, bring up the microservices by running Docker Compose with the appropriate configuration.
+Navigate to microservice directory
+````sh
+cd ..\microservices\
+````
 Setup before run docker
 ```` sh
 node Setup/setup.js
 ````
 Execute the docker compose file
 ```` sh
-docker-compose -f microservices/docker-compose.yml up -d
+docker-compose up -d --build
 ````
 Register all the Services with Consul
 ```` sh
@@ -121,6 +134,8 @@ node Setup/serversRegister.js
 
 #### 7. Setup the Kong API Gateway
 Setup the gateway by composing the Gateway Container. This will setup the Kong API Gateway, add all the services and routes.
+
+
 ```` sh
 docker-compose -f gateway/docker-compose.yml up -d
 ````
