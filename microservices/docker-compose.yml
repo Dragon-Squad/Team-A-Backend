@@ -10,34 +10,7 @@ services:
     networks:
       - microservice-network
     ports:
-      - 3001:3001
-
-  authservice:
-    build: ./AuthService
-    container_name: auth_service
-    hostname: auth_service
-    env_file:
-      - .env
-    networks:
-      - microservice-network
-    ports:
-      - 3000:3000
-    depends_on:
-      - emailservice
-
-  charitymanagementservice:
-    build: ./CharityManagementService
-    container_name: charity_management_service
-    hostname: charity_management_service
-    env_file:
-      - .env
-    networks:
-      - microservice-network
-    ports:
-      - 3002:3002
-    depends_on:
-      - authservice
-      - emailservice
+      - 8001:8001
 
   projectmanagementservice:
     build: ./ProjectManagementService
@@ -48,9 +21,7 @@ services:
     networks:
       - microservice-network
     ports:
-      - 3003:3003
-    depends_on:
-      - charitymanagementservice
+      - 8002:8002
 
   donationservice:
     build: ./DonationService
@@ -61,7 +32,7 @@ services:
     networks:
       - microservice-network
     ports:
-      - 3005:3005
+      - 8003:8003
     depends_on:
       - projectmanagementservice
 
@@ -74,27 +45,9 @@ services:
     networks:
       - microservice-network
     ports:
-      - 3006:3006
+      - 8004:8004
     depends_on:
       - projectmanagementservice
-
-  documentationservice:
-    build: ./DocumentationService
-    container_name: documentation_service
-    hostname: documentation_service
-    env_file:
-      - .env
-    networks:
-      - microservice-network
-    ports:
-      - 3007:3007
-    depends_on:
-      - emailservice
-      - authservice
-      - charitymanagementservice
-      - projectmanagementservice
-      - donationservice
-      - shardedprojectservice
 
   cryptservice:
     build: ./CryptService

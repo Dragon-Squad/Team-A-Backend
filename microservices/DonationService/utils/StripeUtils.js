@@ -67,16 +67,13 @@ async function createOrRetrieveOneTimeProduct(unitAmount) {
     return { product, price };
 }
 
-function createSessionConfig(customerId, monthlyDonationId, personalMessage, projectId, amount) {
+function createSessionConfig(customerId, monthlyDonationId, personalMessage, projectId, amount, donorId) {
     const today = new Date();
     let billingCycleAnchor = new Date(today.getFullYear(), today.getMonth(), 13); 
     if (today.getDate() > 15) {
         billingCycleAnchor.setMonth(billingCycleAnchor.getMonth() + 1);
     }
     const billingCycleAnchorTimestamp = Math.floor(billingCycleAnchor.getTime() / 1000);
-
-    // Convert timestamp to a MongoDB-compatible Date object
-    const renewDate = new Date(billingCycleAnchorTimestamp * 1000);
 
     return {
         customer: customerId,
@@ -93,21 +90,20 @@ function createSessionConfig(customerId, monthlyDonationId, personalMessage, pro
             personal_message: personalMessage || 'No message provided',
             projectId: projectId,
             monthlyDonationId: monthlyDonationId || null,
-            renewDate: renewDate, 
             amount: amount,
+            donorId: donorId,
         },
     };
 }
 
-async function createDonationSession(customerId, monthlyDonationId, unitAmount, personalMessage, projectId) {
+async function createDonationSession(customerId, monthlyDonationId, unitAmount, personalMessage, projectId, donorId) {
     if (!unitAmount || typeof unitAmount !== 'number' || unitAmount <= 0) {
         throw new Error('Invalid unitAmount. It must be a positive number representing the smallest currency unit.');
     }
 
-    console.log(`unitAmount: ${unitAmount}`);
     await attachPaymentMethod(customerId);
 
-    let sessionConfig = createSessionConfig(customerId, monthlyDonationId, personalMessage, projectId, unitAmount);
+    let sessionConfig = createSessionConfig(customerId, monthlyDonationId, personalMessage, projectId, unitAmount, donorId);
 
     if (monthlyDonationId) {
         const product = await createOrRetrieveMonthlyProduct(monthlyDonationId, unitAmount);

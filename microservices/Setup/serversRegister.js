@@ -8,15 +8,15 @@ const CONSUL_PORT = 8500;
 // Map of services and their ports
 const serverMap = new Map([
   ['email', process.env.EMAIL_SERVER_PORT],
-  ['auth', process.env.AUTH_SERVER_PORT],
   ['project', process.env.PROJECT_SERVER_PORT],
   ['donation', process.env.DONATION_SERVER_PORT],
   ['shard', process.env.SHARD_SERVER_PORT],
   ['crypt', process.env.CRYPT_SERVER_PORT],
-  ['', process.env.API_DOCS_SERVER_PORT],
 ]);
 
 function registerServices() {
+    console.log(serverMap);
+
     if (!WSL_IPV4) {
         console.log('Container IPv4 Address not found.');
         return;
