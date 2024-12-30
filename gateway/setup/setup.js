@@ -1,10 +1,9 @@
 const { waitForKongAdminAPI, createService, createRoute, enableRateLimitingPlugin, serversDiscovery } = require("./https");
-const { authRoutes, cryptRoutes, emailRoutes, projectRoutes, fileRoutes, donationRoutes, charityRoutes, shardedProjectRoutes, services } = require("./resources/servicesAndRoutes");
+const { cryptRoutes, emailRoutes, projectRoutes, donationRoutes, shardedProjectRoutes, services } = require("./resources/servicesAndRoutes");
 const IPAdr = process.env.IP_ADR || "172.30.208.1";
 
 const serviceMap = new Map([
     ['email', 'EmailService'],
-    ['auth', 'AuthService'],
     ['project', 'ProjectManagementService'],
     ['donation', 'DonationService'],
     ['shard', 'ShardedProjectService'],
@@ -24,25 +23,12 @@ async function setupServices() {
 
         // Step 1: Create services
         const emailServiceId = await createService(serviceMap.get('email'), urlMap.get('email'));
-        const authServiceId = await createService(serviceMap.get('auth'), urlMap.get('auth'));
         const projectManagementServiceId = await createService(serviceMap.get('project'), urlMap.get('project'));
         const donationServiceId = await createService(serviceMap.get('donation'), urlMap.get('donation'));
         const shardedProjectServiceId = await createService(serviceMap.get('shard'), urlMap.get('shard'));
         const cryptServiceId = await createService(serviceMap.get('crypt'), urlMap.get('crypt'));
 
-        const charityManagementServiceId = await createService('CharityManagementService', `http://${IPAdr}:3002`);
-
         // Step 2: Create routes for the created services
-        // Routes for Auth Service
-        for (const route of authRoutes) {
-            try {
-                await createRoute(authServiceId, route);
-                console.log(`Route created for AuthService: ${route}`);
-            } catch (routeError) {
-                console.error(`Error creating route ${route} for AuthService:`, routeError.message);
-            }
-        }
-
         // Routes for Crypt Service
         for (const route of cryptRoutes) {
             try {
@@ -72,16 +58,6 @@ async function setupServices() {
                 console.error(`Error creating route ${route} for ProjectManagementService:`, routeError.message);
             }
         }
-        
-        // Routes for File Upload Service
-        for (const route of fileRoutes) {
-            try {
-                await createRoute(fileUploadServiceId, route);
-                console.log(`Route created for FileUploadService: ${route}`);
-            } catch (routeError) {
-                console.error(`Error creating route ${route} for FileUploadService:`, routeError.message);
-            }
-        }
 
         // Routes for Donation Service
         for (const route of donationRoutes) {
@@ -90,16 +66,6 @@ async function setupServices() {
                 console.log(`Route created for DonationService: ${route}`);
             } catch (routeError) {
                 console.error(`Error creating route ${route} for DonationService:`, routeError.message);
-            }
-        }
-
-        // Routes for Charity Service
-        for (const route of charityRoutes) {
-            try {
-                await createRoute(charityManagementServiceId, route);
-                console.log(`Route created for CharityManagementService: ${route}`);
-            } catch (routeError) {
-                console.error(`Error creating route ${route} for CharityManagementService:`, routeError.message);
             }
         }
 

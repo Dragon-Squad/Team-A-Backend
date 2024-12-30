@@ -1,9 +1,3 @@
-const authRoutes = [
-    'auth/new',
-    'auth/login',
-    'auth/logout'
-];
-
 const cryptRoutes = [
     '/crypt/asym/public',
     '/crypt/asym/decrypt',
@@ -59,30 +53,25 @@ const charityRoutes = [
     '/charity/payment-method/'
 ];
 
-const deleteShardRoutes = [
+const shardedProjectRoutes = [
     'deleted/projects/all',
     'deleted/projects/',
 ];
 
 const services = [
-    'AuthService',
     'CryptService',
     'EmailService',
-    'CharityManagementService',
     'ProjectManagementService',
-    'FileUploadService',
     'DonationService',
-    'DeletedShardService'
+    'ShardedProjectService'
 ];
 
 module.exports = {
-    authRoutes,
     cryptRoutes,
     emailRoutes,
     projectRoutes,
     fileRoutes,
     donationRoutes,
-    charityRoutes,
-    deleteShardRoutes,
+    shardedProjectRoutes,
     services
 };

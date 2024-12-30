@@ -10,7 +10,7 @@ services:
     networks:
       - microservice-network
     ports:
-      - 8001:8001
+      - "${EMAIL_SERVER_PORT}:${EMAIL_SERVER_PORT}"
 
   projectmanagementservice:
     build: ./ProjectManagementService
@@ -21,7 +21,7 @@ services:
     networks:
       - microservice-network
     ports:
-      - 8002:8002
+      - "${PROJECT_SERVER_PORT}:${PROJECT_SERVER_PORT}"
 
   donationservice:
     build: ./DonationService
@@ -32,9 +32,7 @@ services:
     networks:
       - microservice-network
     ports:
-      - 8003:8003
-    depends_on:
-      - projectmanagementservice
+      - "${DONATION_SERVER_PORT}:${DONATION_SERVER_PORT}"
 
   shardedprojectservice:
     build: ./ShardedProjectService
@@ -45,9 +43,7 @@ services:
     networks:
       - microservice-network
     ports:
-      - 8004:8004
-    depends_on:
-      - projectmanagementservice
+      - "${SHARD_SERVER_PORT}:${SHARD_SERVER_PORT}"
 
   cryptservice:
     build: ./CryptService
@@ -58,7 +54,7 @@ services:
     networks:
       - microservice-network
     ports:
-      - 3008:3008
+      - "${CRYPT_SERVER_PORT}:${CRYPT_SERVER_PORT}"
 
 networks:
   microservice-network:

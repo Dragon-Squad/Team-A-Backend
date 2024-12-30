@@ -8,7 +8,7 @@ const helmet = require("helmet");
 const httpStatus = require("http-status");
 
 // Application settings
-const SERVER_PORT = process.env.PROJECT_SERVER_PORT || 3003;
+const SERVER_PORT = process.env.PROJECT_SERVER_PORT || 8003;
 const CLIENT_PORT = process.env.CLIENT_PORT || 2582;
 const DOCS_PORT = process.env.API_DOCS_SERVER_PORT || 2582;
 

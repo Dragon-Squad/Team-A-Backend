@@ -9,7 +9,7 @@ const httpStatus = require("http-status");
 const CryptRouter = require('./Crypt/CryptRouter');
 
 const app = express();
-const SERVER_PORT = process.env.CRYPT_SERVER_PORT || 3008;
+const SERVER_PORT = process.env.CRYPT_SERVER_PORT || 8007;
 const CLIENT_PORT = process.env.CLIENT_PORT || 2582;
 
 const runApp = async () => {
