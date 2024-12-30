@@ -8,7 +8,7 @@ const helmet = require("helmet");
 const httpStatus = require("http-status");
 
 // Application settings
-const SERVER_PORT = process.env.DONATION_SERVER_PORT || 3005;
+const SERVER_PORT = process.env.DONATION_SERVER_PORT || 3004;
 const CLIENT_PORT = process.env.CLIENT_PORT || 2582;
 
 // Whitelisted CORS origins

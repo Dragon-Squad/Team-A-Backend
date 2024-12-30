@@ -1,21 +1,35 @@
-const { waitForKongAdminAPI, createService, createRoute, enableRateLimitingPlugin } = require("./https");
-const { authRoutes, cryptRoutes, emailRoutes, projectRoutes, fileRoutes, donationRoutes, charityRoutes, deleteShardRoutes, services } = require("./resources/servicesAndRoutes");
-const IPAdr = process.env.IP_ADR || "host.docker.internal";
+const { waitForKongAdminAPI, createService, createRoute, enableRateLimitingPlugin, serversDiscovery } = require("./https");
+const { authRoutes, cryptRoutes, emailRoutes, projectRoutes, fileRoutes, donationRoutes, charityRoutes, shardedProjectRoutes, services } = require("./resources/servicesAndRoutes");
+const IPAdr = process.env.IP_ADR || "172.30.208.1";
+
+const serviceMap = new Map([
+    ['email', 'EmailService'],
+    ['auth', 'AuthService'],
+    ['project', 'ProjectManagementService'],
+    ['donation', 'DonationService'],
+    ['shard', 'ShardedProjectService']
+  ]);
 
 // Main function to create services and their corresponding routes
 async function setupServices() {
     try {
         await waitForKongAdminAPI();
 
+        const urlMap = await serversDiscovery(serviceMap);
+
+        for (const [key, url] of urlMap) {
+            console.log(`${key}  :  ${url}`);
+        }
+
         // Step 1: Create services
-        const authServiceId = await createService('AuthService', `http://${IPAdr}:3000`);
-        const emailServiceId = await createService('EmailService', `http://${IPAdr}:3001`);
+        const emailServiceId = await createService(serviceMap.get('email'), urlMap.get('email'));
+        const authServiceId = await createService(serviceMap.get('auth'), urlMap.get('auth'));
+        const projectManagementServiceId = await createService(serviceMap.get('project'), urlMap.get('project'));
+        const donationServiceId = await createService(serviceMap.get('donation'), urlMap.get('donation'));
+        const shardedProjectServiceId = await createService(serviceMap.get('shard'), urlMap.get('shard'));
+        const cryptServiceId = await createService(serviceMap.get('crypt'), urlMap.get('crypt'));
+
         const charityManagementServiceId = await createService('CharityManagementService', `http://${IPAdr}:3002`);
-        const projectManagementServiceId = await createService('ProjectManagementService', `http://${IPAdr}:3003`);
-        const fileUploadServiceId = await createService('FileUploadService', `http://${IPAdr}:3004`);
-        const donationServiceId = await createService('DonationService', `http://${IPAdr}:3005`);
-        const deleteShardServiceId = await createService('DeleteShardService', `http://${IPAdr}:3006`);
-        const cryptServiceId = await createService('CryptService', `http://${IPAdr}:3008`);
 
         // Step 2: Create routes for the created services
         // Routes for Auth Service
@@ -89,12 +103,12 @@ async function setupServices() {
         }
 
         // Routes for Delete Shard Service
-        for (const route of deleteShardRoutes) {
+        for (const route of shardedProjectRoutes) {
             try {
-                await createRoute(deleteShardServiceId, route);
-                console.log(`Route created for DeleteShardService: ${route}`);
+                await createRoute(shardedProjectServiceId, route);
+                console.log(`Route created for shardedProjectService: ${route}`);
             } catch (routeError) {
-                console.error(`Error creating route ${route} for DeleteShardService:`, routeError.message);
+                console.error(`Error creating route ${route} for shardedProjectService:`, routeError.message);
             }
         }
 

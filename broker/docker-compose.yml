@@ -42,8 +42,9 @@ services:
       KAFKA_LISTENERS: "PLAINTEXT://0.0.0.0:9092"
       KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://host.docker.internal:9092"
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_MESSAGE_MAX_BYTES: 2000000
-      KAFKA_CREATE_TOPICS: "project_to_charity:1:1,project_to_delete_shard:1:1,project_to_donation:1:1,charity_to_project:1:1,donation_to_project:1:1"
+      KAFKA_MESSAGE_MAX_BYTES: 104857600  
+      KAFKA_FETCH_MAX_BYTES: 104857600  
+      KAFKA_CREATE_TOPICS: "project_to_charity:1:1,project_to_shard:1:1,project_to_donation:1:1,charity_to_project:1:1,donation_to_project:1:1"
     ports:
       - "9092:9092"
 

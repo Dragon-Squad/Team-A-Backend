@@ -12,11 +12,21 @@ class ProjectRepository {
 
   async delete(id) {
     const result = await Project.findByIdAndDelete(id);
-    return result !== null; // Returns true if deleted, false if not found
+    return result !== null; 
   }
 
   async getById(id) {
-    return await Project.findById(id);
+    // Find a project by ID and populate related fields (charity, category, region)
+    const project = await Project.findById(id)
+      .populate("charityId") // Populates the charityId field with the full Charity document
+      .populate("categoryId") // Populates the categoryId field with the full Category document
+      .populate("regionId"); // Populates the regionId field with the full Region document
+
+    if (!project) {
+      return null; // Return null if no project is found
+    }
+
+    return project;
   }
 
   async getAll(filters) {
@@ -44,7 +54,10 @@ class ProjectRepository {
     // Find projects and return paginated results
     const projects = await Project.find(query)
       .skip(skip)
-      .limit(parseInt(limit));
+      .limit(parseInt(limit))
+      .populate("charityId") // Populates the charityId field with Charity document
+      .populate("categoryId") // Populates the categoryId field with Category document
+      .populate("regionId"); // Populates the regionId field with Region document
 
     const total = await Project.countDocuments(query); // Total count for pagination
 

@@ -6,7 +6,7 @@ const createProjects = async (Project, charityDocs, categoryDocs, regionDocs) =>
     try {
         // Create a map for charity lookups based on companyName
         const charityMap = charityDocs.reduce((map, charity) => {
-            map[charity.companyName] = charity._id;
+            map[charity.name] = charity._id;
             return map;
         }, {});
 

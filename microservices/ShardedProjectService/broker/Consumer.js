@@ -1,15 +1,15 @@
 const { Kafka, logLevel } = require("kafkajs");
-
+const DeletedProjectExternalService = require("../DeletedProject/External/DeletedProjectExternalService");
 // Configuration properties
 const CLIENT_ID = process.env.CLIENT_ID || "delete-shard-service";
 const GROUP_ID = process.env.GROUP_ID || "project-service-group";
-const BROKERS = process.env.BROKERS ? process.env.BROKERS.split(",") : ["172.18.0.4:9092"];
+const BROKERS = process.env.BROKERS;
 const FROM_BEGINNING = process.env.FROM_BEGINNING === "true";
 
 // Kafka instance
 const kafka = new Kafka({
   clientId: CLIENT_ID,
-  brokers: BROKERS,
+  brokers: [BROKERS],
   logLevel: logLevel.INFO,
 });
 
@@ -55,23 +55,19 @@ const subscribe = async (topic, messageHandler) => {
     console.info(`Subscribed to topic: ${topic}`);
 
     await consumer.run({
-      eachMessage: async ({ topic, partition, message }) => {
+      eachMessage: async ({ key, message }) => {
         try {
           const key = message.key?.toString();
           const value = message.value ? JSON.parse(message.value.toString()) : null;
-          
-          console.info({ topic, partition, key, offset: message.offset }, "Message received");
-
+        
           if (value) {
-            const result = await messageHandler(value);
-            console.info({ result }, "Message processed successfully");
-
-            // Commit offset manually
-            if (message.offset !== undefined) {
-              await consumer.commitOffsets([
-                { topic, partition, offset: (Number(message.offset) + 1).toString() },
-              ]);
-              console.info(`Committed offset for partition ${partition}: ${Number(message.offset) + 1}`);
+            switch (key) {
+              case "deleted_project":
+                await DeletedProjectExternalService.create(value);
+                break;
+        
+              default:
+                console.error(`Unexpected Kafka Key in ${topic} topic: ${key}`);
             }
 
             setupShutdownHooks();

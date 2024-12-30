@@ -8,7 +8,7 @@ const helmet = require("helmet");
 const httpStatus = require("http-status");
 
 // Application settings
-const SERVER_PORT = process.env.DELETE_SHARD_SERVER_PORT || 3006;
+const SERVER_PORT = process.env.SHARD_SERVER_PORT || 3005;
 const CLIENT_PORT = process.env.CLIENT_PORT || 2582;
 
 // Whitelisted CORS origins

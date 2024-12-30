@@ -4,12 +4,12 @@ const { getProjectById, updateProjectRaisedAmount } = require("../Project/Extern
 // Configuration properties
 const CLIENT_ID = process.env.CLIENT_ID || "Project";
 const GROUP_ID = process.env.GROUP_ID || "Project";
-const BROKERS = process.env.BROKERS ? process.env.BROKERS.split(",") : ["172.18.0.4:9092"];
+const BROKERS = process.env.BROKERS;
 const FROM_BEGINNING = process.env.FROM_BEGINNING === "true";
 
 const kafka = new Kafka({
   clientId: CLIENT_ID,
-  brokers: BROKERS,
+  brokers: [BROKERS],
   logLevel: logLevel.WARN,
 });
 
