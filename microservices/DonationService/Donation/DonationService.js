@@ -1,20 +1,30 @@
 const DonationRepository = require('./DonationRepository');
 const { createDonationSession } = require('../utils/StripeUtils');
 const { publish } = require("../broker/Producer");
-const { subscribe, connectConsumer } = require("../broker/Consumer");
-const { v4: uuidv4 } = require("uuid");
+const { connectConsumer } = require("../broker/Consumer");
 const MonthlyDonationService = require('../MonthlyDonation/MonthlyDonationService');
+const axios = require("axios");
 
 class DonationService {
     async donation(data) {
-        const { email, message: personalMessage = null, projectId, donationType, amount } = data;
+        const { donorId, message: personalMessage = null, projectId, donationType, amount } = data;
         const customerId = "cus_RPk3Q0QY3NFMwo"; // Replace with dynamic customer ID if needed
     
-        if (!email) throw new Error('No Email provided');
+        if (!donorId) throw new Error('No DonorId provided');
         if (!projectId) throw new Error('No Project provided');
         if (!donationType) throw new Error('No Donation Type provided');
         if (typeof amount !== 'number' || isNaN(amount) || amount <= 0) throw new Error('Amount must be a valid positive number');
     
+        const response = await axios.get(`http://localhost:3000/api/donors/${donorId}`);
+        if (!response.data) {
+            throw new Error("Error validating donor ID");
+        }
+
+        const email = await axios.get(`http://localhost:3000/api/donors/${donorId}/email`);
+        if (!email) {
+            throw new Error("No Email Found");
+        }
+
         await publish({
             topic: "donation_to_project",
             event: "verify_project",
@@ -54,7 +64,7 @@ class DonationService {
                 monthlyDonationId = monthlyDonation._id.toString();
             }
     
-            const session = await createDonationSession(customerId, monthlyDonationId, unitAmount, personalMessage, projectId);
+            const session = await createDonationSession(customerId, monthlyDonationId, unitAmount, personalMessage, projectId, donorId);
             return { checkoutUrl: session.url };
     
         } catch (err) {

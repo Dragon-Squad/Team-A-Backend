@@ -42,13 +42,13 @@ class WebhookService {
         switch (event.type) {
             case 'checkout.session.completed':
                 const amount = session.amount_total/100;
-                // const donor = await donorRepository.findByStripeId(session.customer);
-                // //TODO: there is 2 cases where donor is not found, or donor is a guest 
-                // if (donor) {
-                //     await donorRepository.update(donor.id, { totalDonation: donor.totalDonation + session.amount_total });
-                // } else {
-                //     //TODO: Handle logic here
-                // }
+                const response = await axios.get(`http://localhost:3000/api/donors/${session.metadata.donorId}`);
+            
+                //TODO: there is 2 cases where donor is not found, or donor is a guest 
+                if (response.data) {
+                    const body = {donationAmount: amount, projectId: projectId};
+                    await axios.get(`http://localhost:3000/api/donors/${session.metadata.donorId}/update-stats`, body);
+                } 
 
                 transaction = PaymentTransactionService.create({
                     donationId: (await donation)._id,
@@ -86,7 +86,18 @@ class WebhookService {
                         projectId: projectId,
                         amount: amount,
                     },
-                  });
+                });
+
+                // await publish({
+                //     topic: "donation_to_email",
+                //     event: "donation_success",
+                //     message: {
+                //         donor: donor,
+                //         donation: donation,
+                //         transaction: transaction,
+                //     },
+                // });
+
                 break;
 
             case 'checkout.session.expired':

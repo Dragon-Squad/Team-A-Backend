@@ -4,22 +4,46 @@ const CategoryService = require("../Category/CategoryService");
 const CharityRepository = require("../Charity/CharityRepository");
 const RegionService = require("../Region/RegionService");
 const { publish } = require("../broker/Producer");
+const axios = require("axios");
 
 class ProjectService {
   async create(projectData) {
     // Validate project creation data
     ProjectValidator.validateProjectCreationRequest(projectData);
 
+    const response = await axios.get(`http://localhost:3000/api/charities/${projectData.charityId}`);
+
+    if (!response.data) {
+      throw new Error("Error validating charity ID");
+    } 
+
+    const category = await CategoryService.getCategoryById(project.categoryId);
+    if(!category){
+      throw new Error("Error validating category ID");
+    }
+
+    const region = await RegionService.getRegionById(project.regionId);
+    if(!region){
+      throw new Error("Error validating region ID");
+    }
+
     // Proceed with project creation
     const project = await ProjectRepository.create(projectData);
 
     // Get the notification list from category and region
-    const category = await CategoryService.getCategoryById(project.categoryId);
-    const region = await RegionService.getRegionById(project.regionId);
     const mergedNotificationList = new Set([
       ...region.notificationList.map(String),
       ...category.notificationList,
     ]);
+    
+    await publish({
+      topic: "project_to_email",
+      event: "create_project",
+      message: {
+          project: project,
+          notificationList: mergedNotificationList,
+      },
+  });
 
     return project;
   }
@@ -27,6 +51,28 @@ class ProjectService {
   async update(id, projectData) {
     // Validate project update data
     ProjectValidator.validateProjectUpdateRequest(id, projectData);
+
+    if(projectData.charityId){
+      const response = await axios.get(`http://localhost:3000/api/charities/${projectData.charityId}`);
+
+      if (!response.data) {
+        throw new Error("Error validating charity ID");
+      } 
+    }
+
+    if(projectData.categoryId){
+      const category = await CategoryService.getCategoryById(project.categoryId);
+      if(!category){
+        throw new Error("Error validating category ID");
+      }
+    }
+
+    if(projectData.regionId){
+      const region = await RegionService.getRegionById(project.regionId);
+      if(!region){
+        throw new Error("Error validating region ID");
+      }
+    }
 
     // Proceed with update
     return await ProjectRepository.update(id, projectData);
