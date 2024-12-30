@@ -42,12 +42,12 @@ class WebhookService {
         switch (event.type) {
             case 'checkout.session.completed':
                 const amount = session.amount_total/100;
-                const response = await axios.get(`http://localhost:3000/api/donors/${session.metadata.donorId}`);
+                const response = await axios.get(`http://172.30.208.1:3000/api/donors/${session.metadata.donorId}`);
             
                 //TODO: there is 2 cases where donor is not found, or donor is a guest 
                 if (response.data) {
                     const body = {donationAmount: amount, projectId: projectId};
-                    await axios.get(`http://localhost:3000/api/donors/${session.metadata.donorId}/update-stats`, body);
+                    await axios.get(`http://172.30.208.1:3000/api/donors/${session.metadata.donorId}/update-stats`, body);
                 } 
 
                 transaction = PaymentTransactionService.create({

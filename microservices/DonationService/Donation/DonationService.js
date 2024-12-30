@@ -15,14 +15,9 @@ class DonationService {
         if (!donationType) throw new Error('No Donation Type provided');
         if (typeof amount !== 'number' || isNaN(amount) || amount <= 0) throw new Error('Amount must be a valid positive number');
     
-        const response = await axios.get(`http://localhost:3000/api/donors/${donorId}`);
+        const response = await axios.get(`http://172.30.208.1:3000/api/donors/${donorId}`);
         if (!response.data) {
-            throw new Error("Error validating donor ID");
-        }
-
-        const email = await axios.get(`http://localhost:3000/api/donors/${donorId}/email`);
-        if (!email) {
-            throw new Error("No Email Found");
+            throw new Error("No Donor Found");
         }
 
         await publish({
@@ -102,12 +97,17 @@ class DonationService {
             return result;
         } catch (error){
             throw new Error('Error: ' + error.message);
-        }
+        } 
     }
 
     async getDonationsByDonor(limit, page, donorId){
         try{
             if(!donorId) throw new Error('No Donor Id provided');
+
+            const response = await axios.get(`http://172.30.208.1:3000/api/donors/${donorId}`);
+            if (!response.data) {
+                throw new Error("Error validating donor ID");
+            }
 
             const result = await DonationRepository.getAllByDonor(limit, page, donorId);
             return result;

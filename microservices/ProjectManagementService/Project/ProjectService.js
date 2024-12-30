@@ -11,7 +11,7 @@ class ProjectService {
     // Validate project creation data
     ProjectValidator.validateProjectCreationRequest(projectData);
 
-    const response = await axios.get(`http://localhost:3000/api/charities/${projectData.charityId}`);
+    const response = await axios.get(`http://172.30.208.1:3000/api/charities/${projectData.charityId}`);
 
     if (!response.data) {
       throw new Error("Error validating charity ID");
@@ -53,7 +53,7 @@ class ProjectService {
     ProjectValidator.validateProjectUpdateRequest(id, projectData);
 
     if(projectData.charityId){
-      const response = await axios.get(`http://localhost:3000/api/charities/${projectData.charityId}`);
+      const response = await axios.get(`http://172.30.208.1:3000/api/charities/${projectData.charityId}`);
 
       if (!response.data) {
         throw new Error("Error validating charity ID");
