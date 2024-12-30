@@ -1,7 +1,7 @@
 const authRoutes = [
-    '/auth/new',
-    '/auth/login',
-    '/auth/logout'
+    'auth/new',
+    'auth/login',
+    'auth/logout'
 ];
 
 const cryptRoutes = [
@@ -60,8 +60,8 @@ const charityRoutes = [
 ];
 
 const deleteShardRoutes = [
-    '/deleted/projects/all',
-    '/deleted/projects/',
+    'deleted/projects/all',
+    'deleted/projects/',
 ];
 
 const services = [

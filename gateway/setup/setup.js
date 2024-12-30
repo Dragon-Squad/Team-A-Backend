@@ -7,7 +7,8 @@ const serviceMap = new Map([
     ['auth', 'AuthService'],
     ['project', 'ProjectManagementService'],
     ['donation', 'DonationService'],
-    ['shard', 'ShardedProjectService']
+    ['shard', 'ShardedProjectService'],
+    ['crypt', 'CryptService'],
   ]);
 
 // Main function to create services and their corresponding routes
