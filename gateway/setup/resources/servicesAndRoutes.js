@@ -72,7 +72,7 @@ const services = [
     'ProjectManagementService',
     'FileUploadService',
     'DonationService',
-    'DeleteShardService'
+    'DeletedShardService'
 ];
 
 module.exports = {
