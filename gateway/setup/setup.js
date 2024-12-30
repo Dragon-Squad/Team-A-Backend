@@ -1,5 +1,5 @@
 const { waitForKongAdminAPI, createService, createRoute, enableRateLimitingPlugin, serversDiscovery } = require("./https");
-const { authRoutes, emailRoutes, projectRoutes, fileRoutes, donationRoutes, charityRoutes, shardedProjectRoutes, services } = require("./resources/servicesAndRoutes");
+const { authRoutes, cryptRoutes, emailRoutes, projectRoutes, fileRoutes, donationRoutes, charityRoutes, shardedProjectRoutes, services } = require("./resources/servicesAndRoutes");
 const IPAdr = process.env.IP_ADR || "172.30.208.1";
 
 const serviceMap = new Map([
@@ -7,7 +7,8 @@ const serviceMap = new Map([
     ['auth', 'AuthService'],
     ['project', 'ProjectManagementService'],
     ['donation', 'DonationService'],
-    ['shard', 'ShardedProjectService']
+    ['shard', 'ShardedProjectService'],
+    ['crypt', 'CryptService'],
   ]);
 
 // Main function to create services and their corresponding routes
@@ -27,6 +28,7 @@ async function setupServices() {
         const projectManagementServiceId = await createService(serviceMap.get('project'), urlMap.get('project'));
         const donationServiceId = await createService(serviceMap.get('donation'), urlMap.get('donation'));
         const shardedProjectServiceId = await createService(serviceMap.get('shard'), urlMap.get('shard'));
+        const cryptServiceId = await createService(serviceMap.get('crypt'), urlMap.get('crypt'));
 
         const charityManagementServiceId = await createService('CharityManagementService', `http://${IPAdr}:3002`);
 
@@ -38,6 +40,16 @@ async function setupServices() {
                 console.log(`Route created for AuthService: ${route}`);
             } catch (routeError) {
                 console.error(`Error creating route ${route} for AuthService:`, routeError.message);
+            }
+        }
+
+        // Routes for Crypt Service
+        for (const route of cryptRoutes) {
+            try {
+                await createRoute(cryptServiceId, route);
+                console.log(`Route created for CryptService: ${route}`);
+            } catch (routeError) {
+                console.error(`Error creating route ${route} for CryptService:`, routeError.message);
             }
         }
 
