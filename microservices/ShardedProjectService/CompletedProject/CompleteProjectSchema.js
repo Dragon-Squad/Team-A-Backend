@@ -10,7 +10,7 @@ const completedProjectSchema = new Schema({
   goalAmount: { type: Number, required: true },
   raisedAmount: { type: Number, default: 0 },
   createdAt: { type: Date, default: Date.now },
-  status: { type: String, default: "deleted"},
+  status: { type: String, default: "completed"},
   startDate: { type: Date, required: true },
   endDate: { type: Date, required: true, index: true },
   images: { type: [String] },
