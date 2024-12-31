@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs');
 const { faker } = require ('@faker-js/faker');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 const createDonors= async (User, Donor, Address) => {
     try {
@@ -23,10 +24,36 @@ const createDonors= async (User, Donor, Address) => {
             });
             await donorUser.save();
 
+            let customerId;
+            try {
+                // Check for existing Stripe customer
+                const customers = await stripe.customers.list({
+                    email: email,
+                    limit: 1,
+                });
+
+                if (customers.data.length > 0) {
+                    customerId = customers.data[0].id;
+                } else {
+                    // Create a new Stripe customer
+                    const newCustomer = await stripe.customers.create({
+                        email: email,
+                    });
+                    customerId = newCustomer.id;
+                }
+            } catch (err) {
+                throw new Error('Failed to retrieve or create customer: ' + err.message);
+            }
+
+            if (!customerId){
+                throw new Error("Can not create Stripe Customer");
+            }
+
             const donor = new Donor({
                 userId: donorUser._id,
                 firstName: faker.person.firstName(),
                 lastName: faker.person.lastName(),
+                hashedStripeId: await bcrypt.hash(customerId, 10),
             });
             donors.push(await donor.save());
         }

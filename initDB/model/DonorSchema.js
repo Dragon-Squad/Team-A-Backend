@@ -13,7 +13,7 @@ const donorSchema = new Schema({
   lastName: { type: String, required: true },
   address: { type: Schema.Types.ObjectId, ref: 'address'},
   region: { type: String },
-  hashedStripeId: { type: String },
+  hashedStripeId: { type: String, require: true },
   donationStat: { type: donationStatSchema, default: () => ({}) } 
 });
 

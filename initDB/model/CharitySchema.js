@@ -9,6 +9,7 @@ const charitySchema = new Schema({
   category: [{ type: String} ],
   type: { type: String, enum: ['Person', 'Company', 'Non-profit Organization'], required: true },
   description: { type: String },
+  hashedStripeId: { type: String, require: true },
   taxCode: { type: String , required: true},
 });
 

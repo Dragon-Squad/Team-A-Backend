@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const initialData = require('../../../resources/initialData');
 const charitiesData = initialData.charities;
 const { faker } = require ('@faker-js/faker');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 const createCharities = async (User, Charity, Address) => {
     try {
@@ -19,13 +20,40 @@ const createCharities = async (User, Charity, Address) => {
                 });
                 await address.save();
 
+                const email = `${charity.companyName.replace(' ', '').toLowerCase()}@charitan.com`;
+
                 // Create a user in authDB
                 const charityUser = new User({
-                    email: `${charity.companyName.replace(' ', '').toLowerCase()}@charitan.com`,
+                    email: email,
                     hashedPassword: await bcrypt.hash('charitypassword', 10),
                     isActive: true, 
                 });
                 await charityUser.save();
+
+                let customerId;
+                try {
+                    // Check for existing Stripe customer
+                    const customers = await stripe.customers.list({
+                        email: email,
+                        limit: 1,
+                    });
+
+                    if (customers.data.length > 0) {
+                        customerId = customers.data[0].id;
+                    } else {
+                        // Create a new Stripe customer
+                        const newCustomer = await stripe.customers.create({
+                            email: email,
+                        });
+                        customerId = newCustomer.id;
+                    }
+                } catch (err) {
+                    throw new Error('Failed to retrieve or create customer: ' + err.message);
+                }
+
+                if (!customerId){
+                    throw new Error("Can not create Stripe Customer");
+                }
 
                 // Create a charity entry in charityDB
                 const charityDoc = new Charity({
@@ -36,6 +64,7 @@ const createCharities = async (User, Charity, Address) => {
                     address: address._id,
                     region: charity.regions,
                     category: charity.category,
+                    hashedStripeId: await bcrypt.hash(customerId, 10),
                 });
                 await charityDoc.save();
                 return charityDoc;
