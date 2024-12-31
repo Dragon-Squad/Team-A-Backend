@@ -22,12 +22,18 @@ async function validateUser(charityId) {
   return userResponse.data;
 }
 
-async function validateCategory(categoryId) {
-  const category = await CategoryService.getCategoryById(categoryId);
-  if (!category) {
-    throw new Error("Error validating category ID");
-  }
-  return category;
+async function validateCategory(categoryIds) {
+  const categories = [];
+
+  categoryIds.forEach(async (categoryId) => {
+    const category = await CategoryService.getCategoryById(categoryId);
+    if (!category) {
+      throw new Error("Error validating category ID");
+    }
+    categories.push(category);
+  });
+
+  return categories;
 }
 
 async function validateRegion(regionId) {
@@ -38,11 +44,16 @@ async function validateRegion(regionId) {
   return region;
 }
 
-function mergeNotificationLists(region, category) {
-  return new Set([
-    ...region.notificationList.map(String),
-    ...category.notificationList,
-  ]);
+function mergeNotificationLists(region, categories) {
+  const result = new Set();
+
+  categories.forEach(category => {
+    category.notificationList.forEach(item => result.add(item));
+  });
+
+  region.notificationList.forEach(item => result.add(item));
+
+  return result;
 }
 
 class ProjectService {
@@ -52,12 +63,12 @@ class ProjectService {
     const charity = await validateCharity(projectData.charityId);
     const user = await validateUser(projectData.charityId);
 
-    const category = await validateCategory(projectData.categoryId);
+    const categories = await validateCategory(projectData.categoryId);
     const region = await validateRegion(projectData.regionId);
 
     const project = await ProjectRepository.create(projectData);
 
-    const mergedNotificationList = mergeNotificationLists(region, category);
+    const mergedNotificationList = mergeNotificationLists(region, categories);
 
     await publish({
       topic: "project_to_email",
@@ -115,10 +126,10 @@ class ProjectService {
         const charity = await validateCharity(project.charityId);
         const user = await validateUser(project.charityId);
 
-        const category = await validateCategory(project.categoryId);
+        const categories = await validateCategory(project.categoryId);
         const region = await validateRegion(project.regionId);
 
-        const mergedNotificationList = mergeNotificationLists(region, category);
+        const mergedNotificationList = mergeNotificationLists(region, categories);
 
         await publish({
           topic: "project_to_email",

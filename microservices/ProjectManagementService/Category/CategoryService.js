@@ -118,6 +118,15 @@ class CategoryService {
             throw new Error(error.message);
         }
     }
+
+    async getCategoryById(id){
+        try {
+            const category = await CategoryRepository.findById(id);
+            return category;
+        } catch(error){
+            throw new Error(error.message);
+        }
+    }
 }
 
 module.exports = new CategoryService();
