@@ -6,85 +6,93 @@ const RegionService = require("../Region/RegionService");
 const { publish } = require("../broker/Producer");
 const axios = require("axios");
 
+async function validateCharity(charityId) {
+  const charityResponse = await axios.get(`http://172.30.208.1:3000/api/charities/${charityId}`);
+  if (!charityResponse.data) {
+    throw new Error("No Charity Found");
+  }
+  return charityResponse.data;
+}
+
+async function validateUser(charityId) {
+  const userResponse = await axios.get(`http://172.30.208.1:3000/api/users/${charityId}`);
+  if (!userResponse.data) {
+    throw new Error("No Email Found");
+  }
+  return userResponse.data;
+}
+
+async function validateCategory(categoryId) {
+  const category = await CategoryService.getCategoryById(categoryId);
+  if (!category) {
+    throw new Error("Error validating category ID");
+  }
+  return category;
+}
+
+async function validateRegion(regionId) {
+  const region = await RegionService.getRegionById(regionId);
+  if (!region) {
+    throw new Error("Error validating region ID");
+  }
+  return region;
+}
+
+function mergeNotificationLists(region, category) {
+  return new Set([
+    ...region.notificationList.map(String),
+    ...category.notificationList,
+  ]);
+}
+
 class ProjectService {
   async create(projectData) {
-    // Validate project creation data
     ProjectValidator.validateProjectCreationRequest(projectData);
 
-    const response = await axios.get(`http://172.30.208.1:3000/api/charities/${projectData.charityId}`);
+    const charity = await validateCharity(projectData.charityId);
+    const user = await validateUser(projectData.charityId);
 
-    if (!response.data) {
-      throw new Error("Error validating charity ID");
-    } 
+    const category = await validateCategory(projectData.categoryId);
+    const region = await validateRegion(projectData.regionId);
 
-    const category = await CategoryService.getCategoryById(project.categoryId);
-    if(!category){
-      throw new Error("Error validating category ID");
-    }
-
-    const region = await RegionService.getRegionById(project.regionId);
-    if(!region){
-      throw new Error("Error validating region ID");
-    }
-
-    // Proceed with project creation
     const project = await ProjectRepository.create(projectData);
 
-    // Get the notification list from category and region
-    const mergedNotificationList = new Set([
-      ...region.notificationList.map(String),
-      ...category.notificationList,
-    ]);
-    
+    const mergedNotificationList = mergeNotificationLists(region, category);
+
     await publish({
       topic: "project_to_email",
       event: "create_project",
       message: {
-          project: project,
-          notificationList: mergedNotificationList,
+        charity: { name: charity.name, email: user.email },
+        project,
+        notificationList: mergedNotificationList,
       },
-  });
+    });
 
     return project;
   }
 
   async update(id, projectData) {
-    // Validate project update data
     ProjectValidator.validateProjectUpdateRequest(id, projectData);
 
-    if(projectData.charityId){
-      const response = await axios.get(`http://172.30.208.1:3000/api/charities/${projectData.charityId}`);
-
-      if (!response.data) {
-        throw new Error("Error validating charity ID");
-      } 
+    if (projectData.charityId) {
+      await validateCharity(projectData.charityId);
+    }
+    if (projectData.categoryId) {
+      await validateCategory(projectData.categoryId);
+    }
+    if (projectData.regionId) {
+      await validateRegion(projectData.regionId);
     }
 
-    if(projectData.categoryId){
-      const category = await CategoryService.getCategoryById(project.categoryId);
-      if(!category){
-        throw new Error("Error validating category ID");
-      }
-    }
-
-    if(projectData.regionId){
-      const region = await RegionService.getRegionById(project.regionId);
-      if(!region){
-        throw new Error("Error validating region ID");
-      }
-    }
-
-    // Proceed with update
     return await ProjectRepository.update(id, projectData);
   }
 
   async delete(id) {
     const project = await ProjectRepository.getById(id);
-
-    if (!project || project.status != "halted") return false;
+    if (!project || project.status !== "halted") return false;
 
     const result = await ProjectRepository.delete(id);
-
     if (result) {
       await publish({
         topic: "project_to_shard",
@@ -92,19 +100,40 @@ class ProjectService {
         message: project,
       });
     }
+    return result;
   }
 
-  async updateStatus(id, status) {
+  async updateStatus(id, status, reason) {
     const project = await ProjectRepository.getById(id);
     if (!project) return false;
 
-    // To halt, Only Active Projects can be halted
-    // To resume, Only Halted Projects can be resumed
     if (
-      (project.status == "active" && status == "halted") ||
-      (project.status == "halted" && status == "active")
-    )
+      (project.status === "active" && status === "halted") ||
+      (project.status === "halted" && status === "active")
+    ) {
+      if (status === "halted") {
+        const charity = await validateCharity(project.charityId);
+        const user = await validateUser(project.charityId);
+
+        const category = await validateCategory(project.categoryId);
+        const region = await validateRegion(project.regionId);
+
+        const mergedNotificationList = mergeNotificationLists(region, category);
+
+        await publish({
+          topic: "project_to_email",
+          event: "halt_project",
+          message: {
+            charity: { name: charity.name, email: user.email },
+            project,
+            notificationList: mergedNotificationList,
+            reason,
+          },
+        });
+      }
+
       return await ProjectRepository.update(id, { status });
+    }
 
     return false;
   }
@@ -113,44 +142,31 @@ class ProjectService {
     const project = await ProjectRepository.getById(id);
     if (!project) throw new Error("No Project Found");
 
-    if (project.status != "pending")
-      throw new Error("Cannot active non-pending Project");
+    if (project.status !== "pending") {
+      throw new Error("Cannot activate non-pending Project");
+    }
 
     return await ProjectRepository.update(id, "active");
   }
 
   async getById(id) {
-    // Get the project by ID and populate related fields (charity, category, region)
     const project = await ProjectRepository.getById(id);
     if (!project) {
       throw new Error("Project not found");
     }
-
     return project;
   }
 
-  // Service: Get All Projects
   async getAll(filters) {
-    // Check if charity name is present in the filters
     if (filters.charityName) {
-      // Use the CharityRepository to search by charity name and get the charityId(s)
-      const charityIds = await CharityRepository.searchByName(
-        filters.charityName
-      );
+      const charityIds = await CharityRepository.searchByName(filters.charityName);
 
-      // If charityIds are found, set the charityId filter to use the charityIds array
       if (charityIds.length > 0) {
-        filters.charityId = { $in: charityIds }; // Update the charityId filter with an array of charityIds
+        filters.charityId = { $in: charityIds };
       } else {
-        // If no matching charity is found, return an empty result
-        return {
-          total: 0,
-          page: filters.page || 1,
-          limit: filters.limit || 10,
-          projects: [],
-        };
+        return { total: 0, page: filters.page || 1, limit: filters.limit || 10, projects: [] };
       }
-      // Remove charityName from filters to prevent it being used in the query
+
       delete filters.charityName;
     }
 

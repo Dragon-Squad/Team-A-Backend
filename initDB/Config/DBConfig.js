@@ -1,7 +1,29 @@
 require('dotenv').config();
 const mongoose = require('mongoose');
 
-let AuthDB, CharityDB, DonorDB, DonationDB, ProjectDB, FileDB;
+let AddressDB, AdminDB, AuthDB, CharityDB, DonorDB, DonationDB, ProjectDB, UserDB, ShardedProjectDB;
+
+const connectAddressDB = async () => {
+  if (!AddressDB) {
+    AddressDB = await mongoose.createConnection(process.env.MONGO_URI_ADDRESS, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log('Connected to AddressDB');
+  }
+  return AddressDB;
+};
+
+const connectAdminDB = async () => {
+  if (!AdminDB) {
+    AdminDB = await mongoose.createConnection(process.env.MONGO_URI_ADMIN, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log('Connected to AdminDB');
+  }
+  return AdminDB;
+};
 
 const connectAuthDB = async () => {
   if (!AuthDB) {
@@ -58,15 +80,26 @@ const connectProjectDB = async () => {
     return ProjectDB;
 };
 
-const connectFileDB = async () => {
-  if (!FileDB) {
-      FileDB = await mongoose.createConnection(process.env.MONGO_URI_FILE, {
+const connectUserDB = async () => {
+  if (!UserDB) {
+      UserDB = await mongoose.createConnection(process.env.MONGO_URI_USER, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
-    console.log('Connected to FileDB');
+    console.log('Connected to UserDB');
   }
-  return FileDB;
+  return UserDB;
 };
 
-module.exports = { connectAuthDB, connectCharityDB, connectDonationDB, connectDonorDB, connectProjectDB, connectFileDB };
+const connectShardedProjectDB = async () => {
+  if (!ShardedProjectDB) {
+    ShardedProjectDB = await mongoose.createConnection(process.env.MONGO_URI_SHARDED_PROJECT, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log('Connected to ShardedProjectDB');
+  }
+  return ShardedProjectDB;
+};
+
+module.exports = { connectAddressDB, connectAuthDB, connectAdminDB, connectCharityDB, connectDonationDB, connectDonorDB, connectProjectDB, connectUserDB, connectShardedProjectDB };

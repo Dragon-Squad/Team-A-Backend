@@ -46,113 +46,22 @@ node scripts.js
 
 <hr>
 
-###  3. Run Consul
-Consul is used for service discovery in this setup. Docker Compose is utilized to deploy Consul as a containerized service. Follow the steps below to start Consul:
-Navigate to Consul Directory
-```` sh
-cd ..\consul\
-````
-Execute docker compose
-```` sh
-docker-compose up -d --build
-````
-Verify that Consul is running by checking if port 8005 is accessible. You can do this by visiting the following URL: https://localhost:8005
-
-<hr>
-
-### 4. Run Kafka
-Kafka is required for messaging between the services. Ensure you are in the root directory of the project, then execute the following commands:
-Navigate to broker directory
-```` sh
-cd ..\broker\
-````
-Start the Kafka broker and ensure it's running in detached mode.
-```` sh
-docker-compose up -d --build
-````
-Create Cluster
-   - Using the Kafka-Manager to create the cluster, Kafka Manager is available at: https://localhost:9000
-   - Using this credentails to login to the page:
-         username: admin
-         password: bigbang
-   - Click on "Add Cluster"
-   - Fill in the Cluster Name and Cluster Zookeeper Hosts
-         Cluster Name: MyCluster
-         Cluster Zookeeper Hosts: zookeeper:2181
-   - Then Enable the JMX Pilling option under the Kafka Version
-   - Click on Save
-   - Click to Cluster View
-   - Click on the number next to Topic
-   - Verify if you can see all the topics registered
-    ![Image Description](./image/topics.png)
-
-Register Kafka with Consul
-```` sh
-node KafkaRegister/kafkaRegister.js
-````
-
-<hr>
-
-### 5. Create the network
-Next, create a custom Docker network to enable communication between different microservices. This step is essential for setting up a network environment for the services to interact securely.
-Create the network
-```` sh
-docker network create microservice-network
-````
-To verify that the network was created successfully, you can list all Docker networks:
-```` sh
-docker network ls
-````
-You should see an output similar to the following, confirming that the microservice-network has been created:
-```
-NETWORK ID     NAME                   DRIVER    SCOPE
-68b9bdb5ccb0   microservice-network   bridge    local
-```
-
-<hr>
-
-### 6. Run the Microservices
-Then, bring up the microservices by running Docker Compose with the appropriate configuration.
-Navigate to microservice directory
+### 3. Run the Backend
+Execute this if you are using Linux/MacOs
 ````sh
-cd ..\microservices\
+sudo chmod +x ./run.sh
+./run.sh
 ````
-Setup before run docker
-```` sh
-node Setup/setup.js
-````
-Execute the docker compose file
-```` sh
-docker-compose up -d --build
-````
-Register all the Services with Consul
-```` sh
-node Setup/serversRegister.js
-````
-
-<hr>
-
-#### 7. Setup the Kong API Gateway
-Setup the gateway by composing the Gateway Container. This will setup the Kong API Gateway, add all the services and routes.
-
-
-```` sh
-docker-compose -f gateway/docker-compose.yml up -d
+or Execute this if you are using Window
+````sh
+.\run.bat
 ````
 To verify that the services were added successfully, you can access: http://localhost:8001/services
 To verify that the routes were added successfully, you can access: http://localhost:8001/routes
 
 <hr>
 
-### 8. Stripe Login
-Login to Stripe
-```` sh
-docker-compose -f stripe/docker-compose.yml up -d
-````
-
-<hr>
-
-### 9. Setup ngrok
+### 4. Setup ngrok
 Installation
 - Get ngrok from this link: `https://download.ngrok.com/windows`
 

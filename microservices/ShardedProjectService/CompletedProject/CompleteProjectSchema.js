@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const deletedProjectSchema = new Schema({
+const completedProjectSchema = new Schema({
   charityId: { type: Schema.Types.ObjectId, ref: "Charity", required: true, index: true },
   categoryId: [{ type: Schema.Types.ObjectId, ref: "Category"}],
   regionId: { type: Schema.Types.ObjectId, ref: "Region", required: true },
@@ -19,9 +19,9 @@ const deletedProjectSchema = new Schema({
   stripeId: { type: String },
 });
 
-deletedProjectSchema.pre("save", function (next) {
+completedProjectSchema.pre("save", function (next) {
   const date = new Date(this.endDate);
   this.partitionKey = `${date.getFullYear()}-${date.getMonth() + 1}`; 
 });
 
-module.exports = mongoose.model("DeletedProject", deletedProjectSchema);
+module.exports = mongoose.model("CompletedProject", completedProjectSchema);
