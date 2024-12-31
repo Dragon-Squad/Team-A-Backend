@@ -55,6 +55,11 @@ services:
       - microservice-network
     ports:
       - "${CRYPT_SERVER_PORT}:${CRYPT_SERVER_PORT}"
+    depends_on:
+      - emailservice
+      - projectmanagementservice
+      - donationservice
+      - shardedprojectservice
 
 networks:
   microservice-network:

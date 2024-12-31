@@ -4,6 +4,7 @@ const { publish } = require('../broker/Producer');
 const DonationService = require("../Donation/DonationService");
 const MonthlyDonationService = require('../MonthlyDonation/MonthlyDonationService');
 const PaymentTransactionService = require('../PaymentTransaction/PaymentTransactionService');
+const axios = require("axios");
 
 class WebhookService {
     verifyEvent(payload, signature) {
@@ -21,6 +22,7 @@ class WebhookService {
     async handleEvent(event) {
         let transaction;
         const session = event.data.object;
+        console.log(session);
 
         const projectId = session.metadata.projectId;
         const message = session.metadata.personal_message;
@@ -43,13 +45,24 @@ class WebhookService {
             case 'checkout.session.completed':
                 const amount = session.amount_total/100;
                 const response = await axios.get(`http://172.30.208.1:3000/api/donors/${session.metadata.donorId}`);
-            
-                //TODO: there is 2 cases where donor is not found, or donor is a guest 
+    
+                //If there is donor -> update donor statistic and send the email 
                 if (response.data) {
                     const body = {donationAmount: amount, projectId: projectId};
-                    await axios.get(`http://172.30.208.1:3000/api/donors/${session.metadata.donorId}/update-stats`, body);
+                    await axios.post(`http://172.30.208.1:3000/api/donors/${session.metadata.donorId}/update-stats`, body);
+
+                    // await publish({
+                    //     topic: "donation_to_email",
+                    //     event: "donation_success",
+                    //     message: {
+                    //         donor: donor,
+                    //         donation: donation,
+                    //         transaction: transaction,
+                    //     },
+                    // });
                 } 
 
+                //create transaction record
                 transaction = PaymentTransactionService.create({
                     donationId: (await donation)._id,
                     amount: amount,
@@ -57,6 +70,7 @@ class WebhookService {
                     paymentProvider: selectedPaymentMethods
                 });
 
+                //if it is monthly, create monthly donation record
                 const monthlyDonationId = session.metadata.monthlyDonationId;
                 if(monthlyDonationId){
                     try{
@@ -79,6 +93,7 @@ class WebhookService {
                     }
                 }
                 
+                //update the project raised amount
                 await publish({
                     topic: "donation_to_project",
                     event: "update_project",
@@ -87,16 +102,6 @@ class WebhookService {
                         amount: amount,
                     },
                 });
-
-                // await publish({
-                //     topic: "donation_to_email",
-                //     event: "donation_success",
-                //     message: {
-                //         donor: donor,
-                //         donation: donation,
-                //         transaction: transaction,
-                //     },
-                // });
 
                 break;
 

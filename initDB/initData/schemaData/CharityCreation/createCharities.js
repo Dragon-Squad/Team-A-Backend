@@ -3,10 +3,8 @@ const initialData = require('../../../resources/initialData');
 const charitiesData = initialData.charities;
 const { faker } = require ('@faker-js/faker');
 
-const createCharities = async (User, Charity, Address, fileIds) => {
+const createCharities = async (User, Charity, Address) => {
     try {
-        let imageIndex = 0;
-
         // Process each charity entry
         console.log('Creating charity accounts...');
         const charityDocs = await Promise.all(
@@ -35,7 +33,6 @@ const createCharities = async (User, Charity, Address, fileIds) => {
                     name: charity.companyName,
                     taxCode: `TAX${Math.floor(Math.random() * 10000)}`,
                     type: charity.type,
-                    images: [fileIds[imageIndex]],
                     address: address._id,
                     region: charity.regions,
                     category: charity.category,

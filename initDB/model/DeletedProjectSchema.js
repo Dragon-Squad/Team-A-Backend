@@ -24,4 +24,6 @@ deletedProjectSchema.pre("save", function (next) {
   this.partitionKey = `${date.getFullYear()}-${date.getMonth() + 1}`; 
 });
 
-module.exports = mongoose.model("DeletedProject", deletedProjectSchema);
+const createDeletedProjectModel = (dbConnection) => dbConnection.model('DeletedProject', deletedProjectSchema);
+
+module.exports = createDeletedProjectModel;

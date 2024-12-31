@@ -9,6 +9,8 @@ const createProjectModel = require('./ProjectSchema');
 const createDonationModel = require('./DonationSchema');
 const createMonthlyDonationModel = require('./MonthlyDonationSchema');
 const createPaymentTransactionModel = require('./PaymentTransactionSchema');
+const createDeletedProjectModel = require('./DeletedProjectSchema');
+const createCompletedProjectModel = require('./CompletedProjectSchema');
 
 module.exports = {
     createAddressModel,
@@ -21,5 +23,7 @@ module.exports = {
     createProjectModel,
     createDonationModel,
     createMonthlyDonationModel,
-    createPaymentTransactionModel
+    createPaymentTransactionModel,
+    createDeletedProjectModel,
+    createCompletedProjectModel,
 }

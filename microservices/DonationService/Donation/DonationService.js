@@ -14,7 +14,7 @@ class DonationService {
         if (!projectId) throw new Error('No Project provided');
         if (!donationType) throw new Error('No Donation Type provided');
         if (typeof amount !== 'number' || isNaN(amount) || amount <= 0) throw new Error('Amount must be a valid positive number');
-    
+        
         const response = await axios.get(`http://172.30.208.1:3000/api/donors/${donorId}`);
         if (!response.data) {
             throw new Error("No Donor Found");
@@ -117,13 +117,42 @@ class DonationService {
     }
 
     async getDonationsByProject(limit, page, projectId){
-        try{
-            if(!projectId) throw new Error('No Project Id provided');
+        if(!projectId) throw new Error('No Project Id provided');
 
-            const result = await DonationRepository.getAllByProject(limit, page, projectId);
-            return result;
-        } catch (error){
-            throw new Error('Error: ' + error.message);
+        await publish({
+            topic: "donation_to_project",
+            event: "verify_project",
+            message: { projectId: projectId }
+        });
+    
+        const consumer = await connectConsumer("project_to_donation");
+        const timeout = 10000; 
+    
+        try {
+            const result = await new Promise((resolve, reject) => {
+                const timer = setTimeout(() => {
+                    reject(new Error("No Project Found"));
+                }, timeout);
+    
+                consumer.run({
+                    eachMessage: async ({ message }) => {
+                        const value = message.value ? JSON.parse(message.value.toString()) : null;
+                        if (value.project._id === projectId) {
+                            clearTimeout(timer);
+                            resolve();
+                        }
+                    }
+                });
+            });
+    
+            const donations = await DonationRepository.getAllByProject(limit, page, projectId);
+            return donations;
+    
+        } catch (err) {
+            console.error('Error during donation process:', err.message);
+            throw err;
+        } finally {
+            await consumer.disconnect();
         }
     }
 }
