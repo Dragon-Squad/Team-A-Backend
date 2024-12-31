@@ -31,17 +31,14 @@ cd Team-A-Backend
 
 ### 2. Init Data for all the Databases
 To set up the required data for all databases, run the initialization script. This will ensure that all necessary database tables and configurations are properly set up before starting the services.
-Navigate to the `initDB` direcory:
-```` sh
-cd initDB
+Execute this if you are using Linux/MacOs
+````sh
+sudo chmod +x ./initDB.sh
+./initDB.sh
 ````
-Install the required dependencies:
-```` sh
-npm install
-````
-Run the initialization script:
-```` sh
-node scripts.js
+or Execute this if you are using Window
+````sh
+.\initDB.bat
 ````
 
 <hr>
