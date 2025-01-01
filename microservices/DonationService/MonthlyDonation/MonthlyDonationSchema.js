@@ -2,8 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const monthlyDonationSchema = new Schema({
-  // donorId: { type: Schema.Types.ObjectId, ref: 'Donor' },
-  donorId: { type: String},
+  donorId: { type: Schema.Types.ObjectId, ref: 'Donor' },
   projectId: { type: Schema.Types.ObjectId, ref: 'Project' },
   stripeSubscriptionId: { type: String},
   amount: { type: Number },

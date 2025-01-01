@@ -1,7 +1,7 @@
 const { Kafka, logLevel, Partitioners } = require("kafkajs");
 
 // Configuration properties
-const CLIENT_ID = process.env.CLIENT_ID || "project-service";
+const CLIENT_ID = "ProjectA";
 const BROKERS = process.env.BROKERS; 
 
 const kafka = new Kafka({

@@ -1,8 +1,8 @@
 const { Kafka, logLevel } = require("kafkajs");
 const EmailExternalService = require("../Email/External/EmailExternalService");
 // Configuration properties
-const CLIENT_ID = process.env.CLIENT_ID || "email-service";
-const GROUP_ID = process.env.GROUP_ID || "email-group";
+const CLIENT_ID = "EmailA";
+const GROUP_ID = "EmailA";
 const BROKERS = process.env.BROKERS;
 const FROM_BEGINNING = process.env.FROM_BEGINNING === "true";
 

@@ -1,8 +1,8 @@
 const { Kafka, logLevel } = require("kafkajs");
 const DeletedProjectExternalService = require("../DeletedProject/External/DeletedProjectExternalService");
 // Configuration properties
-const CLIENT_ID = process.env.CLIENT_ID || "delete-shard-service";
-const GROUP_ID = process.env.GROUP_ID || "project-service-group";
+const CLIENT_ID = "ShardA";
+const GROUP_ID = "ShardA";
 const BROKERS = process.env.BROKERS;
 const FROM_BEGINNING = process.env.FROM_BEGINNING === "true";
 

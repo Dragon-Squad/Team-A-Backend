@@ -2,8 +2,8 @@ const { Kafka, logLevel } = require("kafkajs");
 const { getProjectById, updateProjectRaisedAmount } = require("../Project/External/ProjectExternalService");
 
 // Configuration properties
-const CLIENT_ID = process.env.CLIENT_ID || "Project";
-const GROUP_ID = process.env.GROUP_ID || "Project";
+const CLIENT_ID = "ProjectA";
+const GROUP_ID = "ProjectA";
 const BROKERS = process.env.BROKERS;
 const FROM_BEGINNING = process.env.FROM_BEGINNING === "true";
 

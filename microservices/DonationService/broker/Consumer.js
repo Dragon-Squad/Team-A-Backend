@@ -1,8 +1,8 @@
 const { Kafka, logLevel } = require("kafkajs");
 
 // Configuration properties
-const CLIENT_ID = "Donation";
-const GROUP_ID = "Donation";
+const CLIENT_ID = "DonationA";
+const GROUP_ID = "DonationA";
 const BROKERS = process.env.BROKERS;
 const FROM_BEGINNING = process.env.FROM_BEGINNING === "true";
 
