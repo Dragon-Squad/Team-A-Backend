@@ -16,7 +16,8 @@ const uploadImage = async (filename, uploadFolder) => {
 
       // Generate a unique file name using the current timestamp
       const timestamp = Date.now();
-      const fileName = `image-${timestamp}${path.extname(localFilePath)}`; 
+      const randomStr = Math.random().toString(36).substring(2, 8);
+      const fileName = `image-${timestamp}-${randomStr}${path.extname(localFilePath)}`; 
       const destination = `Charitan/${uploadFolder}/${fileName}`;
   
       // Upload the file

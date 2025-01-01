@@ -18,8 +18,8 @@ const projectSchema = new Schema({
   },
   startDate: { type: Date, required: true },
   endDate: { type: Date, required: true, index: true },
-  images: { type: [String] },
-  videos: { type: [String] },
+  images: [{ type: String }],
+  videos: [{ type: String }],
   account: { type: String },
   hashedStripeId: { type: String, required: true },
 });

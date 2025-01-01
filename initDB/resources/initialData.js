@@ -22,7 +22,7 @@ const initialData = {
         charityCompanyName: 'Non-profit IL',
         category: 'Health',
         region: 'Africa',
-
+        images: ["project1.jpg", "project2.jpg", "project3.jpg"],
       },
       {
         title: 'Ukraine - Russia War',
@@ -32,6 +32,7 @@ const initialData = {
         charityCompanyName: 'Non-profit UA',
         category: 'Humanitarian', 
         region: 'Europe', 
+        images: ["project4.jpg", "project5.jpg"],
       },
       {
         title: 'Food Program in South Africa',
@@ -41,6 +42,7 @@ const initialData = {
         charityCompanyName: 'Company SA',
         category: 'Food', 
         region: 'Africa', 
+        images: ["project6.jpg", "project7.jpg"],
       },
     ],
     
@@ -53,7 +55,8 @@ const initialData = {
         charityCompanyName: 'Individual VN',
         category: 'Humanitarian',
         region: 'Asia', 
-        country: 'VN'
+        country: 'VN',
+        images: ["project8.jpg", "project9.jpg"],
       },
       {
         title: 'Milton Hurricane Support',
@@ -63,7 +66,8 @@ const initialData = {
         charityCompanyName: 'Individual USA',
         category: 'Humanitarian', 
         region: 'North America', 
-        country: 'US'
+        country: 'US',
+        images: ["project10.jpg"],
       },
       {
         title: 'Helping Ukrainian Refugee',
@@ -73,7 +77,8 @@ const initialData = {
         charityCompanyName: 'Company DE',
         category: 'Humanitarian', 
         region: 'Europe',
-        country: 'UA'
+        country: 'UA',
+        images: ["project11.jpg", "project12.jpg"],
       },
       {
         title: "Supporting SOS Children’s Village",
@@ -83,7 +88,8 @@ const initialData = {
         charityCompanyName: 'Company DE',
         category: 'Education', 
         region: 'Asia', 
-        country: 'CN'
+        country: 'CN',
+        images: ["project13.jpg", "project14.jpg"],
       },
     ],
   };
