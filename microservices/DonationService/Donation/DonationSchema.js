@@ -7,12 +7,6 @@ const donationSchema = new Schema({
   donationType: { type: String, enum: ["one-time", "monthly"], required: true },
   message: { type: String },
   createdAt: { type: Date, default: Date.now },
-  partitionKey: { type: String, index: true },
-});
-
-donationSchema.pre("save", function (next) {
-  const date = new Date(this.createdAt);
-  this.partitionKey = `${date.getFullYear()}-${date.getMonth() + 1}`; 
 });
 
 module.exports = mongoose.model("Donation", donationSchema);

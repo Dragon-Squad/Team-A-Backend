@@ -10,10 +10,6 @@ const donationSchema = new Schema({
   partitionKey: { type: String, index: true },
 });
 
-donationSchema.pre("save", function (next) {
-  const date = new Date(this.createdAt);
-  this.partitionKey = `${date.getFullYear()}-${date.getMonth() + 1}`; 
-});
 
 const createDonationModel = (dbConnection) => dbConnection.model('Donation', donationSchema);
 

@@ -24,11 +24,6 @@ const projectSchema = new Schema({
   stripeId: { type: String },
 });
 
-projectSchema.pre("save", function (next) {
-  const date = new Date(this.endDate);
-  this.partitionKey = `${date.getFullYear()}-${date.getMonth() + 1}`; 
-});
-
 const createProjectModel = (dbConnection) => dbConnection.model('Project', projectSchema);
 
 module.exports = createProjectModel;

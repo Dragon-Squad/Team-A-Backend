@@ -14,21 +14,27 @@ async function validateCharity(charityId) {
   return charityResponse.data;
 }
 
-async function validateUser(charityId) {
-  const userResponse = await axios.get(`http://172.30.208.1:3000/api/users/${charityId}`);
+async function validateUser(userId) {
+  const userResponse = await axios.get(`http://172.30.208.1:3000/api/users/${userId}`);
   if (!userResponse.data) {
     throw new Error("No Email Found");
   }
   return userResponse.data;
 }
 
-async function validateCategory(categoryId) {
-  const category = await CategoryService.getCategoryById(categoryId);
-  if (!category) {
-    throw new Error("Error validating category ID");
+async function validateCategory(categoryIds) {
+  const categories = [];
+
+  for (const categoryId of categoryIds) {
+    const category = await CategoryService.getCategoryById(categoryId);
+    if (!category) {
+      throw new Error("Error validating category ID");
+    }
+    categories.push(category);
   }
-  return category;
+  return categories;
 }
+
 
 async function validateRegion(regionId) {
   const region = await RegionService.getRegionById(regionId);
@@ -38,39 +44,62 @@ async function validateRegion(regionId) {
   return region;
 }
 
-function mergeNotificationLists(region, category) {
-  return new Set([
-    ...region.notificationList.map(String),
-    ...category.notificationList,
-  ]);
+function mergeNotificationLists(region, categories) {
+  const result = new Set();
+
+  categories.forEach(category => {
+    category.notificationList.forEach(item => result.add(item));
+  });
+
+  region.notificationList.forEach(item => result.add(item));
+
+  return result;
 }
 
 class ProjectService {
   async create(projectData) {
     ProjectValidator.validateProjectCreationRequest(projectData);
-
+  
     const charity = await validateCharity(projectData.charityId);
-    const user = await validateUser(projectData.charityId);
+    const user = await validateUser(charity.userId);
+    
+    const categories = await validateCategory(projectData.categoryIds);
+    const categoryIds = categories.map(category => category._id);
 
-    const category = await validateCategory(projectData.categoryId);
     const region = await validateRegion(projectData.regionId);
-
+  
+    projectData = {
+      charityId: projectData.charityId,
+      categoryIds, 
+      regionId: region._id, 
+      title: projectData.title,
+      goalAmount: projectData.goalAmount,
+      startDate: projectData.startDate,
+      endDate: projectData.endDate,
+      hashedStripeId: charity.hashedStripeId,
+    };
+  
+    console.log(projectData);
+  
     const project = await ProjectRepository.create(projectData);
+  
+    const projectDTO = {...project, region: region, categories: categories[0]};
 
-    const mergedNotificationList = mergeNotificationLists(region, category);
-
+    const mergedNotificationList = mergeNotificationLists(region, categories);
+  
     await publish({
-      topic: "project_to_email",
+      topic: "to_email",
       event: "create_project",
       message: {
         charity: { name: charity.name, email: user.email },
-        project,
-        notificationList: mergedNotificationList,
+        project: projectDTO,
+        notificationList: [...mergedNotificationList],
       },
     });
-
+  
     return project;
   }
+  
 
   async update(id, projectData) {
     ProjectValidator.validateProjectUpdateRequest(id, projectData);
@@ -95,7 +124,7 @@ class ProjectService {
     const result = await ProjectRepository.delete(id);
     if (result) {
       await publish({
-        topic: "project_to_shard",
+        topic: "to_shard",
         event: "deleted_project",
         message: project,
       });
@@ -112,21 +141,24 @@ class ProjectService {
       (project.status === "halted" && status === "active")
     ) {
       if (status === "halted") {
-        const charity = await validateCharity(project.charityId);
-        const user = await validateUser(project.charityId);
+        // const charityId = await ProjectRepository.getCharityId(id);
+        const charity = await validateCharity(reason);
+        const user = await validateUser(charity.userId);
 
-        const category = await validateCategory(project.categoryId);
+        const categoryIds = project.categoryIds.map(category => category._id);
+        console.log(categoryIds);
+        const categories = await validateCategory(categoryIds);
         const region = await validateRegion(project.regionId);
 
-        const mergedNotificationList = mergeNotificationLists(region, category);
+        const mergedNotificationList = mergeNotificationLists(region, categories);
 
         await publish({
-          topic: "project_to_email",
+          topic: "to_email",
           event: "halt_project",
           message: {
             charity: { name: charity.name, email: user.email },
-            project,
-            notificationList: mergedNotificationList,
+            project: project,
+            notificationList: [...mergedNotificationList],
             reason,
           },
         });

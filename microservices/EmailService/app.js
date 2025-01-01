@@ -7,6 +7,7 @@ const path = require("path");
 const helmet = require("helmet");
 const httpStatus = require("http-status");
 const EmailRouter = require('./Email/EmailRouter');
+const { subscribe } = require("./broker/Consumer");
 
 const app = express();
 const SERVER_PORT = process.env.EMAIL_SERVER_PORT || 8002;
@@ -36,6 +37,8 @@ const runApp = async () => {
     app.use(bodyParser.json()); // Parse JSON bodies
     app.use(bodyParser.urlencoded({ extended: true })); // Parse URL-encoded bodies
     app.use(express.static(path.join(__dirname, 'public'))); // Serve static files
+
+    await subscribe("to_email");
 
     app.use(`/email`, EmailRouter);
 

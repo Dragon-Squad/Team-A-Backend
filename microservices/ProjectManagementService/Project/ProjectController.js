@@ -1,5 +1,5 @@
 const ProjectService = require("./ProjectService");
-const RedisMiddleware = require("../redisMiddleware");
+// const RedisMiddleware = require("../redisMiddleware");
 const hash = require("object-hash");
 
 class ProjectController {
@@ -93,11 +93,11 @@ class ProjectController {
       const cacheKey = `project:${id}`;
 
       // Check Redis cache
-      const cachedProject = await RedisMiddleware.readData(clientId, cacheKey);
-      if (cachedProject) {
-        console.log("Cache hit for project ID:", id);
-        return res.status(200).json(cachedProject);
-      }
+      // const cachedProject = await RedisMiddleware.readData(clientId, cacheKey);
+      // if (cachedProject) {
+      //   console.log("Cache hit for project ID:", id);
+      //   return res.status(200).json(cachedProject);
+      // }
 
       // Fetch from database if not cached
       const project = await ProjectService.getById(id);
@@ -105,8 +105,8 @@ class ProjectController {
         return res.status(404).json({ message: "Project not found" });
       }
 
-      // Cache the result
-      await RedisMiddleware.writeData(clientId, cacheKey, project);
+      // // Cache the result
+      // await RedisMiddleware.writeData(clientId, cacheKey, project);
 
       res.status(200).json(project);
     } catch (error) {
@@ -122,17 +122,17 @@ class ProjectController {
       const cacheKey = `projects:${hash.sha1(filters)}`; // Generate a unique key for filters
 
       // Check Redis cache
-      const cachedProjects = await RedisMiddleware.readData(clientId, cacheKey);
-      if (cachedProjects) {
-        console.log("Cache hit for project list with filters:", filters);
-        return res.status(200).json(cachedProjects);
-      }
+      // const cachedProjects = await RedisMiddleware.readData(clientId, cacheKey);
+      // if (cachedProjects) {
+      //   console.log("Cache hit for project list with filters:", filters);
+      //   return res.status(200).json(cachedProjects);
+      // }
 
       // Fetch from database if not cached
       const projects = await ProjectService.getAll(filters);
 
       // Cache the result
-      await RedisMiddleware.writeData(clientId, cacheKey, projects);
+      // await RedisMiddleware.writeData(clientId, cacheKey, projects);
 
       res.status(200).json(projects);
     } catch (error) {

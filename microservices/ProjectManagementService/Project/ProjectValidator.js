@@ -6,8 +6,18 @@ class ProjectValidator {
     validators.isRequired(projectData.charityId, "charityId", errors);
     validators.isString(projectData.charityId, "charityId", errors);
 
-    validators.isRequired(projectData.categoryId, "categoryId", errors);
-    validators.isString(projectData.categoryId, "categoryId", errors);
+    if (!projectData.categoryIds) {
+      errors.push({ field: "categoryIds", message: "categoryIds is required" });
+    } else if (!Array.isArray(projectData.categoryIds)) {
+        errors.push({ field: "categoryIds", message: "categoryIds must be an array" });
+    } else {
+        for (const categoryId of projectData.categoryIds) {
+            if (typeof categoryId !== 'string') {
+                errors.push({ field: "categoryIds", message: "All elements in categoryIds must be strings" });
+                break; 
+            }
+        }
+    }
 
     validators.isRequired(projectData.regionId, "regionId", errors);
     validators.isString(projectData.regionId, "regionId", errors);
@@ -29,8 +39,6 @@ class ProjectValidator {
 
     validators.isArrayOfStrings(projectData.images, "images", errors);
     validators.isArrayOfStrings(projectData.videos, "videos", errors);
-
-    validators.isString(projectData.account, "account", errors);
 
     if (errors.length > 0) {
       throw new Error(`Validation error: ${errors.join(" ")}`);

@@ -2,8 +2,8 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const notificationSchema = new Schema({
-  email: { type: String, },
-  name: { type: String, }
+  email: { type: String },
+  name: { type: String }
 });
 
 const categorySchema = new Schema({
