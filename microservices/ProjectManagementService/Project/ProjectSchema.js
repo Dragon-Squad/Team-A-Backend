@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const projectSchema = new Schema({
   charityId: { type: Schema.Types.ObjectId, ref: "Charity", required: true, index: true },
-  categoryId: [{ type: Schema.Types.ObjectId, ref: "Category"}],
+  categoryIds: [{ type: Schema.Types.ObjectId, ref: "Category"}],
   regionId: { type: Schema.Types.ObjectId, ref: "Region", required: true },
   title: { type: String, required: true },
   description: { type: String },
@@ -12,7 +12,7 @@ const projectSchema = new Schema({
   createdAt: { type: Date, default: Date.now },
   status: {
     type: String,
-    enum: ["pending", "active", "halted", "completed", "deleted"],
+    enum: ["pending", "active", "halted"],
     required: true,
     default: "pending",
   },
@@ -21,12 +21,7 @@ const projectSchema = new Schema({
   images: { type: [String] },
   videos: { type: [String] },
   account: { type: String },
-  stripeId: { type: String },
-});
-
-projectSchema.pre("save", function (next) {
-  const date = new Date(this.endDate);
-  this.partitionKey = `${date.getFullYear()}-${date.getMonth() + 1}`; 
+  hashedStripeId: { type: String, required: true },
 });
 
 module.exports = mongoose.model("Project", projectSchema);

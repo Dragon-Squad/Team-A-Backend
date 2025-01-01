@@ -37,13 +37,13 @@ class DonationRepository {
   }
 
   async getAllByDonor(limit, page, donorId) {
-    const totalCount = await Donation.countDocuments({ donor: donorId });  
+    const totalCount = await Donation.countDocuments({ donorId: donorId });  
     const totalPages = Math.ceil(totalCount / limit);                       
     const currentPage = page;                                          
     const isLast = currentPage >= totalPages;                             
 
     const offset = (page - 1) * limit;
-    const data = await Donation.find({ donor: donorId })
+    const data = await Donation.find({ donorId: donorId })
       .skip(offset)
       .limit(limit);
 
@@ -59,13 +59,13 @@ class DonationRepository {
   }
 
   async getAllByProject(limit, page, projectId) {
-    const totalCount = await Donation.countDocuments({ project: projectId }); 
+    const totalCount = await Donation.countDocuments({ projectId: projectId }); 
     const totalPages = Math.ceil(totalCount / limit);                         
     const currentPage = page;                                               
     const isLast = currentPage >= totalPages;                                
 
     const offset = (page - 1) * limit;
-    const data = await Donation.find({ project: projectId })
+    const data = await Donation.find({ projectId: projectId })
       .skip(offset)
       .limit(limit);
 
@@ -78,14 +78,6 @@ class DonationRepository {
       },
       data: data                        
     };
-  }
-
-  async countByDonor(donorId) {
-    return await Donation.countDocuments({ donor: donorId });
-  }
-
-  async countByProject(projectId) {
-    return await Donation.countDocuments({ project: projectId });
   }
 }
 

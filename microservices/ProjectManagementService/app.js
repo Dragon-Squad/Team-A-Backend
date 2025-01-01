@@ -4,7 +4,6 @@ const ProjectRouter = require("./Project/ProjectRouter");
 const CategoryRouter = require("./Category/CategoryRouter");
 const RegionRouter = require("./Region/RegionRouter");
 const { subscribe } = require("./broker/Consumer");
-const { getProjectById } = require("./Project/External/ProjectExternalService");
 
 const runApp = async () => {
   try {
@@ -19,7 +18,11 @@ const runApp = async () => {
     app.use(`/category`, CategoryRouter);
     app.use(`/region`, RegionRouter);
 
-    await subscribe("donation_to_project", getProjectById);
+    app.get('/health/check', (req, res) => {
+      res.status(200).json({ message: 'Server is working!' });
+    });
+
+    await subscribe("donation_to_project");
 
     // Add error handler
     app.use(errorHandler);

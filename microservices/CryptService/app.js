@@ -39,10 +39,6 @@ const runApp = async () => {
 
     app.use(`/crypt`, CryptRouter);
 
-    app.get('/crypt/test', (req, res) => {
-      res.status(200).json({ message: 'Server is working!' });
-    });
-
     const errorHandler = (err, req, res, next) => {
       console.error(err);
       return res.status(err.status || httpStatus.INTERNAL_SERVER_ERROR).json({

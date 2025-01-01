@@ -26,22 +26,24 @@ class EmailExternalService {
             projectUrl,
             amount
         );
-        await EmailService.sendEmail(mailOptions);
+        const info = await transporter.sendMail(mailOptions);
+        console.log("Email sent:", info.response);
     }
 
     // Send donors an email for new project
     async sendDonorProjectCreatedEmail(value) {
         value.notificationList.forEach(async (notificationDetail) => {
             const mailOptions = donorProjectCreatedMail(
-                notificationDetail.value,
+                notificationDetail.email,
                 notificationDetail.name,
-                "",
+                value.project._doc.title, 
+                "", 
                 value.project.region.name,
-                value.project.categories.name,
-                value.project.description,
-                value.project.goalAmount
+                value.project.categories.name, 
+                value.project._doc.goalAmount.toString()
             );
-            await EmailService.sendEmail(mailOptions);
+            const info = await transporter.sendMail(mailOptions);
+            console.log("Email sent:", info.response);
         });
     }
 
@@ -49,12 +51,13 @@ class EmailExternalService {
     async sendDonorProjectHaltedEmail(value) {
         value.notificationList.forEach(async (notificationDetail) => {
             const mailOptions = donorProjectHaltedMail(
-                notificationDetail.value,
+                notificationDetail.email,
                 notificationDetail.name,
                 "",
                 value.reason
             );
-            await EmailService.sendEmail(mailOptions);
+            const info = await transporter.sendMail(mailOptions);
+            console.log("Email sent:", info.response);
         });
     }
 
@@ -63,18 +66,20 @@ class EmailExternalService {
         const mailOptions = charityProjectCreatedMail(
             value.charity.email,
             value.charity.name,
-            value.project.name,
-            "",
+            value.project._doc.title, 
+            "", 
             value.project.region.name,
-            value.project.categories.name,
-            value.project.description,
-            value.project.goalAmount
+            value.project.categories.name, 
+            value.project._doc.goalAmount.toString()
         );
-        await EmailService.sendEmail(mailOptions);
+        const info = await transporter.sendMail(mailOptions);
+        console.log("Email sent:", info.response);
     }
+    
 
     // Send charity an email on project halt
     async sendCharityProjectHaltedEmail(value) {
+        console.log(value);
         const mailOptions = charityProjectHaltedMail(
             value.charity.email,
             value.charity.name,
@@ -82,7 +87,8 @@ class EmailExternalService {
             "",
             value.reason
         );
-        await EmailService.sendEmail(mailOptions);
+        const info = await transporter.sendMail(mailOptions);
+        console.log("Email sent:", info.response);
     }
 
     // Send charity an email on project completion
@@ -98,11 +104,6 @@ class EmailExternalService {
             projectTitle,
             projectUrl
         );
-        await EmailService.sendEmail(mailOptions);
-    }
-
-    // Generic function to send emails
-    static async sendEmail(mailOptions) {
         const info = await transporter.sendMail(mailOptions);
         console.log("Email sent:", info.response);
     }
