@@ -1,4 +1,5 @@
 const CategoryRepository = require('./CategoryRepository');
+const axios = require("axios");
 
 const ListType = Object.freeze({
     SUBSCRIPTION: 'subscriptionList',
@@ -8,17 +9,17 @@ const ListType = Object.freeze({
 async function fetchDonorDetails(donorId) {
     if (!donorId) throw new Error("No Donor Id provided");
 
-    const donorResponse = await axios.get(`http://172.30.208.1:3000/api/donors/${donorId}`);
-    if (!donorResponse.data) throw new Error("No Donor Found");
+    const response = await axios.get(`http://172.30.208.1:3000/api/donors/${donorId}`);
+    if (!response.data) throw new Error("No Donor Found");
 
-    return donorResponse.data;
+    return response.data;
 }
 
 async function fetchUserEmail(donorId) {
-    const userResponse = await axios.get(`http://172.30.208.1:3000/api/users/${donorId}`);
-    if (!userResponse.data) throw new Error("No Email Found");
+    const response = await axios.get(`http://172.30.208.1:3000/api/donors/${donorId}/email`);
+    if (!response.data) throw new Error("No Email Found");
 
-    return userResponse.data.email;
+    return response.data.email;
 }
 
 async function getCategoryById(categoryId) {
@@ -58,6 +59,7 @@ class CategoryService {
         try {
             const donor = await fetchDonorDetails(donorId);
             const donorEmail = await fetchUserEmail(donorId);
+            console.log(donorEmail);
             const category = await getCategoryById(categoryId);
 
             await ensureSubscribed(category, categoryId, donorId);

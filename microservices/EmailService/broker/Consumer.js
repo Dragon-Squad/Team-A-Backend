@@ -47,7 +47,7 @@ const disconnectConsumer = async () => {
 };
 
 // Subscribes to a Kafka topic and processes messages
-const subscribe = async (topic, messageHandler) => {
+const subscribe = async (topic) => {
   const consumer = await connectConsumer();
 
   try {

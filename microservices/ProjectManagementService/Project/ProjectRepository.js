@@ -19,7 +19,7 @@ class ProjectRepository {
     // Find a project by ID and populate related fields (charity, category, region)
     const project = await Project.findById(id)
       .populate("charityId") // Populates the charityId field with the full Charity document
-      .populate("categoryId") // Populates the categoryId field with the full Category document
+      .populate("categoryIds") // Populates the categoryId field with the full Category document
       .populate("regionId"); // Populates the regionId field with the full Region document
 
     if (!project) {
@@ -56,7 +56,7 @@ class ProjectRepository {
       .skip(skip)
       .limit(parseInt(limit))
       .populate("charityId") // Populates the charityId field with Charity document
-      .populate("categoryId") // Populates the categoryId field with Category document
+      .populate("categoryIds") // Populates the categoryId field with Category document
       .populate("regionId"); // Populates the regionId field with Region document
 
     const total = await Project.countDocuments(query); // Total count for pagination
@@ -67,6 +67,11 @@ class ProjectRepository {
       limit: parseInt(limit),
       projects,
     };
+  }
+
+  async getCharityId(id){
+    const project = await Project.findById(id);
+    return project.charityId.toString;
   }
 }
 

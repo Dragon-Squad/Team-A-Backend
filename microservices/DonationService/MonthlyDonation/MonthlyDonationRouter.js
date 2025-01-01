@@ -2,6 +2,11 @@ const express = require('express');
 const MonthlyDonationController = require('./MonthlyDonationController');
 const MonthlyDonationRouter = express.Router();
 
+MonthlyDonationRouter.get(
+    '/all', 
+    MonthlyDonationController.getAllMonthlyDonations
+);
+
 MonthlyDonationRouter.put(
     '/:id', 
     MonthlyDonationController.update
@@ -10,11 +15,6 @@ MonthlyDonationRouter.put(
 MonthlyDonationRouter.put(
     '/cancel/:id', 
     MonthlyDonationController.cancel
-);
-
-MonthlyDonationRouter.get(
-    '/', 
-    MonthlyDonationController.getAllMonthlyDonations
 );
 
 MonthlyDonationRouter.get(

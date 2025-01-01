@@ -20,19 +20,25 @@ class WebhookService {
     }
 
     async handleEvent(event) {
+        console.log("session");
         let transaction;
         const session = event.data.object;
-        console.log(session);
 
         const projectId = session.metadata.projectId;
         const message = session.metadata.personal_message;
         const donationType = session.mode === "payment" ? "one-time" : "monthly";
+        const donorId = session.metadata.donorId;
+        console.log("=========metadata=========");
+        console.log(projectId);
+        console.log(donationType);
 
-        const donation = DonationService.create({
+        const donation = await DonationService.create({
             projectId: projectId,
+            donorId: donorId,
             donationType: donationType,
             message: message
         });
+        console.log(`Donation: ${donation}`);
 
         const allPaymentMethods = session.payment_method_types; // Available methods
         const configuredMethods = Object.keys(session.payment_method_options || {}); // Configured methods
@@ -44,12 +50,12 @@ class WebhookService {
         switch (event.type) {
             case 'checkout.session.completed':
                 const amount = session.amount_total/100;
-                const response = await axios.get(`http://172.30.208.1:3000/api/donors/${session.metadata.donorId}`);
+                const response = await axios.get(`http://172.30.208.1:3000/api/donors/${donorId}`);
     
                 //If there is donor -> update donor statistic and send the email 
-                if (response.data) {
+                if (response.data & amount > 0) {
                     const body = {donationAmount: amount, projectId: projectId};
-                    await axios.post(`http://172.30.208.1:3000/api/donors/${session.metadata.donorId}/update-stats`, body);
+                    await axios.post(`http://172.30.208.1:3000/api/donors/${donorId}/update-stats`, body);
 
                     // await publish({
                     //     topic: "donation_to_email",
@@ -72,19 +78,21 @@ class WebhookService {
 
                 //if it is monthly, create monthly donation record
                 const monthlyDonationId = session.metadata.monthlyDonationId;
+                console.log(monthlyDonationId);
                 if(monthlyDonationId){
                     try{
                         const monthlyDonation = await MonthlyDonationService.getMonthlyDonationById(monthlyDonationId);
                         
                         const updatedMonthlyDonation = {
-                            donorId: session.customer,
+                            donorId: donorId,
                             projectId: projectId,
                             stripeSubscriptionId: session.subscription,
-                            amount: session.metadata.amount,
+                            amount: amount,
                             renewDate: session.metadata.renewDate,
                             cancelledAt: null,
                             isActive: true,
                         };
+                        console.log(updatedMonthlyDonation);
 
                         await MonthlyDonationService.update(monthlyDonationId,updatedMonthlyDonation);
                     

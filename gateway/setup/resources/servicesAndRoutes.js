@@ -43,6 +43,7 @@ const donationRoutes = [
     '/donation/donor/',
     '/donation/project/',
     '/donation/monthly/',
+    '/donation/monthly/all',
     '/donation/monthly/new',
     '/donation/monthly/donor/',
     '/donation/monthly/cancel/',
