@@ -43,7 +43,20 @@ or Execute this if you are using Window
 
 <hr>
 
-### 3. Run the Backend
+### 3. Setup Backend
+Execute this if you are using Linux/MacOs
+````sh
+sudo chmod +x ./setup.sh
+./setup.sh
+````
+or Execute this if you are using Window
+````sh
+.\setup.bat
+````
+
+<hr>
+
+### 4. Run the Backend
 Execute this if you are using Linux/MacOs
 ````sh
 sudo chmod +x ./run.sh
@@ -58,7 +71,7 @@ To verify that the routes were added successfully, you can access: http://localh
 
 <hr>
 
-### 4. Setup ngrok
+### 5. Setup ngrok
 Installation
 - Get ngrok from this link: `https://download.ngrok.com/windows`
 

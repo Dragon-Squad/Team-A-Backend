@@ -3,7 +3,7 @@ const initialData = require('../../../resources/initialData');
 const charitiesData = initialData.charities;
 const { faker } = require ('@faker-js/faker');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-const { uploadImage } = require('../../fileData/uploadImage');
+const { uploadImage } = require('../../fileData/uploadFile');
 
 const createCharities = async (User, Charity, Address) => {
     try {
@@ -22,7 +22,7 @@ const createCharities = async (User, Charity, Address) => {
                 await address.save();
 
                 const email = `${charity.companyName.replace(' ', '').toLowerCase()}@charitan.com`;
-                const imageUrl = await uploadImage(charity.avatar, "Charity");
+                const imageUrl = await uploadImage(charity.avatar, "Charity", "Charity");
 
                 // Create a user in authDB
                 const charityUser = new User({

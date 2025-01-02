@@ -84,8 +84,8 @@ function createSessionConfig(customerId, monthlyDonationId, personalMessage, pro
                 proration_behavior: 'none',
             }
             : undefined,
-        success_url: 'http://localhost:5500/success',
-        cancel_url: 'http://localhost:5500/cancel',
+        success_url: 'http://localhost:5173/success',
+        cancel_url: 'http://localhost:5173/cancel',
         metadata: {
             personal_message: personalMessage || 'No message provided',
             projectId: projectId,

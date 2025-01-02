@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const projectSchema = new Schema({
   charityId: { type: Schema.Types.ObjectId, ref: "Charity", required: true, index: true },
-  categoryId: [{ type: Schema.Types.ObjectId, ref: "Category"}],
+  categoryIds: [{ type: Schema.Types.ObjectId, ref: "Category"}],
   regionId: { type: Schema.Types.ObjectId, ref: "Region", required: true },
   title: { type: String, required: true },
   description: { type: String },

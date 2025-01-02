@@ -1,7 +1,7 @@
 const initialData = require('../../../resources/initialData');
 const globalProjectsData = initialData.globalProjects;
 const localProjectsData = initialData.localProjects;
-const { uploadImage } = require('../../fileData/uploadImage');
+const { uploadImage, uploadVideo } = require('../../fileData/uploadFile');
 
 const createProjects = async (Project, charityDocs, categoryDocs, regionDocs) => {
     try {
@@ -33,17 +33,26 @@ const createProjects = async (Project, charityDocs, categoryDocs, regionDocs) =>
         console.log('Creating global projects...');
         const globalProjects = await Promise.all(globalProjectsData.map(async (project) => {
             const charityId = charityMap[project.charityCompanyName];
-            const categoryId = categoryMap[project.category];
+            let categoryIds = [];
+            for(const category of project.categories){
+                categoryIds.push(categoryMap[category]);
+            }
             const regionId = regionMap[project.region];
             
-            if (!charityId || !categoryId || !regionId) {
+            if (!charityId || !categoryIds || !regionId) {
                 console.warn(`Missing data for global project: ${project.title}`);
                 return null;  
             }
         
-            const uploadPromises = project.images.map(image => uploadImage(image, "Project"));
+            const uploadPromises = project.images.map(image => uploadImage(image, "Project", "Project/Image"));
             const imageUrls = await Promise.all(uploadPromises);
-        
+            
+            let videoUrls = [];
+            if(project.videos){
+                const uploadPromises = project.videos.map(video => uploadVideo(video, "Project"));
+                videoUrls = await Promise.all(uploadPromises);
+            }
+
             const today = new Date();
         
             return {
@@ -51,13 +60,14 @@ const createProjects = async (Project, charityDocs, categoryDocs, regionDocs) =>
                 description: project.description,
                 goalAmount: project.goalAmount,
                 charityId: charityId,
-                categoryId: categoryId,
+                categoryIds: categoryIds,
                 regionId: regionId,
                 status: 'active',
                 createdAt: today,
                 startDate: today,
                 endDate: calculateEndDate(project.duration),
                 images: imageUrls,
+                videos: videoUrls,
             };
         }));
         
@@ -74,17 +84,20 @@ const createProjects = async (Project, charityDocs, categoryDocs, regionDocs) =>
         console.log('Creating local projects...');
         const localProjects = await Promise.all(localProjectsData.map(async (project) => {
             const charityId = charityMap[project.charityCompanyName];
-            const categoryId = categoryMap[project.category];
+            let categoryIds = [];
+            for(const category of project.categories){
+                categoryIds.push(categoryMap[category]);
+            }
             const regionId = regionMap[project.region];
         
-            if (!charityId || !categoryId || !regionId) {
+            if (!charityId || !categoryIds || !regionId) {
                 console.warn(`Missing data for local project: ${project.title}`);
                 return null;  
             }
         
-            const uploadPromises = project.images.map(image => uploadImage(image, "Project"));
+            const uploadPromises = project.images.map(image => uploadImage(image, "Project","Project/Image"));
             const imageUrls = await Promise.all(uploadPromises);
-        
+
             const today = new Date();
         
             return {
@@ -92,7 +105,7 @@ const createProjects = async (Project, charityDocs, categoryDocs, regionDocs) =>
                 description: project.description,
                 goalAmount: project.goalAmount,
                 charityId: charityId,
-                categoryId: categoryId,
+                categoryIds: categoryIds,
                 regionId: regionId,
                 status: 'pending',
                 createdAt: today,
