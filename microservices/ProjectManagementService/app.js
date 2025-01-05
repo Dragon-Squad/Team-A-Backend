@@ -1,8 +1,8 @@
 const { app, SERVER_PORT, configureApp, errorHandler } = require("./Config/AppConfig");
 const { connectDB } = require("./Config/DBConfig");
-const ProjectRouter = require("./Project/ProjectRouter");
-const CategoryRouter = require("./Category/CategoryRouter");
-const RegionRouter = require("./Region/RegionRouter");
+const ProjectRouter = require("./models/Project/ProjectRouter");
+const CategoryRouter = require("./models/Category/CategoryRouter");
+const RegionRouter = require("./models/Region/RegionRouter");
 const { subscribe } = require("./broker/Consumer");
 
 const runApp = async () => {

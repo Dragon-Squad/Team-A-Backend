@@ -1,5 +1,5 @@
 const { Kafka, logLevel } = require("kafkajs");
-const { getProjectById, updateProjectRaisedAmount } = require("../Project/External/ProjectExternalService");
+const { getProjectById, updateProjectRaisedAmount } = require("../models/Project/External/ProjectExternalService");
 
 // Configuration properties
 const CLIENT_ID = "ProjectA";

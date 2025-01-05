@@ -1,24 +1,49 @@
-const DonationRepository = require('./DonationRepository');
-const { createDonationSession } = require('../utils/StripeUtils');
-const { publish } = require("../broker/Producer");
-const { connectConsumer } = require("../broker/Consumer");
-const MonthlyDonationService = require('../MonthlyDonation/MonthlyDonationService');
-const axios = require("axios");
+const GuestDonationRepository = require('./GuestDonationRepository');
+const GuestDonorService = require('../GuestDonor/GuestDonorService');
+const { publish } = require("../../../broker/Producer");
+const { connectConsumer } = require("../../../broker/Consumer");
+const { createDonationSession } = require('../../../utils/StripeUtils');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
-class DonationService {
+class GuestDonationService {
     async donation(data) {
-        const { donorId, message: personalMessage = null, projectId, donationType, amount } = data;
-        const customerId = "cus_RPk3Q0QY3NFMwo"; // Replace with dynamic customer ID if needed
+        const { guestFirstName, guestLastName, guestEmail, guestAddress, message: personalMessage = null, projectId, amount } = data;
     
-        if (!donorId) throw new Error('No DonorId provided');
+        if (!guestFirstName && !guestLastName && !guestEmail && !guestAddress) throw new Error('Missing Guest Information for Donation');
         if (!projectId) throw new Error('No Project provided');
-        if (!donationType) throw new Error('No Donation Type provided');
         if (typeof amount !== 'number' || isNaN(amount) || amount <= 0) throw new Error('Amount must be a valid positive number');
         
-        const response = await axios.get(`http://172.30.208.1:3000/api/donors/${donorId}`);
-        if (!response.data) {
-            throw new Error("No Donor Found");
+        let customerId;
+        try {
+            // Check for existing Stripe customer
+            const customers = await stripe.customers.list({
+                email: guestEmail,
+                limit: 1,
+            });
+
+            if (customers.data.length > 0) {
+                customerId = customers.data[0].id;
+            } else {
+                // Create a new Stripe customer
+                const newCustomer = await stripe.customers.create({
+                    email: email,
+                });
+                customerId = newCustomer.id;
+            }
+        } catch (err) {
+            throw new Error('Failed to retrieve or create customer: ' + err.message);
         }
+
+        if (!customerId){
+            throw new Error("Can not create Stripe Customer");
+        }
+
+        const guestDonor = await GuestDonorService.create({
+            firstName: guestFirstName,
+            lastName: guestLastName,
+            email: guestEmail,
+            address: guestAddress,  
+        });
 
         await publish({
             topic: "donation_to_project",
@@ -52,14 +77,9 @@ class DonationService {
             });
     
             const unitAmount = Math.round(amount * 100);
-            let monthlyDonationId = null;
-    
-            if (donationType === "monthly") {
-                const monthlyDonation = await MonthlyDonationService.create();
-                monthlyDonationId = monthlyDonation._id.toString();
-            }
-    
-            const session = await createDonationSession(customerId, monthlyDonationId, unitAmount, personalMessage, projectId, donorId);
+            const donorId = (await guestDonor)._id;
+            console.log(donorId.toString());
+            const session = await createDonationSession(customerId, null, unitAmount, personalMessage, projectId, donorId.toString(), "GuestDonation");
             return { checkoutUrl: session.url };
     
         } catch (err) {
@@ -69,54 +89,37 @@ class DonationService {
             await consumer.disconnect();
         }
     }
-    
 
     async create(data){
         try{
-            const result = await DonationRepository.create(data);
+            const result = await GuestDonationRepository.create(data);
             return result;
         } catch (error){
             throw new Error('Error: ' + error.message);
         }
     }
 
-    async getAllDonations(limit, page){
+    async getAllGuestDonations(limit, page){
         try{
-            const result = await DonationRepository.getAll(limit, page);
+            const result = await GuestDonationRepository.getAll(limit, page);
             return result;
         } catch (error){
             throw new Error('Error: ' + error.message);
         }
     }
 
-    async getDonationById(donationId){
-        try{
-            if(!donationId) throw new Error('No Donation Id provided');
-
-            const result = await DonationRepository.findById(donationId);
-            return result;
-        } catch (error){
-            throw new Error('Error: ' + error.message);
-        } 
-    }
-
-    async getDonationsByDonor(limit, page, donorId){
-        try{
-            if(!donorId) throw new Error('No Donor Id provided');
-
-            const response = await axios.get(`http://172.30.208.1:3000/api/donors/${donorId}`);
-            if (!response.data) {
-                throw new Error("Error validating donor ID");
-            }
-
-            const result = await DonationRepository.getAllByDonor(limit, page, donorId);
-            return result;
-        } catch (error){
-            throw new Error('Error: ' + error.message);
+    async getGuestDonationById(donationId){
+            try{
+                if(!donationId) throw new Error('No Donation Id provided');
+    
+                const result = await GuestDonationRepository.findById(donationId);
+                return result;
+            } catch (error){
+                throw new Error('Error: ' + error.message);
+            } 
         }
-    }
 
-    async getDonationsByProject(limit, page, projectId){
+    async getGuestDonationsByProject(limit, page, projectId){
         if(!projectId) throw new Error('No Project Id provided');
 
         await publish({
@@ -145,11 +148,11 @@ class DonationService {
                 });
             });
     
-            const donations = await DonationRepository.getAllByProject(limit, page, projectId);
-            return donations;
+            const guestDonations = await GuestDonationRepository.getAllByProject(limit, page, projectId);
+            return guestDonations;
     
         } catch (err) {
-            console.error('Error during donation process:', err.message);
+            console.error('Error during GuestDonation process:', err.message);
             throw err;
         } finally {
             await consumer.disconnect();
@@ -157,4 +160,4 @@ class DonationService {
     }
 }
 
-module.exports = new DonationService();
+module.exports = new GuestDonationService();

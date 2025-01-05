@@ -37,6 +37,10 @@ const projectRoutes = [
 const fileRoutes = ['/files/upload/', '/files'];
 
 const donationRoutes = [
+    '/donation/guest/',
+    '/donation/guest/all',
+    '/donation/guest/new',
+    '/donation/guest/project/',
     '/donation/',
     '/donation/all',
     '/donation/new',
@@ -47,16 +51,12 @@ const donationRoutes = [
     '/donation/monthly/new',
     '/donation/monthly/donor/',
     '/donation/monthly/cancel/',
-    '/donation/webhook/handle',
-];
-
-const charityRoutes = [
-    '/charity/payment-method/'
+    '/donation/webhook/handle'
 ];
 
 const shardedProjectRoutes = [
-    'deleted/projects/all',
-    'deleted/projects/',
+    '/deleted/projects/all',
+    '/deleted/projects/',
 ];
 
 const services = [

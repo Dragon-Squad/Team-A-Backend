@@ -3,7 +3,7 @@ const ProjectRepository = require("./ProjectRepository");
 const CategoryService = require("../Category/CategoryService");
 const CharityRepository = require("../Charity/CharityRepository");
 const RegionService = require("../Region/RegionService");
-const { publish } = require("../broker/Producer");
+const { publish } = require("../../broker/Producer");
 const axios = require("axios");
 
 async function validateCharity(charityId) {

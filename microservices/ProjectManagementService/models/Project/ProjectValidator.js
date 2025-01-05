@@ -1,4 +1,4 @@
-const validators = require("../utils/requestValidators");
+const validators = require("../../utils/requestValidators");
 
 class ProjectValidator {
   validateProjectCreationRequest(projectData) {

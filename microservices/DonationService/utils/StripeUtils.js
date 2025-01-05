@@ -67,7 +67,7 @@ async function createOrRetrieveOneTimeProduct(unitAmount) {
     return { product, price };
 }
 
-function createSessionConfig(customerId, monthlyDonationId, personalMessage, projectId, amount, donorId) {
+function createSessionConfig(customerId, monthlyDonationId, personalMessage, projectId, amount, donorId, donorType) {
     const today = new Date();
     let billingCycleAnchor = new Date(today.getFullYear(), today.getMonth(), 13); 
     if (today.getDate() > 15) {
@@ -92,18 +92,19 @@ function createSessionConfig(customerId, monthlyDonationId, personalMessage, pro
             monthlyDonationId: monthlyDonationId || null,
             amount: amount,
             donorId: donorId,
+            donorType: donorType
         },
     };
 }
 
-async function createDonationSession(customerId, monthlyDonationId, unitAmount, personalMessage, projectId, donorId) {
+async function createDonationSession(customerId, monthlyDonationId, unitAmount, personalMessage, projectId, donorId, donorType) {
     if (!unitAmount || typeof unitAmount !== 'number' || unitAmount <= 0) {
         throw new Error('Invalid unitAmount. It must be a positive number representing the smallest currency unit.');
     }
 
     await attachPaymentMethod(customerId);
 
-    let sessionConfig = createSessionConfig(customerId, monthlyDonationId, personalMessage, projectId, unitAmount, donorId);
+    let sessionConfig = createSessionConfig(customerId, monthlyDonationId, personalMessage, projectId, unitAmount, donorId, donorType);
 
     if (monthlyDonationId) {
         const product = await createOrRetrieveMonthlyProduct(monthlyDonationId, unitAmount);

@@ -1,5 +1,5 @@
 const ProjectRepository = require("../ProjectRepository");
-const { publish } = require("../../broker/Producer");
+const { publish } = require("../../../broker/Producer");
 
 class ProjectService {
   async getProjectById(value) {
