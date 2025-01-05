@@ -1,20 +1,34 @@
 require('dotenv').config();
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY); 
 const { publish } = require('../broker/Producer');
-const DonationService = require("../Donation/DonationService");
-const MonthlyDonationService = require('../MonthlyDonation/MonthlyDonationService');
-const PaymentTransactionService = require('../PaymentTransaction/PaymentTransactionService');
+const DonationService = require("../models/RegisterDonor/Donation/DonationService");
+const MonthlyDonationService = require('../models/RegisterDonor/MonthlyDonation/MonthlyDonationService');
+const PaymentTransactionService = require('../models/PaymentTransaction/PaymentTransactionService');
 const axios = require("axios");
+const GuestDonationService = require('../models/GuestDonor/GuestDonation/GuestDonationService');
+const GuestDonorService = require('../models/GuestDonor/GuestDonor/GuestDonorService');
 
-async function handleCheckoutSessionCompleted(session, donorId, projectId, donation, selectedPaymentMethods) {
+async function handleCheckoutSessionCompleted(session, donorId, projectId, donation, selectedPaymentMethods, donorType) {
     const amount = session.amount_total / 100;
-    const response = await axios.get(`http://172.30.208.1:3000/api/donors/${donorId}`);
+    if(donorType === "Donation"){
+        const response = await axios.get(`http://172.30.208.1:3000/api/donors/${donorId}`);
 
-    if (response.data && amount > 0) {
-        await updateDonorStats(donorId, amount, projectId);
+        if(!response){
+            throw new Error("No Donor Found to update");
+        }
+
+        if (response.data && amount > 0) {
+            await updateDonorStats(donorId, amount, projectId);
+        }
+    } else {
+        const response = await GuestDonorService.findById(donorId);
+
+        if(!response){
+            throw new Error("No Guest Donor Found");
+        }
     }
 
-    await createTransactionRecord(donation, amount, selectedPaymentMethods);
+    await createTransactionRecord(donation, amount, selectedPaymentMethods, "success", donorType);
 
     const monthlyDonationId = session.metadata.monthlyDonationId;
     if (monthlyDonationId) {
@@ -24,12 +38,12 @@ async function handleCheckoutSessionCompleted(session, donorId, projectId, donat
     await updateProjectRaisedAmount(projectId, amount);
 }
 
-async function handleCheckoutSessionExpired(session, donation, selectedPaymentMethods) {
+async function handleCheckoutSessionExpired(session, donation, selectedPaymentMethods, donorType) {
     const amount = session.amount_total / 100;
-    await createTransactionRecord(donation, amount, selectedPaymentMethods, "failed");
+    await createTransactionRecord(donation, amount, selectedPaymentMethods, "failed", donorType);
 }
 
-async function handleInvoicePaymentSucceeded(session, donorId, projectId, donation, selectedPaymentMethods) {
+async function handleInvoicePaymentSucceeded(session, donorId, projectId, donation, selectedPaymentMethods, donorType) {
     const amount = session.amount_total / 100;
     const subscriptionId = session.subscription;
 
@@ -43,12 +57,12 @@ async function handleInvoicePaymentSucceeded(session, donorId, projectId, donati
         await updateDonorStats(donorId, amount, projectId);
     }
 
-    await createTransactionRecord(donation, amount, selectedPaymentMethods);
+    await createTransactionRecord(donation, amount, selectedPaymentMethods,  "success", donorType);
 }
 
-async function handleInvoicePaymentFailed(session, donation, selectedPaymentMethods) {
+async function handleInvoicePaymentFailed(session, donation, selectedPaymentMethods, donorType) {
     const amount = session.amount_total / 100;
-    await createTransactionRecord(donation, amount, selectedPaymentMethods, "failed");
+    await createTransactionRecord(donation, amount, selectedPaymentMethods, "failed", donorType);
 
     const subscriptionId = session.subscription;
 
@@ -63,12 +77,13 @@ async function updateDonorStats(donorId, amount, projectId) {
     await axios.post(`http://172.30.208.1:3000/api/donors/${donorId}/update-stats`, body);
 }
 
-async function createTransactionRecord(donation, amount, selectedPaymentMethods, status = "success") {
+async function createTransactionRecord(donation, amount, selectedPaymentMethods, status, donorType) {
     await PaymentTransactionService.create({
         donationId: (await donation)._id,
         amount: amount,
         status: status,
-        paymentProvider: selectedPaymentMethods
+        paymentProvider: selectedPaymentMethods,
+        type: donorType
     });
 }
 
@@ -128,17 +143,23 @@ class WebhookService {
         const message = session.metadata.personal_message;
         const donationType = session.mode === "payment" ? "one-time" : "monthly";
         const donorId = session.metadata.donorId;
-        console.log("=========metadata=========");
-        console.log(projectId);
-        console.log(donationType);
+        const donorType = session.metadata.donorType;
 
-        const donation = await DonationService.create({
-            projectId: projectId,
-            donorId: donorId,
-            donationType: donationType,
-            message: message
-        });
-        console.log(`Donation: ${donation}`);
+        let donation;
+        if(donorType == "Donation"){
+            donation = await DonationService.create({
+                projectId: projectId,
+                donorId: donorId,
+                donationType: donationType,
+                message: message
+            });
+        } else {
+            donation = await GuestDonationService.create({
+                projectId: projectId,
+                guestId: donorId,
+                message: message
+            });
+        }
 
         const allPaymentMethods = session.payment_method_types;
         const configuredMethods = Object.keys(session.payment_method_options || {});
@@ -148,19 +169,19 @@ class WebhookService {
 
         switch (event.type) {
             case 'checkout.session.completed':
-                await handleCheckoutSessionCompleted(session, donorId, projectId, donation, selectedPaymentMethods);
+                await handleCheckoutSessionCompleted(session, donorId, projectId, donation, selectedPaymentMethods, donorType);
                 break;
 
             case 'checkout.session.expired':
-                await handleCheckoutSessionExpired(session, donation, selectedPaymentMethods);
+                await handleCheckoutSessionExpired(session, donation, selectedPaymentMethods, donationType);
                 break;
 
             case 'invoice.payment_succeeded':
-                await handleInvoicePaymentSucceeded(session, donorId, projectId, donation, selectedPaymentMethods);
+                await handleInvoicePaymentSucceeded(session, donorId, projectId, donation, selectedPaymentMethods, donorType);
                 break;
             
             case 'invoice.payment_failed':
-                await handleInvoicePaymentFailed(session, donation, selectedPaymentMethods);
+                await handleInvoicePaymentFailed(session, donation, selectedPaymentMethods, donorType);
                 break;
 
             default:

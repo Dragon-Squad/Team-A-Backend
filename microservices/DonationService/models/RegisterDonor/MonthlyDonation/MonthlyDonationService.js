@@ -1,5 +1,5 @@
 const MonthlyDonationRepository = require('./MonthlyDonationRepository');
-const { cancelSubscription } = require("../utils/StripeUtils");
+const { cancelSubscription } = require("../../../utils/StripeUtils");
 
 class MonthlyDonationService {
   async create() {

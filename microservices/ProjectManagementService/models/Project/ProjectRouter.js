@@ -1,7 +1,7 @@
 const express = require("express");
 const ProjectController = require("./ProjectController");
-const { authenticate, authorize } = require("../middleware/auth");
-const UserType = require("../enum/UserType");
+// const { authenticate, authorize } = require("../middleware/auth");
+// const UserType = require("../enum/UserType");
 const ProjectRouter = express.Router();
 
 ProjectRouter.get("/all", ProjectController.getAll);

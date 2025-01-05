@@ -14,7 +14,7 @@ call node Setup\serversRegister.js
 echo ================== Kong =======================
 echo Starting Docker containers...
 cd..\
-docker-compose -f gateway/docker-compose.yml up -d
+docker-compose -f gateway/docker-compose.yml up -d --build
 
 :: Health check for the service at localhost:8007/crypt/test
 echo Checking server health...
