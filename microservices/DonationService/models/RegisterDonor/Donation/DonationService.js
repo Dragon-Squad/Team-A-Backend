@@ -16,6 +16,12 @@ class DonationService {
         if (!donationType) throw new Error('No Donation Type provided');
         if (typeof amount !== 'number' || isNaN(amount) || amount <= 0) throw new Error('Amount must be a valid positive number');
 
+        const response = await axios.get(`http://172.30.208.1:3000/api/donors/${donorId}`);
+        
+        if(!response){
+            throw new Error("No Donor Found to update");
+        }
+
         await publish({
             topic: "donation_to_project",
             event: "verify_project",

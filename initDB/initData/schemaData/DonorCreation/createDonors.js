@@ -18,9 +18,11 @@ const createDonors= async (User, Donor, Address) => {
             const email = faker.internet.email({provider: 'gmail.com'});
 
             const donorUser = new User({
+                username: email,
                 email: email,
                 hashedPassword: await bcrypt.hash('donorpassword', 10),
-                isActive: true
+                isActive: true,
+                role: "Donor",
             });
             await donorUser.save();
 

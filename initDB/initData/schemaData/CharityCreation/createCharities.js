@@ -26,10 +26,12 @@ const createCharities = async (User, Charity, Address) => {
 
                 // Create a user in authDB
                 const charityUser = new User({
+                    username: email,
                     email: email,
                     hashedPassword: await bcrypt.hash('charitypassword', 10),
                     isActive: true, 
                     avatar: imageUrl,
+                    role: "Charity",
                 });
                 await charityUser.save();
 

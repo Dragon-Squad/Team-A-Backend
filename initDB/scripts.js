@@ -1,5 +1,5 @@
-const { connectAddressDB, connectAuthDB, connectAdminDB, connectCharityDB, connectDonationDB, connectDonorDB, connectProjectDB, connectUserDB, connectShardedProjectDB } = require('./Config/DBConfig');
-const { createAddressModel, createAdminModel, createUserModel, createCharityModel, createDonorModel, createCategoryModel, createRegionModel, createProjectModel, createDonationModel, createMonthlyDonationModel, createPaymentTransactionModel, createDeletedProjectModel, createCompletedProjectModel } = require('./model');
+const { connectAuthDB, connectCharityDB, connectDonationDB, connectDonorDB, connectProjectDB, connectShardedProjectDB } = require('./Config/DBConfig');
+const { createAddressModel, createAdminModel, createUserModel, createCharityModel, createDonorModel, createCategoryModel, createRegionModel, createProjectModel, createDonationModel, createMonthlyDonationModel, createGuestDonorModel, createGuestDonationModel, createPaymentTransactionModel, createDeletedProjectModel, createCompletedProjectModel } = require('./model');
 const { createAdminAccount } = require('./initData/schemaData/AdminCreation/createAdminAccount');
 const { createCharities } = require('./initData/schemaData/CharityCreation/createCharities');
 const { createDonors } = require('./initData/schemaData/DonorCreation/createDonors');
@@ -7,14 +7,10 @@ const { createCategories, createRegions, createProjects } = require('./initData/
 
 (async () => {
   try {
-    const addressDB = await connectAddressDB();
-    const Address = createAddressModel(addressDB);
-
-    const userDB = await connectUserDB();
-    const User = createUserModel(userDB);
-
-    const adminDB = await connectAdminDB();
-    const Admin = createAdminModel(adminDB);
+    const authDB = await connectAuthDB();
+    const Address = createAddressModel(authDB);
+    const User = createUserModel(authDB);
+    const Admin = createAdminModel(authDB);
 
     const charityDB = await connectCharityDB();
     const Charity = createCharityModel(charityDB);
@@ -30,6 +26,8 @@ const { createCategories, createRegions, createProjects } = require('./initData/
     const donationDB = await connectDonationDB();
     const Donation = createDonationModel(donationDB);
     const MonthlyDonation = createMonthlyDonationModel(donationDB);
+    const GuestDonor = createGuestDonorModel(donationDB);
+    const GuestDonation = createGuestDonationModel(donationDB);
     const PaymentTransaction = createPaymentTransactionModel(donationDB);
 
     const shardedProjectDB = await connectShardedProjectDB();
@@ -47,6 +45,8 @@ const { createCategories, createRegions, createProjects } = require('./initData/
     await Project.deleteMany();
     await Donation.deleteMany();
     await MonthlyDonation.deleteMany();
+    await GuestDonor.deleteMany();
+    await GuestDonation.deleteMany();
     await PaymentTransaction.deleteMany();
     await DeletedProject.deleteMany();
     await CompletedProject.deleteMany();

@@ -1,29 +1,8 @@
 require('dotenv').config();
 const mongoose = require('mongoose');
 
-let AddressDB, AdminDB, AuthDB, CharityDB, DonorDB, DonationDB, ProjectDB, UserDB, ShardedProjectDB;
+let AuthDB, CharityDB, DonorDB, DonationDB, ProjectDB, ShardedProjectDB;
 
-const connectAddressDB = async () => {
-  if (!AddressDB) {
-    AddressDB = await mongoose.createConnection(process.env.MONGO_URI_ADDRESS, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    console.log('Connected to AddressDB');
-  }
-  return AddressDB;
-};
-
-const connectAdminDB = async () => {
-  if (!AdminDB) {
-    AdminDB = await mongoose.createConnection(process.env.MONGO_URI_ADMIN, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    console.log('Connected to AdminDB');
-  }
-  return AdminDB;
-};
 
 const connectAuthDB = async () => {
   if (!AuthDB) {
@@ -80,17 +59,6 @@ const connectProjectDB = async () => {
     return ProjectDB;
 };
 
-const connectUserDB = async () => {
-  if (!UserDB) {
-      UserDB = await mongoose.createConnection(process.env.MONGO_URI_USER, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    console.log('Connected to UserDB');
-  }
-  return UserDB;
-};
-
 const connectShardedProjectDB = async () => {
   if (!ShardedProjectDB) {
     ShardedProjectDB = await mongoose.createConnection(process.env.MONGO_URI_SHARDED_PROJECT, {
@@ -102,4 +70,4 @@ const connectShardedProjectDB = async () => {
   return ShardedProjectDB;
 };
 
-module.exports = { connectAddressDB, connectAuthDB, connectAdminDB, connectCharityDB, connectDonationDB, connectDonorDB, connectProjectDB, connectUserDB, connectShardedProjectDB };
+module.exports = { connectAuthDB, connectCharityDB, connectDonationDB, connectDonorDB, connectProjectDB, connectShardedProjectDB };
