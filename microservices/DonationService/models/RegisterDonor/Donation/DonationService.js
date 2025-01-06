@@ -7,25 +7,22 @@ const MonthlyDonationService = require('../MonthlyDonation/MonthlyDonationServic
 const axios = require("axios");
 const DonationDTO = require('./DonationDTO');
 const CryptoJS = require('crypto-js');
+const { getDonor } = require('../../../utils/ApiUtils');
 
 const secretKey = process.env.SECRET_KEY;
 
 class DonationService {
-    async donation(data) {
+    async donation(data, accessToken) {
         const { message: personalMessage = null, projectId, donationType, amount } = data;
     
         if (!projectId) throw new Error('No Project provided');
         if (!donationType) throw new Error('No Donation Type provided');
         if (typeof amount !== 'number' || isNaN(amount) || amount <= 0) throw new Error('Amount must be a valid positive number');
 
-        const response = await axios.get(`http://172.30.208.1:3000/api/donors/my`);
-        
-        if(!response){
-            throw new Error("No Donor Found to update");
-        }
-        const donorId = response._id;
-        let customerId = response.hashedStripeId;
-        const bytes = CryptoJS.AES.decrypt(encryptedValue, secretKey);
+        const donor = await getDonor(accessToken);
+        const userId = donor.userId;
+        let customerId = donor.hashedStripeId;
+        const bytes = CryptoJS.AES.decrypt(customerId, secretKey);
         customerId = bytes.toString(CryptoJS.enc.Utf8);
 
         await publish({
@@ -67,7 +64,7 @@ class DonationService {
                 monthlyDonationId = monthlyDonation._id.toString();
             }
     
-            const session = await createDonationSession(customerId, monthlyDonationId, unitAmount, personalMessage, projectId, donorId, "Donation");
+            const session = await createDonationSession(customerId, monthlyDonationId, unitAmount, personalMessage, projectId, userId, "Donation");
             return { checkoutUrl: session.url };
     
         } catch (err) {
@@ -87,16 +84,26 @@ class DonationService {
         }
     }
 
-    async getAllDonations(limit, page){
+    async getAllDonations(limit, page, accessToken){
         try{
             let result = await DonationRepository.getAll(limit, page);
             let donations = result.data;
 
             let dtos = [];
             for(const donation of donations){
-                const response = await axios.get(`http://172.30.208.1:3000/api/donors/${donation.donorId}`);
+                const response = await axios.get(
+                    `http://172.30.208.1:3000/api/donors/my`,
+                    {
+                        credentials: "include",
+                        method: "GET",
+                        headers: {
+                          "Content-Type": "application/json",
+                          Cookie: `accessToken=${accessToken}`,
+                        }
+                    }
+                  );
                 if (!response.data) {
-                    throw new Error("No Donor Found");
+                    throw new Error("Error validating donor ID");
                 }
                 const donor = response.data;
                 delete donor.hashedStripeId;
@@ -111,16 +118,12 @@ class DonationService {
         }
     }
 
-    async getDonationById(donationId){
+    async getDonationById(donationId, accessToken){
         try{
             if(!donationId) throw new Error('No Donation Id provided');
 
             let result = await DonationRepository.findById(donationId);
-            const response = await axios.get(`http://172.30.208.1:3000/api/donors/${result.donorId}`);
-            if (!response.data) {
-                throw new Error("No Donor Found");
-            }
-            const donor = response.data;
+            const donor = await getDonor(accessToken);
             delete donor.hashedStripeId;
 
             result = result.toObject(); 
@@ -131,24 +134,14 @@ class DonationService {
         } 
     }
 
-    async getDonationsByDonor(limit, page) {
+    async getDonationsByDonor(limit, page, accessToken) {
         try {
-            const response = await axios.get(
-                `http://localhost:3000/api/donors/my`,
-                {
-                    withCredentials: true,
-                }
-              );
-            if (!response.data) {
-                throw new Error("Error validating donor ID");
-            }
-            console.log(response);
-            const donor = response.data;
-    
-            let result = await DonationRepository.getAllByDonor(limit, page, donor._id);
+            const donor = await getDonor(accessToken);
+            console.log(donor.userId);
+            let result = await DonationRepository.getAllByDonor(limit, page, donor.userId);
             const trimmedDonations = result.data.map(donation => {
                 const donationObject = donation.toObject();
-                delete donationObject.donorId;
+                delete donationObject.userId;
                 return donationObject;
             });
             

@@ -49,8 +49,8 @@ class MonthlyDonationRepository {
     };
   }
 
-  async getAllByDonor(page, limit, donorId, status, sortField, sortOrder) {
-    const query = { donorId };
+  async getAllByDonor(page, limit, userId, status, sortField, sortOrder) {
+    const query = { userId };
 
     if (status) {
       query.isActive = status; 

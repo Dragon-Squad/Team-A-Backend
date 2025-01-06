@@ -4,7 +4,7 @@ const { jwtDecrypt } = require('jose')
 const jwt = require('jsonwebtoken');
 
 const authenticate = async (req, res, next) => {
-  const accessToken = req.cookies.accessToken
+  const accessToken = req.cookies.accessToken;
   if (!accessToken) {
     return res.status(401).json({
       message: "Unauthenticated"
@@ -20,7 +20,6 @@ const authenticate = async (req, res, next) => {
 
     res.userId = decoded.userId;
     res.userRole = decoded.userRole;
-    req.accessToken = jws;
     
     next();
   } catch (error) {

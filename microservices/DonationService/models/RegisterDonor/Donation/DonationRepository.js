@@ -37,14 +37,14 @@ class DonationRepository {
     };
   }
 
-  async getAllByDonor(limit, page, donorId) {
-    const totalCount = await Donation.countDocuments({ donorId: donorId });  
+  async getAllByDonor(limit, page, userId) {
+    const totalCount = await Donation.countDocuments({ userId: userId });  
     const totalPages = Math.ceil(totalCount / limit);                       
     const currentPage = page;                                          
     const isLast = currentPage >= totalPages;                             
 
     const offset = (page - 1) * limit;
-    const data = await Donation.find({ donorId: donorId })
+    const data = await Donation.find({ userId: userId })
       .skip(offset)
       .limit(limit)
       .populate("transactionId");
