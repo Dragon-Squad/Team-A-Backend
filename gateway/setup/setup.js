@@ -1,5 +1,5 @@
 const { waitForKongAdminAPI, createService, createRoute, enableRateLimitingPlugin, serversDiscovery } = require("./https");
-const { cryptRoutes, emailRoutes, projectRoutes, donationRoutes, shardedProjectRoutes, services } = require("./resources/servicesAndRoutes");
+const { emailRoutes, projectRoutes, donationRoutes, shardedProjectRoutes, services } = require("./resources/servicesAndRoutes");
 const IPAdr = process.env.IP_ADR || "172.30.208.1";
 
 const serviceMap = new Map([
@@ -7,7 +7,6 @@ const serviceMap = new Map([
     ['project', 'ProjectManagementService'],
     ['donation', 'DonationService'],
     ['shard', 'ShardedProjectService'],
-    ['crypt', 'CryptService'],
   ]);
 
 // Main function to create services and their corresponding routes
@@ -26,19 +25,8 @@ async function setupServices() {
         const projectManagementServiceId = await createService(serviceMap.get('project'), urlMap.get('project'));
         const donationServiceId = await createService(serviceMap.get('donation'), urlMap.get('donation'));
         const shardedProjectServiceId = await createService(serviceMap.get('shard'), urlMap.get('shard'));
-        const cryptServiceId = await createService(serviceMap.get('crypt'), urlMap.get('crypt'));
 
         // Step 2: Create routes for the created services
-        // Routes for Crypt Service
-        for (const route of cryptRoutes) {
-            try {
-                await createRoute(cryptServiceId, route);
-                console.log(`Route created for CryptService: ${route}`);
-            } catch (routeError) {
-                console.error(`Error creating route ${route} for CryptService:`, routeError.message);
-            }
-        }
-
         // Routes for Email Service
         for (const route of emailRoutes) {
             try {

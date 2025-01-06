@@ -5,6 +5,7 @@ class DonationController {
     async donate(req, res) {
         try {
             const donateData = req.body;
+            donateData
             // const donorId = req.id;
             const url = await DonationService.donation(donateData);
             return res.status(200).json(url);
@@ -35,12 +36,23 @@ class DonationController {
         }
     }
 
+    async getMyDonations(req, res) {
+        try {
+            const limit = parseInt(req.query.limit) || 10;
+            const page = parseInt(req.query.page) || 1;
+            const accessToken = req.accessToken;
+            const results = await DonationService.getDonationsByDonor(limit, page, accessToken);
+            res.status(200).json(results);
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+    }
+
     async getDonationsByDonor(req, res) {
         try {
             const limit = parseInt(req.query.limit) || 10;
             const page = parseInt(req.query.page) || 1;
-            const donorId = req.params.id;
-            const results = await DonationService.getDonationsByDonor(limit, page, donorId);
+            const results = await DonationService.getDonationsByDonor(limit, page);
             res.status(200).json(results);
         } catch (error) {
             res.status(500).json({ message: error.message });

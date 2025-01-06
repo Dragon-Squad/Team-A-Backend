@@ -11,7 +11,6 @@ const serverMap = new Map([
   ['project', process.env.PROJECT_SERVER_PORT],
   ['donation', process.env.DONATION_SERVER_PORT],
   ['shard', process.env.SHARD_SERVER_PORT],
-  ['crypt', process.env.CRYPT_SERVER_PORT],
 ]);
 
 function registerServices() {

@@ -85,6 +85,28 @@ class MonthlyDonationRepository {
       data: data
     };
   }
+
+  async getAllByProject(limit, page, projectId) {
+      const totalCount = await MonthlyDonation.countDocuments({ projectId: projectId }); 
+      const totalPages = Math.ceil(totalCount / limit);                         
+      const currentPage = page;                                               
+      const isLast = currentPage >= totalPages;                                
+  
+      const offset = (page - 1) * limit;
+      const data = await MonthlyDonation.find({ projectId: projectId })
+        .skip(offset)
+        .limit(limit);
+  
+      return {
+        meta: {
+          totalPages: totalPages,        
+          currentPage: currentPage,       
+          pageSize: limit,                
+          isLast: isLast                 
+        },
+        data: data                        
+      };
+    }
   
   async getByStripeSubscriptionId(stripeSubscriptionId){
     return await MonthlyDonation.findOne({ stripeSubscriptionId }).exec();

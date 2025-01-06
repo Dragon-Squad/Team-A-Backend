@@ -1,13 +1,18 @@
 const express = require('express');
 const CategoryController = require('./CategoryController');
 const { authenticate, authorize } = require('../../middleware/auth');
-const UserType = require('../User/enum/userType');
+const UserType = require('../../enum/UserType');
 
 const CategoryRouter = express.Router();
 
 CategoryRouter.get('/all', CategoryController.getAllCategories);
 
-CategoryRouter.get('/:id', CategoryController.getCategoryById);
+CategoryRouter.get(
+    '/:id', 
+    authenticate,
+    authorize([UserType.DONOR, UserType.CHARITY, UserType.ADMIN]),
+    CategoryController.getCategoryById
+);
 
 CategoryRouter.post(
     '/subscribe/:id',

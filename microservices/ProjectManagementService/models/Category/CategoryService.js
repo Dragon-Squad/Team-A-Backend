@@ -133,6 +133,8 @@ class CategoryService {
     async getAllCategories(){
         try {
             const categories = await CategoryRepository.getAll();
+            delete categories.subscriptionList;
+            delete categories.notificationList;
             return categories;
         } catch(error){
             throw new Error(error.message);

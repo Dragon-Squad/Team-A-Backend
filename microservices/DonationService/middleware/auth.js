@@ -18,9 +18,10 @@ const authenticate = async (req, res, next) => {
     const jws = decrypted.payload.jws;
     const decoded = jwt.verify(jws, process.env.JWS_PUBLIC_MW, { algorithm: 'RS256' });
 
-    req.userId = decoded.userId;
-    req.userRole = decoded.userRole;
-
+    res.userId = decoded.userId;
+    res.userRole = decoded.userRole;
+    req.accessToken = jws;
+    
     next();
   } catch (error) {
     console.log(error);
@@ -38,7 +39,7 @@ const authenticate = async (req, res, next) => {
 const authorize = (allowedRoles) => {
   return async (req, res, next) => {
     try {
-      const { userRole } = req;
+      const { userRole } = res;
 
       if (!allowedRoles.includes(userRole)) {
         return res.status(403).json({
