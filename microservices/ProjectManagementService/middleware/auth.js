@@ -1,5 +1,5 @@
 require("dotenv").config();
-const { getUserById } = require('../models/User/UserService');
+// const { getUserById } = require('../models/User/UserService');
 const { createPrivateKey } = require('crypto')
 const { jwtDecrypt } = require('jose')
 const jwt = require('jsonwebtoken');
@@ -19,8 +19,8 @@ const authenticate = async (req, res, next) => {
     const jws = decrypted.payload.jws;
     const decoded = jwt.verify(jws, process.env.JWS_PUBLIC_MW, { algorithm: 'RS256' });
 
-    res.locals.id = decoded.userId;
-    res.locals.role = decoded.userRole;
+    res.locals.userId = decoded.userId;
+    res.locals.userRole = decoded.userRole;
 
     next();
   } catch (error) {
@@ -39,15 +39,15 @@ const authenticate = async (req, res, next) => {
 const authorize = (allowedRoles) => {
   return async (req, res, next) => {
     try {
-      const { role } = res.locals;
+      const { userRole } = res.locals;
 
-      if (!allowedRoles.includes(role)) {
+      if (!allowedRoles.includes(userRole)) {
         return res.status(403).json({
           message: "Insufficient permissions"
         });
       }
 
-      const response = await fetch(`http://localhost:3010/user`, {
+      const response = await fetch(`http://localhost:3000/api/auth/user`, {
         headers: {
           "Cookie": `accessToken=${req.cookies.accessToken};refreshToken=${req.cookies.refreshToken}`
         }
@@ -58,6 +58,13 @@ const authorize = (allowedRoles) => {
           message: "User not found"
         });
       }
+
+      const user = await response.json();
+      if (user.role !== userRole) {
+        return res.status(403).json({
+          message: "User role does not match"
+        })
+      };
 
       next();
     } catch (error) {

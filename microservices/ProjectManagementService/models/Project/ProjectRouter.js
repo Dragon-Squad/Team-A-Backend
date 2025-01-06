@@ -8,18 +8,45 @@ ProjectRouter.get("/all", ProjectController.getAll);
 
 ProjectRouter.post(
   "/",
-  //   authenticate,
-  //   authorize([UserType.ADMIN, UserType.CHARITY]),
+  authenticate,
+  authorize([UserType.CHARITY, UserType.ADMIN]),
   ProjectController.create
 );
 
-ProjectRouter.put("/:id", ProjectController.update);
+ProjectRouter.put(
+  "/:id",
+  authenticate,
+  authorize([UserType.CHARITY, UserType.ADMIN]),
+  ProjectController.update
+);
 
-ProjectRouter.delete("/:id", ProjectController.delete);
+ProjectRouter.delete(
+  "/:id",
+  authenticate,
+  authorize([UserType.CHARITY, UserType.ADMIN]),
+  ProjectController.delete
+);
 
-ProjectRouter.patch("/active/:id", ProjectController.active);
-ProjectRouter.patch("/halt/:id", ProjectController.halt);
-ProjectRouter.patch("/resume/:id", ProjectController.resume);
+ProjectRouter.patch(
+  "/active/:id",
+  authenticate,
+  authorize([UserType.ADMIN]),
+  ProjectController.active
+);
+
+ProjectRouter.patch(
+  "/halt/:id",
+  authenticate,
+  authorize([UserType.CHARITY, UserType.ADMIN]),
+  ProjectController.halt
+);
+
+ProjectRouter.patch(
+  "/resume/:id",
+  authenticate,
+  authorize([UserType.CHARITY, UserType.ADMIN]),
+  ProjectController.resume
+);
 
 ProjectRouter.get("/:id", ProjectController.getById);
 
