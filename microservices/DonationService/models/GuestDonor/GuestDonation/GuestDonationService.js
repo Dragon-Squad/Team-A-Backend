@@ -4,6 +4,7 @@ const { publish } = require("../../../broker/Producer");
 const { connectConsumer } = require("../../../broker/Consumer");
 const { createDonationSession } = require('../../../utils/StripeUtils');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const GuestDonationDTO = require('./GuestDonationDTO');
 
 class GuestDonationService {
     async donation(data) {
@@ -101,7 +102,22 @@ class GuestDonationService {
 
     async getAllGuestDonations(limit, page){
         try{
-            const result = await GuestDonationRepository.getAll(limit, page);
+            let result = await GuestDonationRepository.getAll(limit, page);
+            let donations = result.data;
+
+            let dtos = [];
+            for(const donation of donations){
+                const response = await GuestDonorService.findById(donation.guestId);
+                if (!response) {
+                    throw new Error("No Guest Donor Found");
+                }
+                const donor = response;
+                delete donor.hashedStripeId;
+
+                dtos.push(new GuestDonationDTO(donation, donor));
+            }
+
+            result = {...result, data: dtos};
             return result;
         } catch (error){
             throw new Error('Error: ' + error.message);
@@ -112,8 +128,17 @@ class GuestDonationService {
             try{
                 if(!donationId) throw new Error('No Donation Id provided');
     
-                const result = await GuestDonationRepository.findById(donationId);
-                return result;
+                let result = await GuestDonationRepository.findById(donationId);
+                const response = await GuestDonorService.findById(result.guestId);
+                if (!response) {
+                    throw new Error("No Guest Donor Found");
+                }
+                const donor = response;
+                delete donor.hashedStripeId;
+
+                result = result.toObject(); 
+
+                return new GuestDonationDTO(result, donor);
             } catch (error){
                 throw new Error('Error: ' + error.message);
             } 

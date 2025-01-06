@@ -4,6 +4,7 @@ const { publish } = require("../../../broker/Producer");
 const { connectConsumer } = require("../../../broker/Consumer");
 const MonthlyDonationService = require('../MonthlyDonation/MonthlyDonationService');
 const axios = require("axios");
+const DonationDTO = require('./DonationDTO');
 
 class DonationService {
     async donation(data) {
@@ -14,11 +15,6 @@ class DonationService {
         if (!projectId) throw new Error('No Project provided');
         if (!donationType) throw new Error('No Donation Type provided');
         if (typeof amount !== 'number' || isNaN(amount) || amount <= 0) throw new Error('Amount must be a valid positive number');
-        
-        const response = await axios.get(`http://172.30.208.1:3000/api/donors/${donorId}`);
-        if (!response.data) {
-            throw new Error("No Donor Found");
-        }
 
         await publish({
             topic: "donation_to_project",
@@ -81,7 +77,22 @@ class DonationService {
 
     async getAllDonations(limit, page){
         try{
-            const result = await DonationRepository.getAll(limit, page);
+            let result = await DonationRepository.getAll(limit, page);
+            let donations = result.data;
+
+            let dtos = [];
+            for(const donation of donations){
+                const response = await axios.get(`http://172.30.208.1:3000/api/donors/${donation.donorId}`);
+                if (!response.data) {
+                    throw new Error("No Donor Found");
+                }
+                const donor = response.data;
+                delete donor.hashedStripeId;
+
+                dtos.push(new DonationDTO(donation, donor));
+            }
+
+            result = {...result, data: dtos};
             return result;
         } catch (error){
             throw new Error('Error: ' + error.message);
@@ -92,28 +103,47 @@ class DonationService {
         try{
             if(!donationId) throw new Error('No Donation Id provided');
 
-            const result = await DonationRepository.findById(donationId);
-            return result;
+            let result = await DonationRepository.findById(donationId);
+            const response = await axios.get(`http://172.30.208.1:3000/api/donors/${result.donorId}`);
+            if (!response.data) {
+                throw new Error("No Donor Found");
+            }
+            const donor = response.data;
+            delete donor.hashedStripeId;
+
+            result = result.toObject(); 
+
+            return new DonationDTO(result, donor);
         } catch (error){
             throw new Error('Error: ' + error.message);
         } 
     }
 
-    async getDonationsByDonor(limit, page, donorId){
-        try{
-            if(!donorId) throw new Error('No Donor Id provided');
-
+    async getDonationsByDonor(limit, page, donorId) {
+        try {
+            if (!donorId) throw new Error('No Donor Id provided');
+    
             const response = await axios.get(`http://172.30.208.1:3000/api/donors/${donorId}`);
             if (!response.data) {
                 throw new Error("Error validating donor ID");
             }
-
-            const result = await DonationRepository.getAllByDonor(limit, page, donorId);
+            const donor = response.data;
+    
+            let result = await DonationRepository.getAllByDonor(limit, page, donorId);
+            const trimmedDonations = result.data.map(donation => {
+                const donationObject = donation.toObject();
+                delete donationObject.donorId;
+                return donationObject;
+            });
+            
+    
+            result = { ...result, donor: donor, data: trimmedDonations };
             return result;
-        } catch (error){
+        } catch (error) {
             throw new Error('Error: ' + error.message);
         }
     }
+    
 
     async getDonationsByProject(limit, page, projectId){
         if(!projectId) throw new Error('No Project Id provided');
