@@ -47,7 +47,7 @@ const authorize = (allowedRoles) => {
         });
       }
 
-      const response = await fetch(`http://localhost:3000/api/auth/user`, {
+      const response = await fetch(process.env.WSL_IPV4 + ":3010/user", {
         headers: {
           "Cookie": `accessToken=${req.cookies.accessToken};refreshToken=${req.cookies.refreshToken}`
         }
