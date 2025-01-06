@@ -7,7 +7,7 @@ const MonthlyDonationService = require('../MonthlyDonation/MonthlyDonationServic
 const axios = require("axios");
 const DonationDTO = require('./DonationDTO');
 const CryptoJS = require('crypto-js');
-const { getDonor } = require('../../../utils/ApiUtils');
+const { getDonor, getUser } = require('../../../utils/ApiUtils');
 
 const secretKey = process.env.SECRET_KEY;
 
@@ -21,6 +21,9 @@ class DonationService {
 
         const donor = await getDonor(accessToken);
         const userId = donor.userId;
+        const user = await getUser(userId);
+        // const userEmail = user.email;
+        const userEmail = "viphilongnguyen@gmail.com";
         let customerId = donor.hashedStripeId;
         const bytes = CryptoJS.AES.decrypt(customerId, secretKey);
         customerId = bytes.toString(CryptoJS.enc.Utf8);
@@ -64,7 +67,7 @@ class DonationService {
                 monthlyDonationId = monthlyDonation._id.toString();
             }
     
-            const session = await createDonationSession(customerId, monthlyDonationId, unitAmount, personalMessage, projectId, userId, "Donation");
+            const session = await createDonationSession(customerId, monthlyDonationId, unitAmount, personalMessage, projectId, userId, "Donation", userEmail);
             return { checkoutUrl: session.url };
     
         } catch (err) {

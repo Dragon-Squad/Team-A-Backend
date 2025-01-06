@@ -1,4 +1,5 @@
 const { publish } = require('../broker/Producer');
+const { connectConsumer } = require('../broker/Consumer');
 const DonationService = require("../models/RegisterDonor/Donation/DonationService");
 const MonthlyDonationService = require('../models/RegisterDonor/MonthlyDonation/MonthlyDonationService');
 const PaymentTransactionService = require('../models/PaymentTransaction/PaymentTransactionService');
@@ -12,6 +13,7 @@ function getDataFromSession(session){
     const donationType = session.mode === "payment" ? "one-time" : "monthly";
     const donorType = session.metadata.donorType;
     const userId = session.metadata.userId;
+    const userEmail = session.metadata.userEmail;
 
     const allPaymentMethods = session.payment_method_types;
     const configuredMethods = Object.keys(session.payment_method_options || {});
@@ -19,11 +21,11 @@ function getDataFromSession(session){
         configuredMethods.includes(method)
     ) || "unknown";
 
-    return {amount, projectId, message, donationType, donorType, userId, selectedPaymentMethods};
+    return {amount, projectId, message, donationType, donorType, userId, userEmail, selectedPaymentMethods};
 }
 
 async function handleCheckoutSessionCompleted(session) {
-    const {amount, projectId, message, donationType, donorType, userId, selectedPaymentMethods} = getDataFromSession(session);
+    const {amount, projectId, message, donationType, donorType, userId, userEmail, selectedPaymentMethods} = getDataFromSession(session);
 
     if(donorType === "Donation" && amount > 0){
         await updateDonorStats(userId, amount, projectId);
@@ -55,6 +57,50 @@ async function handleCheckoutSessionCompleted(session) {
     }
 
     await updateProjectRaisedAmount(projectId, amount);
+
+    await publish({
+        topic: "donation_to_project",
+        event: "verify_project",
+        message: { projectId: projectId }
+    });
+
+    const consumer = await connectConsumer("project_to_donation");
+    const timeout = 10000; 
+
+    try {
+        const result = await new Promise((resolve, reject) => {
+            const timer = setTimeout(() => {
+                reject(new Error("No Project Found"));
+            }, timeout);
+
+            consumer.run({
+                eachMessage: async ({ message }) => {
+                    const value = message.value ? JSON.parse(message.value.toString()) : null;
+                    if (value.project._id === projectId) {
+                        clearTimeout(timer);
+
+                        await publish({
+                            topic: "to_email",
+                            event: "donation_success",
+                            message: {
+                                userEmail: userEmail,
+                                projectTitle: value.project.title,
+                                projectUrl: "",
+                                amount: amount,
+                            },
+                        });
+
+                        resolve();
+                    }
+                }
+            });
+        });
+    } catch (err) {
+        console.error('Error during donation process:', err.message);
+        throw err;
+    } finally {
+        await consumer.disconnect();
+    }
 }
 
 async function handleCheckoutSessionExpired(session) {

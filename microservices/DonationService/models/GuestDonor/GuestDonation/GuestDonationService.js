@@ -78,9 +78,8 @@ class GuestDonationService {
             });
     
             const unitAmount = Math.round(amount * 100);
-            const donorId = (await guestDonor)._id;
             console.log(donorId.toString());
-            const session = await createDonationSession(customerId, null, unitAmount, personalMessage, projectId, donorId.toString(), "GuestDonation");
+            const session = await createDonationSession(customerId, null, unitAmount, personalMessage, projectId, guestDonor, "GuestDonation", guestEmail);
             return { checkoutUrl: session.url };
     
         } catch (err) {
