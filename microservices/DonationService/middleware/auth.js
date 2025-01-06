@@ -4,7 +4,7 @@ const { jwtDecrypt } = require('jose')
 const jwt = require('jsonwebtoken');
 
 const authenticate = async (req, res, next) => {
-  const accessToken = req.cookies.accessToken
+  const accessToken = req.cookies.accessToken;
   if (!accessToken) {
     return res.status(401).json({
       message: "Unauthenticated"
@@ -18,9 +18,9 @@ const authenticate = async (req, res, next) => {
     const jws = decrypted.payload.jws;
     const decoded = jwt.verify(jws, process.env.JWS_PUBLIC_MW, { algorithm: 'RS256' });
 
-    req.userId = decoded.userId;
-    req.userRole = decoded.userRole;
-
+    res.userId = decoded.userId;
+    res.userRole = decoded.userRole;
+    
     next();
   } catch (error) {
     console.log(error);
@@ -38,7 +38,7 @@ const authenticate = async (req, res, next) => {
 const authorize = (allowedRoles) => {
   return async (req, res, next) => {
     try {
-      const { userRole } = req;
+      const { userRole } = res;
 
       if (!allowedRoles.includes(userRole)) {
         return res.status(403).json({

@@ -1,13 +1,18 @@
 const express = require('express');
 const RegionController = require('./RegionController');
 const { authenticate, authorize } = require('../../middleware/auth');
-const UserType = require('../User/enum/userType');
+const UserType = require('../../enum/UserType');
 
 const RegionRouter = express.Router();
 
 RegionRouter.get('/all', RegionController.getAllRegions);
 
-RegionRouter.get('/:id', RegionController.getRegionById);
+RegionRouter.get(
+    '/:id', 
+    authenticate,
+    authorize([UserType.DONOR, UserType.CHARITY, UserType.ADMIN]),
+    RegionController.getRegionById
+);
 
 RegionRouter.post(
     '/subscribe/:id',

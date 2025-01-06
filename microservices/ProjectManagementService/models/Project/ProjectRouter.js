@@ -1,12 +1,10 @@
 const express = require("express");
 const ProjectController = require("./ProjectController");
 const { authenticate, authorize } = require("../../middleware/auth");
-const UserType = require("../../enum/UserType");
+const UserType = require('../../enum/UserType');
 const ProjectRouter = express.Router();
 
 ProjectRouter.get("/all",
-  // authenticate,
-  // authorize([UserType.DONOR]),
   ProjectController.getAll
 );
 
@@ -52,6 +50,9 @@ ProjectRouter.patch(
   ProjectController.resume
 );
 
-ProjectRouter.get("/:id", ProjectController.getById);
+ProjectRouter.get(
+  "/:id", 
+  ProjectController.getById
+);
 
 module.exports = ProjectRouter;

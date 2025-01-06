@@ -1,11 +1,3 @@
-const cryptRoutes = [
-    '/crypt/asym/public',
-    '/crypt/asym/decrypt',
-    '/crypt/jwe/public',
-    '/crypt/jwe/certificate',
-    '/crypt/jwe/decrypt',
-]
-
 const emailRoutes = [
     '/email/new/verify',
     '/email/new/welcome',
@@ -36,14 +28,13 @@ const projectRoutes = [
     '/region/notification-off/'
 ];
 
-const fileRoutes = ['/files/upload/', '/files'];
-
 const donationRoutes = [
     '/donation/guest/',
     '/donation/guest/all',
     '/donation/guest/new',
     '/donation/guest/project/',
     '/donation/',
+    '/donation/my',
     '/donation/all',
     '/donation/new',
     '/donation/donor/',
@@ -62,7 +53,6 @@ const shardedProjectRoutes = [
 ];
 
 const services = [
-    'CryptService',
     'EmailService',
     'ProjectManagementService',
     'DonationService',
@@ -70,10 +60,8 @@ const services = [
 ];
 
 module.exports = {
-    cryptRoutes,
     emailRoutes,
     projectRoutes,
-    fileRoutes,
     donationRoutes,
     shardedProjectRoutes,
     services

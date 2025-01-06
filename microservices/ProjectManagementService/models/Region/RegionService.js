@@ -132,6 +132,8 @@ class RegionService {
     async getAllRegions(){
         try {
             const regions = await RegionRepository.getAll();
+            delete regions.subscriptionList;
+            delete regions.notificationList;
             return regions;
         } catch(error){
             throw new Error(error.message);

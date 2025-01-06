@@ -1,9 +1,13 @@
+require('dotenv').config();
 const bcrypt = require('bcryptjs');
 const initialData = require('../../../resources/initialData');
 const charitiesData = initialData.charities;
 const { faker } = require ('@faker-js/faker');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { uploadImage } = require('../../fileData/uploadFile');
+const CryptoJS = require('crypto-js');
+
+const secretKey = process.env.SECRET_KEY;
 
 const createCharities = async (User, Charity, Address) => {
     try {
@@ -69,7 +73,7 @@ const createCharities = async (User, Charity, Address) => {
                     address: address._id,
                     region: charity.regions,
                     category: charity.category,
-                    hashedStripeId: await bcrypt.hash(customerId, 10),
+                    hashedStripeId: CryptoJS.AES.encrypt(customerId, secretKey).toString(),
                 });
                 await charityDoc.save();
                 return charityDoc;
