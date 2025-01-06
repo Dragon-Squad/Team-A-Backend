@@ -2,17 +2,15 @@
 
 ## Tech Stack
 
-| Technology        | Description                                                                 |
-|-------------------|-----------------------------------------------------------------------------|
-| ![Consul](https://img.shields.io/badge/Consul-FF3D00?style=for-the-badge&logo=consul&logoColor=white) | **Consul**: Service Discovery. |
-| ![Kafka](https://img.shields.io/badge/Apache_Kafka-231F20?style=for-the-badge&logo=apachekafka&logoColor=white) | **Kafka**: Real-time data streaming and microservice communication. |
-| ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white) | **Docker**: Containerization for consistent application deployment. |
-| ![NodeJS](https://img.shields.io/badge/Node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white) | **Node.js**: Backend JavaScript runtime for building scalable applications. |
-| ![Express](https://img.shields.io/badge/Express.js-%23404d59.svg?style=for-the-badge&logo=express&logoColor=%2361DAFB) | **Express.js**: Web application framework for Node.js, used for building APIs. |
-| ![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white) | **MongoDB**: NoSQL database for flexible and scalable data storage. |
-| ![Stripe](https://img.shields.io/badge/Stripe-6772E5?style=for-the-badge&logo=stripe&logoColor=white) | **Stripe**: Payment processing service for online payments. |
-| ![Ngrok](https://img.shields.io/badge/Ngrok-000000?style=for-the-badge&logo=ngrok&logoColor=white) | **Ngrok**: Tool for creating secure tunnels to localhost for testing. |
-| ![Kong](https://img.shields.io/badge/Kong-343434?style=for-the-badge&logo=kong&logoColor=white) | **Kong**: API Gateway for managing and securing microservice traffic. |
+![Consul](https://img.shields.io/badge/Consul-FF3D00?style=for-the-badge&logo=consul&logoColor=white) 
+![Kafka](https://img.shields.io/badge/Apache_Kafka-231F20?style=for-the-badge&logo=apachekafka&logoColor=white) 
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![NodeJS](https://img.shields.io/badge/Node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white) 
+![Express](https://img.shields.io/badge/Express.js-%23404d59.svg?style=for-the-badge&logo=express&logoColor=%2361DAFB)
+![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
+![Stripe](https://img.shields.io/badge/Stripe-6772E5?style=for-the-badge&logo=stripe&logoColor=white)
+![Ngrok](https://img.shields.io/badge/Ngrok-000000?style=for-the-badge&logo=ngrok&logoColor=white)
+![Kong](https://img.shields.io/badge/Kong-343434?style=for-the-badge&logo=kong&logoColor=white)
 
 
 
