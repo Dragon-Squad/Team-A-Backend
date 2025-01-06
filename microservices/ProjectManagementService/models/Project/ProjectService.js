@@ -5,9 +5,12 @@ const CharityRepository = require("../Charity/CharityRepository");
 const RegionService = require("../Region/RegionService");
 const { publish } = require("../../broker/Producer");
 const axios = require("axios");
+const { ProjectResponseDTO } = require("./ProjectDto");
 
 async function validateCharity(charityId) {
-  const charityResponse = await axios.get(`http://172.30.208.1:3000/api/charities/${charityId}`);
+  const charityResponse = await axios.get(
+    `http://172.30.208.1:3000/api/charities/${charityId}`
+  );
   if (!charityResponse.data) {
     throw new Error("No Charity Found");
   }
@@ -15,7 +18,9 @@ async function validateCharity(charityId) {
 }
 
 async function validateUser(userId) {
-  const userResponse = await axios.get(`http://172.30.208.1:3000/api/users/${userId}`);
+  const userResponse = await axios.get(
+    `http://172.30.208.1:3000/api/users/${userId}`
+  );
   if (!userResponse.data) {
     throw new Error("No Email Found");
   }
@@ -35,7 +40,6 @@ async function validateCategory(categoryIds) {
   return categories;
 }
 
-
 async function validateRegion(regionId) {
   const region = await RegionService.getRegionById(regionId);
   if (!region) {
@@ -47,11 +51,11 @@ async function validateRegion(regionId) {
 function mergeNotificationLists(region, categories) {
   const result = new Set();
 
-  categories.forEach(category => {
-    category.notificationList.forEach(item => result.add(item));
+  categories.forEach((category) => {
+    category.notificationList.forEach((item) => result.add(item));
   });
 
-  region.notificationList.forEach(item => result.add(item));
+  region.notificationList.forEach((item) => result.add(item));
 
   return result;
 }
@@ -59,34 +63,36 @@ function mergeNotificationLists(region, categories) {
 class ProjectService {
   async create(projectData) {
     ProjectValidator.validateProjectCreationRequest(projectData);
-  
+
     const charity = await validateCharity(projectData.charityId);
     const user = await validateUser(charity.userId);
-    
+
     const categories = await validateCategory(projectData.categoryIds);
-    const categoryIds = categories.map(category => category._id);
+    const categoryIds = categories.map((category) => category._id);
 
     const region = await validateRegion(projectData.regionId);
-  
-    projectData = {
+
+    const preparedData = {
       charityId: projectData.charityId,
-      categoryIds, 
-      regionId: region._id, 
+      categoryIds,
+      regionId: region._id,
       title: projectData.title,
       goalAmount: projectData.goalAmount,
       startDate: projectData.startDate,
       endDate: projectData.endDate,
       hashedStripeId: charity.hashedStripeId,
     };
-  
-    console.log(projectData);
-  
-    const project = await ProjectRepository.create(projectData);
-  
-    const projectDTO = {...project, region: region, categories: categories[0]};
+
+    const project = await ProjectRepository.create(preparedData);
+
+    const projectDTO = new ProjectResponseDTO({
+      ...project,
+      region,
+      categories,
+    });
 
     const mergedNotificationList = mergeNotificationLists(region, categories);
-  
+
     await publish({
       topic: "to_email",
       event: "create_project",
@@ -96,25 +102,21 @@ class ProjectService {
         notificationList: [...mergedNotificationList],
       },
     });
-  
-    return project;
+
+    return projectDTO;
   }
-  
 
   async update(id, projectData) {
     ProjectValidator.validateProjectUpdateRequest(id, projectData);
 
-    if (projectData.charityId) {
-      await validateCharity(projectData.charityId);
-    }
-    if (projectData.categoryId) {
-      await validateCategory(projectData.categoryId);
-    }
-    if (projectData.regionId) {
-      await validateRegion(projectData.regionId);
-    }
+    if (projectData.charityId) await validateCharity(projectData.charityId);
 
-    return await ProjectRepository.update(id, projectData);
+    if (projectData.categoryId) await validateCategory(projectData.categoryId);
+
+    if (projectData.regionId) await validateRegion(projectData.regionId);
+
+    const updatedProject = await ProjectRepository.update(id, projectData);
+    return updatedProject ? new ProjectResponseDTO(updatedProject) : null;
   }
 
   async delete(id) {
@@ -145,12 +147,15 @@ class ProjectService {
         const charity = await validateCharity(reason);
         const user = await validateUser(charity.userId);
 
-        const categoryIds = project.categoryIds.map(category => category._id);
+        const categoryIds = project.categoryIds.map((category) => category._id);
         console.log(categoryIds);
         const categories = await validateCategory(categoryIds);
         const region = await validateRegion(project.regionId);
 
-        const mergedNotificationList = mergeNotificationLists(region, categories);
+        const mergedNotificationList = mergeNotificationLists(
+          region,
+          categories
+        );
 
         await publish({
           topic: "to_email",
@@ -183,26 +188,32 @@ class ProjectService {
 
   async getById(id) {
     const project = await ProjectRepository.getById(id);
-    if (!project) {
-      throw new Error("Project not found");
-    }
-    return project;
+    if (!project) throw new Error("Project not found");
+    return new ProjectResponseDTO(project);
   }
 
   async getAll(filters) {
     if (filters.charityName) {
-      const charityIds = await CharityRepository.searchByName(filters.charityName);
+      const charityIds = await CharityRepository.searchByName(
+        filters.charityName
+      );
 
       if (charityIds.length > 0) {
         filters.charityId = { $in: charityIds };
       } else {
-        return { total: 0, page: filters.page || 1, limit: filters.limit || 10, projects: [] };
+        return {
+          total: 0,
+          page: filters.page || 1,
+          limit: filters.limit || 10,
+          projects: [],
+        };
       }
 
       delete filters.charityName;
     }
 
-    return await ProjectRepository.getAll(filters);
+    const projects = await ProjectRepository.getAll(filters);
+    return projects.map((project) => new ProjectResponseDTO(project));
   }
 }
 

@@ -19,12 +19,15 @@
     "express": "^4.21.1",
     "helmet": "^8.0.0",
     "http-status": "^2.0.0",
-    "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",
     "kafkajs": "^2.2.4",
     "mongoose": "^8.8.1",
     "object-hash": "^3.0.0",
     "path": "^0.12.7",
-    "redis": "^4.7.0"
+    "redis": "^4.7.0",
+    "start": "^5.1.0"
+  },
+  "devDependencies": {
+    "joi": "^17.13.3"
   }
 }
