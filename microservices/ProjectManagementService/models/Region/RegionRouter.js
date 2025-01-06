@@ -3,6 +3,7 @@ const RegionController = require('./RegionController');
 
 const RegionRouter = express.Router();
 
+RegionRouter.get('/all', RegionController.getAllRegions);
 RegionRouter.get('/:id', RegionController.getRegionById);
 RegionRouter.post('/subscribe/:id', RegionController.subscribe);
 RegionRouter.post('/notification-on/:id', RegionController.notificationOn);

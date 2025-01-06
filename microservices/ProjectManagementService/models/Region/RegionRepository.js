@@ -34,6 +34,11 @@ class RegionRepository {
   async findById(id){
     return await Region.findById(id);
   }
+
+  async getAll() {
+    const regions = await Region.find()
+    return regions;
+  }
 }
 
 module.exports = new RegionRepository();

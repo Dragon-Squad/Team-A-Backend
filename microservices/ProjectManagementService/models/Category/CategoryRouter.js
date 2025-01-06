@@ -3,6 +3,7 @@ const CategoryController = require('./CategoryController');
 
 const CategoryRouter = express.Router();
 
+CategoryRouter.get('/all', CategoryController.getAllCategories);
 CategoryRouter.get('/:id', CategoryController.getCategoryById);
 CategoryRouter.post('/subscribe/:id', CategoryController.subscribe);
 CategoryRouter.post('/notification-on/:id', CategoryController.notificationOn);

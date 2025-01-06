@@ -129,6 +129,15 @@ class CategoryService {
             throw new Error(error.message);
         }
     }
+
+    async getAllCategories(){
+        try {
+            const categories = await CategoryRepository.getAll();
+            return categories;
+        } catch(error){
+            throw new Error(error.message);
+        }
+    }
 }
 
 module.exports = new CategoryService();

@@ -34,6 +34,11 @@ class CategoryRepository {
   async findById(id){
     return await Category.findById(id);
   }
+
+  async getAll() {
+    const categories = await Category.find()
+    return categories;
+  }
 }
 
 module.exports = new CategoryRepository();
