@@ -7,15 +7,15 @@ const StatisticRouter = express.Router();
 
 StatisticRouter.get(
     '/donation/total', 
-    // authenticate,
-    // authorize([UserType.ADMIN]),
+    authenticate,
+    authorize([UserType.ADMIN]),
     StatisticController.getTotalDonation
 );
 
 StatisticRouter.get(
     '/donation/compare',
-    // authenticate,
-    // authorize([UserType.ADMIN]),
+    authenticate,
+    authorize([UserType.ADMIN]),
     StatisticController.compareDonation
 );
 
