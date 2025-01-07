@@ -22,8 +22,7 @@ class DonationService {
         const donor = await getDonor(accessToken);
         const userId = donor.userId;
         const user = await getUser(userId);
-        // const userEmail = user.email;
-        const userEmail = "viphilongnguyen@gmail.com";
+        const userEmail = user.email;
         let customerId = donor.hashedStripeId;
         const bytes = CryptoJS.AES.decrypt(customerId, secretKey);
         customerId = bytes.toString(CryptoJS.enc.Utf8);
@@ -61,13 +60,15 @@ class DonationService {
     
             const unitAmount = Math.round(amount * 100);
             let monthlyDonationId = null;
-    
+            let monthlyAmount = null;
+
             if (donationType === "monthly") {
                 const monthlyDonation = await MonthlyDonationService.create();
                 monthlyDonationId = monthlyDonation._id.toString();
+                monthlyAmount = amount;
             }
     
-            const session = await createDonationSession(customerId, monthlyDonationId, unitAmount, personalMessage, projectId, userId, "Donation", userEmail);
+            const session = await createDonationSession(customerId, monthlyDonationId, unitAmount, personalMessage, projectId, userId, "Donation", userEmail, monthlyAmount);
             return { checkoutUrl: session.url };
     
         } catch (err) {
@@ -87,34 +88,12 @@ class DonationService {
         }
     }
 
-    async getAllDonations(limit, page, accessToken){
+    async getAllDonations(limit, page){
         try{
             let result = await DonationRepository.getAll(limit, page);
             let donations = result.data;
 
-            let dtos = [];
-            for(const donation of donations){
-                const response = await axios.get(
-                    `http://172.30.208.1:3000/api/donors/my`,
-                    {
-                        credentials: "include",
-                        method: "GET",
-                        headers: {
-                          "Content-Type": "application/json",
-                          Cookie: `accessToken=${accessToken}`,
-                        }
-                    }
-                  );
-                if (!response.data) {
-                    throw new Error("Error validating donor ID");
-                }
-                const donor = response.data;
-                delete donor.hashedStripeId;
-
-                dtos.push(new DonationDTO(donation, donor));
-            }
-
-            result = {...result, data: dtos};
+            result = { donations };
             return result;
         } catch (error){
             throw new Error('Error: ' + error.message);
@@ -140,14 +119,12 @@ class DonationService {
     async getDonationsByDonor(limit, page, accessToken) {
         try {
             const donor = await getDonor(accessToken);
-            console.log(donor.userId);
             let result = await DonationRepository.getAllByDonor(limit, page, donor.userId);
             const trimmedDonations = result.data.map(donation => {
                 const donationObject = donation.toObject();
                 delete donationObject.userId;
                 return donationObject;
             });
-            
     
             result = { ...result, donor: donor, data: trimmedDonations };
             return result;

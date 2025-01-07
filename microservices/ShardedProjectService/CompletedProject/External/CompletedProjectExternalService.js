@@ -1,6 +1,6 @@
-const ProjectRepository = require("../DeletedProjectRepository");
+const ProjectRepository = require("../CompleteProjectRepository");
 
-class DeletedProjectExternalService {
+class CompletedProjectExternalService {
   async create(projectData) {
     try {
       // Proceed with project creation
@@ -12,4 +12,4 @@ class DeletedProjectExternalService {
   }
 }
 
-module.exports = new DeletedProjectExternalService();
+module.exports = new CompletedProjectExternalService();

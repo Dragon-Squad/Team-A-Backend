@@ -5,6 +5,7 @@ const projectSchema = new Schema({
   charityId: { type: Schema.Types.ObjectId, ref: "Charity", required: true, index: true },
   categoryIds: [{ type: Schema.Types.ObjectId, ref: "Category"}],
   regionId: { type: Schema.Types.ObjectId, ref: "Region", required: true },
+  country: { type: String },
   title: { type: String, required: true },
   description: { type: String },
   goalAmount: { type: Number, required: true },

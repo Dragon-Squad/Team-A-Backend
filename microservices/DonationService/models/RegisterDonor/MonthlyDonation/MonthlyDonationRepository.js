@@ -122,6 +122,27 @@ class MonthlyDonationRepository {
       cancelledAt: new Date()
     }, { new: true });
   }
+
+  async getTopMonthlyDonors() {
+    try {
+      const topDonors = await MonthlyDonation.aggregate([
+        { $match: { isActive: true } },
+        {
+          $group: {
+            _id: '$userId',
+            totalDonated: { $sum: '$amount' }
+          }
+        },
+        { $sort: { totalDonated: -1 } },
+        { $limit: 10 },
+      ]);
+  
+      return topDonors;
+    } catch (error) {
+      console.error('Error fetching top monthly donors:', error);
+      throw error;
+    }
+  }
 }
 
 module.exports = new MonthlyDonationRepository();

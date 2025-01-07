@@ -34,22 +34,27 @@ class ProjectService {
 
         // Move the project to shard if it is completed
         if (updatedAmount >= project.goalAmount) {
-            console.log(`project ${value.projectId} completed`)
             const updatedProjectData = {
+                ...project,
                 raisedAmount: updatedAmount,
                 status: "completed",
             };
 
-            const result = await ProjectRepository.delete(value.projectId);
+            // const result = await ProjectRepository.delete(value.projectId);
 
-            if(result){
-                await publish({
-                  topic: "project_to_shard",
-                  event: "completed_project",
-                  message: updatedProjectData,
-                });
-            }
+            // if(result){
+            //     await publish({
+            //       topic: "project_to_shard",
+            //       event: "completed_project",
+            //       message: updatedProjectData._doc,
+            //     });
+            // }
 
+            await publish({
+                topic: "project_to_shard",
+                event: "completed_project",
+                message: updatedProjectData._doc,
+            });
             return;
         }
 

@@ -52,11 +52,10 @@ async function handleCheckoutSessionCompleted(session) {
     }
 
     const monthlyDonationId = session.metadata.monthlyDonationId;
+    const monthlyAmount = session.metadata.monthlyAmount;
     if (monthlyDonationId) {
-        await updateMonthlyDonation(monthlyDonationId, userId, projectId, session, amount);
+        await updateMonthlyDonation(monthlyDonationId, userId, projectId, session, monthlyAmount);
     }
-
-    await updateProjectRaisedAmount(projectId, amount);
 
     await publish({
         topic: "donation_to_project",
@@ -101,6 +100,8 @@ async function handleCheckoutSessionCompleted(session) {
     } finally {
         await consumer.disconnect();
     }
+
+    await updateProjectRaisedAmount(projectId, amount);
 }
 
 async function handleCheckoutSessionExpired(session) {

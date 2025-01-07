@@ -1,5 +1,6 @@
 const MonthlyDonationRepository = require('./MonthlyDonationRepository');
 const { cancelSubscription } = require("../../../utils/StripeUtils");
+const { getDonor, getUser } = require('../../../utils/ApiUtils');
 
 class MonthlyDonationService {
   async create() {
@@ -20,9 +21,10 @@ class MonthlyDonationService {
     }
   }
 
-  async getAllMonthlyDonationsByDonor(page, limit, donorId, status, sortField = 'startedDate', sortOrder = 'asc') {
+  async getAllMonthlyDonationsByDonor(page, limit, status, sortField = 'startedDate', sortOrder = 'asc', accessToken) {
     try {
-      const result = await MonthlyDonationRepository.getAllByDonor(page, limit, donorId, status, sortField, sortOrder);
+      const donor = await getDonor(accessToken);
+      const result = await MonthlyDonationRepository.getAllByDonor(page, limit, donor.userId, status, sortField, sortOrder);
       return result;
     } catch (error) {
       throw new Error('Error fetching Monthly Donations by Donor: ' + error.message);
