@@ -1,6 +1,7 @@
 const { app, SERVER_PORT, configureApp, errorHandler } = require("./Config/AppConfig");
 const { connectDB } = require("./Config/DBConfig");
 const DeletedProjectRouter = require("./DeletedProject/DeletedProjectRouter");
+const CompletedProjectRouter = require("./CompletedProject/CompletedProjectRouter");
 const Consumer = require("./broker/Consumer");
 
 const runApp = async () => {
@@ -15,7 +16,8 @@ const runApp = async () => {
 
     // Add routes
     app.use(`/deleted/projects`, DeletedProjectRouter);
-    
+    app.use(`/completed/projects`, CompletedProjectRouter);
+
     // Add error handler
     app.use(errorHandler);
 
