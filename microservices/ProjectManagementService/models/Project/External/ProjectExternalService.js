@@ -40,21 +40,16 @@ class ProjectService {
                 status: "completed",
             };
 
-            // const result = await ProjectRepository.delete(value.projectId);
+            const result = await ProjectRepository.delete(value.projectId);
 
-            // if(result){
-            //     await publish({
-            //       topic: "project_to_shard",
-            //       event: "completed_project",
-            //       message: updatedProjectData._doc,
-            //     });
-            // }
+            if(result){
+                await publish({
+                  topic: "project_to_shard",
+                  event: "completed_project",
+                  message: updatedProjectData._doc,
+                });
+            }
 
-            await publish({
-                topic: "project_to_shard",
-                event: "completed_project",
-                message: updatedProjectData._doc,
-            });
             return;
         }
 
