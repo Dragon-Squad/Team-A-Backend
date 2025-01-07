@@ -1,5 +1,5 @@
 const { waitForKongAdminAPI, createService, createRoute, enableRateLimitingPlugin, serversDiscovery } = require("./https");
-const { emailRoutes, projectRoutes, donationRoutes, shardedProjectRoutes, services } = require("./resources/servicesAndRoutes");
+const { emailRoutes, projectRoutes, donationRoutes, shardedProjectRoutes, statisticRoutes, services } = require("./resources/servicesAndRoutes");
 const IPAdr = process.env.IP_ADR || "172.30.208.1";
 
 const serviceMap = new Map([
@@ -7,6 +7,7 @@ const serviceMap = new Map([
     ['project', 'ProjectManagementService'],
     ['donation', 'DonationService'],
     ['shard', 'ShardedProjectService'],
+    ['statistic', "StatisticService"],
   ]);
 
 // Main function to create services and their corresponding routes
@@ -25,6 +26,7 @@ async function setupServices() {
         const projectManagementServiceId = await createService(serviceMap.get('project'), urlMap.get('project'));
         const donationServiceId = await createService(serviceMap.get('donation'), urlMap.get('donation'));
         const shardedProjectServiceId = await createService(serviceMap.get('shard'), urlMap.get('shard'));
+        const statisticServiceId = await createService(serviceMap.get('statistic'), urlMap.get('statistic'));
 
         // Step 2: Create routes for the created services
         // Routes for Email Service
@@ -64,6 +66,16 @@ async function setupServices() {
                 console.log(`Route created for shardedProjectService: ${route}`);
             } catch (routeError) {
                 console.error(`Error creating route ${route} for shardedProjectService:`, routeError.message);
+            }
+        }
+
+        // Routes for Statistic Service
+        for (const route of statisticRoutes) {
+            try {
+                await createRoute(statisticServiceId, route);
+                console.log(`Route created for statisticService: ${route}`);
+            } catch (routeError) {
+                console.error(`Error creating route ${route} for statisticService:`, routeError.message);
             }
         }
 

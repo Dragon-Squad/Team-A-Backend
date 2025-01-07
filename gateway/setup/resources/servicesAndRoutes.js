@@ -52,7 +52,13 @@ const shardedProjectRoutes = [
     '/deleted/projects/',
 ];
 
+const statisticRoutes = [
+    '/statistic/donation/total',
+    '/statistic/donation/compare',
+];
+
 const services = [
+    'StatisticService',
     'EmailService',
     'ProjectManagementService',
     'DonationService',
@@ -64,5 +70,6 @@ module.exports = {
     projectRoutes,
     donationRoutes,
     shardedProjectRoutes,
+    statisticRoutes,
     services
 };

@@ -82,6 +82,24 @@ class DonationRepository {
       data: data                        
     };
   }
+
+  async calculateTotalDonations(projectIds) {
+    const donations = await Donation.find({ projectId: { $in: projectIds } })
+      .populate({
+        path: "transactionId",
+        match: { status: "success" },
+        select: "amount",
+      });
+  
+    const totalDonations = donations.reduce((total, donation) => {
+      if (donation.transactionId) {
+        total += donation.transactionId.amount;
+      }
+      return total;
+    }, 0);
+  
+    return totalDonations;
+  }
 }
 
 module.exports = new DonationRepository();

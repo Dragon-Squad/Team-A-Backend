@@ -47,7 +47,7 @@ class GuestDonationService {
         });
 
         await publish({
-            topic: "donation_to_project",
+            topic: "to_project",
             event: "verify_project",
             message: { projectId: projectId }
         });
@@ -147,7 +147,7 @@ class GuestDonationService {
         if(!projectId) throw new Error('No Project Id provided');
 
         await publish({
-            topic: "donation_to_project",
+            topic: "to_project",
             event: "verify_project",
             message: { projectId: projectId }
         });

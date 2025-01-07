@@ -28,7 +28,7 @@ class DonationService {
         customerId = bytes.toString(CryptoJS.enc.Utf8);
 
         await publish({
-            topic: "donation_to_project",
+            topic: "to_project",
             event: "verify_project",
             message: { projectId: projectId }
         });
@@ -137,7 +137,7 @@ class DonationService {
         if(!projectId) throw new Error('No Project Id provided');
 
         await publish({
-            topic: "donation_to_project",
+            topic: "to_project",
             event: "verify_project",
             message: { projectId: projectId }
         });

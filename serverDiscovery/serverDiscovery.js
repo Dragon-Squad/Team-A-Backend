@@ -4,7 +4,7 @@ const Consul = require('consul');
 const CONSUL_HOST = 'localhost';
 const CONSUL_PORT = 8500;
 
-const serviceNames = ['email', 'project', 'donation', 'shard'];
+const serviceNames = ['email', 'project', 'donation', 'shard', 'statistic'];
 
 // Create Consul client
 const consul = new Consul({ host: CONSUL_HOST, port: CONSUL_PORT });

@@ -45,6 +45,17 @@ services:
     ports:
       - "${SHARD_SERVER_PORT}:${SHARD_SERVER_PORT}"
 
+  statisticservice:
+    build: ./StatisticService
+    container_name: statistic_service
+    hostname: statistic_service
+    env_file:
+      - .env
+    networks:
+      - microservice-network
+    ports:
+      - "${STATISTIC_SERVER_PORT}:${STATISTIC_SERVER_PORT}"
+
 networks:
   microservice-network:
     name: microservice-network

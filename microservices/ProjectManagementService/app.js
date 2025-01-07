@@ -22,7 +22,7 @@ const runApp = async () => {
       res.status(200).json({ message: 'Server is working!' });
     });
 
-    await subscribe("donation_to_project");
+    await subscribe("to_project");
 
     // Add error handler
     app.use(errorHandler);
