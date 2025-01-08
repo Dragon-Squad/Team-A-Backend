@@ -23,16 +23,22 @@ const UpdateProjectRequestDTO = Joi.object({
 
 // Response DTOs
 class ProjectResponseDTO {
-  constructor(project) {
+  constructor(project, categories, region, charity) {
     this.id = project._id;
     this.title = project.title;
     this.goalAmount = project.goalAmount;
     this.startDate = project.startDate;
     this.endDate = project.endDate;
     this.status = project.status;
-    this.charityId = project.charityId;
-    this.categoryIds = project.categoryIds;
-    this.regionId = project.regionId;
+    this.charity = charity; // Assuming charity is an object with relevant fields
+    this.categories = categories.map(category => ({
+      id: category._id,
+      name: category.name // Include only the name of the category
+    }));
+    this.region = {
+      id: region._id,
+      name: region.name // Include only the name of the region
+    };
   }
 }
 

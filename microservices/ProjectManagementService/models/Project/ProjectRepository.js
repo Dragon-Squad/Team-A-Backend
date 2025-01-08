@@ -18,13 +18,12 @@ class ProjectRepository {
   async getById(id) {
     // Find a project by ID and populate related fields (charity, category, region)
     const project = await Project.findById(id)
-      .populate("charityId") // Populates the charityId field with the full Charity document
       .populate("categoryIds") // Populates the categoryId field with the full Category document
       .populate("regionId"); // Populates the regionId field with the full Region document
 
-    if (!project) {
+    if (!project) 
       return null; // Return null if no project is found
-    }
+    
 
     return project;
   }
