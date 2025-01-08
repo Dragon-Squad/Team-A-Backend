@@ -233,14 +233,22 @@ class ProjectService {
       }
     }
 
-    const projects = await ProjectRepository.getAll(filters);
-    return Promise.all(projects.map(async (project) => {
+    const { total, page, limit, projects } = await ProjectRepository.getAll(filters);
+
+    const projectDTOs = await Promise.all(projects.map(async (project) => {
       const charity = await validateCharity(project.charityId);
       const categories = project.categoryIds; // Directly use the populated categoryIds
       const region = project.regionId; // Directly use the populated regionId
   
       return new ProjectResponseDTO(project, categories, region, charity); // Pass all data
     }));
+
+    return {
+      total,
+      page,
+      limit,
+      projects: projectDTOs, // Return the transformed projects using DTOs
+    };
   }
 
   async getTotalProjects(filters) {
