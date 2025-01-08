@@ -57,4 +57,6 @@ ProjectRouter.get(
 
 ProjectRouter.get("/total", ProjectController.getTotalProjects);
 
+ProjectRouter.get("/total-status", ProjectController.getTotalProjectStatus);
+
 module.exports = ProjectRouter;

@@ -214,6 +214,27 @@ class ProjectService {
     const total = await ProjectRepository.countDocuments(query);
     return { total };
   }
+
+  async getTotalProjectStatus(filters) {
+    const query = {};
+    if (filters.year) {
+      const startDate = new Date(filters.year, 0, 1);
+      const endDate = new Date(filters.year + 1, 0, 1);
+      query.createdAt = { $gte: startDate, $lt: endDate };
+    }
+    if (filters.month) {
+      const startDate = new Date(filters.year, filters.month - 1, 1);
+      const endDate = new Date(filters.year, filters.month, 1);
+      query.createdAt = { $gte: startDate, $lt: endDate };
+    }
+    if (filters.week) {
+      const startDate = new Date(filters.year, filters.month - 1, filters.week * 7);
+      const endDate = new Date(filters.year, filters.month - 1, (filters.week + 1) * 7);
+      query.createdAt = { $gte: startDate, $lt: endDate };
+    }
+
+    return await ProjectRepository.countByStatusAndDate(query);
+  }
 }
 
 module.exports = new ProjectService();
