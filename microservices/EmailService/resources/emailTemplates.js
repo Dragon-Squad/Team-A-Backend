@@ -291,11 +291,7 @@ const charityProjectCreatedMail = (
     receiver,
     name,
     projectTitle,
-    projectUrl,
-    projectRegion,
-    projectCategory,
     projectDescription,
-    projectGoal
 ) => ({
     from: sender,
     to: receiver,
@@ -316,11 +312,8 @@ const charityProjectCreatedMail = (
 
                 <p>Here are the details of your project:</p>
                 <div class="details">
-                    <p><strong>Project Name:</strong> <a href="${projectUrl}">${projectTitle}</a></p>
-                    <p><strong>Region:</strong> ${projectRegion}</p>
-                    <p><strong>Category:</strong> ${projectCategory}</p>
+                    <p><strong>Project Name:</strong>${projectTitle}</p>
                     <p><strong>Description:</strong> ${projectDescription}</p>
-                    <p><strong>Goal:</strong> $${projectGoal}</p>
                 </div>
 
                 <p>Share your project link with your network and encourage them to contribute to your cause.

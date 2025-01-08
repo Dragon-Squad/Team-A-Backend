@@ -56,13 +56,10 @@ class EmailExternalService {
     // Send charity an email on project creation
     async sendCharityProjectCreatedEmail(value) {
         const mailOptions = charityProjectCreatedMail(
-            value.charity.email,
+            value.userEmail,
             value.charity.name,
-            value.project._doc.title, 
-            "", 
-            value.project.region.name,
-            value.project.categories.name, 
-            value.project._doc.goalAmount.toString()
+            value.project.title,
+            value.project.description
         );
         const info = await transporter.sendMail(mailOptions);
         console.log("Email sent:", info.response);
