@@ -45,21 +45,16 @@ services:
     ports:
       - "${SHARD_SERVER_PORT}:${SHARD_SERVER_PORT}"
 
-  cryptservice:
-    build: ./CryptService
-    container_name: crypt_service
-    hostname: crypt_service
+  statisticservice:
+    build: ./StatisticService
+    container_name: statistic_service
+    hostname: statistic_service
     env_file:
       - .env
     networks:
       - microservice-network
     ports:
-      - "${CRYPT_SERVER_PORT}:${CRYPT_SERVER_PORT}"
-    depends_on:
-      - emailservice
-      - projectmanagementservice
-      - donationservice
-      - shardedprojectservice
+      - "${STATISTIC_SERVER_PORT}:${STATISTIC_SERVER_PORT}"
 
 networks:
   microservice-network:

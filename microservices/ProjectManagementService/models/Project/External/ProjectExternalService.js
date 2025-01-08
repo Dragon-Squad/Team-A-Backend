@@ -4,6 +4,8 @@ const {
   ProjectResponseDTO,
   UpdateRaisedAmountDTO,
 } = require("./ProjectExternalDto");
+const CategoryExternalService = require("../../Category/External/CategoryExternalService");
+const RegionExternalService = require("../../Region/External/RegionExternalService");
 
 class ProjectExternalService {
   async getProjectById(value) {
@@ -86,6 +88,33 @@ class ProjectExternalService {
     } catch (error) {
       throw new Error(error.message);
     }
+  }
+
+  async getProjectsByFilter(value){
+    const filters = value || {};
+    console.log(value);
+    const projects = await ProjectRepository.getAll(filters);
+
+    await publish({
+        topic: "to_stat",
+        event: "project_by_filter",
+        message: projects,
+    });
+  }
+
+  async getNames(value){
+    console.log(value);
+    const categoryIds = value.slice(0, 2);
+    const regionIds = value.slice(2);
+
+    const categoryNames = await CategoryExternalService.getCategoryNamesByIds(categoryIds);
+    const regionNames = await RegionExternalService.getRegionNamesByIds(regionIds);
+
+    await publish({
+        topic: "to_stat",
+        event: "return_names",
+        message: [...categoryNames, ...regionNames],
+    });
   }
 }
 

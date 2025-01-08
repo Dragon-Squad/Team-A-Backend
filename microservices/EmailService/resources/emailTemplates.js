@@ -174,7 +174,6 @@ const welcomeMail = (receiver, name, role) => ({
 
 const donorDonationSuccessMail = (
     receiver,
-    name,
     projectTitle,
     projectUrl,
     amount
@@ -189,7 +188,6 @@ const donorDonationSuccessMail = (
                 Thank You for Your Donation!
             </div>
             <div class="content">
-                <p>Dear ${name},</p>
                 <p>We are truly grateful for your generous donation to Charitan.
                 Your support will help make a meaningful difference in the lives of individuals and communities in need.</p>
 

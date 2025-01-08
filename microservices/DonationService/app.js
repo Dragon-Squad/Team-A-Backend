@@ -1,5 +1,5 @@
 const { app, SERVER_PORT, configureApp, errorHandler } = require("./Config/AppConfig");
-const { connectDB } = require("./Config/DBConfig");
+const { connectDB  } = require("./Config/DBConfig");
 const DonationRouter = require("./models/RegisterDonor/Donation/DonationRoute");
 const WebhookRouter = require("./Webhook/WebhookRoute");
 const MonthlyDonationRouter = require("./models/RegisterDonor/MonthlyDonation/MonthlyDonationRouter");

@@ -8,6 +8,8 @@ const createRegionModel = require('./RegionSchema');
 const createProjectModel = require('./ProjectSchema');
 const createDonationModel = require('./DonationSchema');
 const createMonthlyDonationModel = require('./MonthlyDonationSchema');
+const createGuestDonorModel = require('./GuestDonorSchema');
+const createGuestDonationModel = require('./GuestDonationSchema');
 const createPaymentTransactionModel = require('./PaymentTransactionSchema');
 const createDeletedProjectModel = require('./DeletedProjectSchema');
 const createCompletedProjectModel = require('./CompletedProjectSchema');
@@ -23,6 +25,8 @@ module.exports = {
     createProjectModel,
     createDonationModel,
     createMonthlyDonationModel,
+    createGuestDonorModel,
+    createGuestDonationModel,
     createPaymentTransactionModel,
     createDeletedProjectModel,
     createCompletedProjectModel,

@@ -8,6 +8,7 @@ const notificationSchema = new Schema({
 
 const regionSchema = new Schema({
   name: { type: String, required: true, unique: true },
+  availableCountries: [{ type: String }],
   subscriptionList: [{ type: Schema.Types.ObjectId, ref: 'Donor' }],
   notificationList: [{ type: notificationSchema, default: () => [] }]
 });

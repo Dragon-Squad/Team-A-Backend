@@ -1,5 +1,7 @@
 const { Kafka, logLevel } = require("kafkajs");
 const DeletedProjectExternalService = require("../DeletedProject/External/DeletedProjectExternalService");
+const CompletedProjectExternalService = require("../CompletedProject/External/CompletedProjectExternalService");
+
 // Configuration properties
 const CLIENT_ID = "ShardA";
 const GROUP_ID = "ShardA";
@@ -64,6 +66,11 @@ const subscribe = async (topic, messageHandler) => {
             switch (key) {
               case "deleted_project":
                 await DeletedProjectExternalService.create(value);
+                break;
+
+              case "completed_project":
+                console.log(value);
+                await CompletedProjectExternalService.create(value);
                 break;
         
               default:

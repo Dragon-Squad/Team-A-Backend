@@ -5,7 +5,14 @@ const createRegions = async (Region) => {
     try {
       // Process each Region entry
       console.log('Creating regions...');
-      const regions = await Region.insertMany(regionsData.map(name => ({ name, subscriptionList: [], notificationList: [] })));
+      const regions = await Region.insertMany(
+        regionsData.map(([name, countries]) => ({
+          name,
+          availableCountries: countries, 
+          subscriptionList: [],
+          notificationList: [],
+        }))
+      );
       
       console.log('All regions created successfully.');
       return regions;  

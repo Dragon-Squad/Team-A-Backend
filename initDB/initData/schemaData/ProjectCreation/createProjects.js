@@ -16,7 +16,7 @@ const createProjects = async (Project, charityDocs, categoryDocs, regionDocs) =>
             map[category.name] = category._id;
             return map;
         }, {});
-        
+
         const regionMap = regionDocs.reduce((map, region) => {
             map[region.name] = region._id;
             return map;
@@ -112,6 +112,7 @@ const createProjects = async (Project, charityDocs, categoryDocs, regionDocs) =>
                 startDate: today,
                 endDate: calculateEndDate(project.duration),
                 images: imageUrls,
+                country: project.country,
             };
         }));
         

@@ -1,6 +1,10 @@
+require('dotenv').config();
 const bcrypt = require('bcryptjs');
 const { faker } = require ('@faker-js/faker');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const CryptoJS = require('crypto-js');
+
+const secretKey = process.env.SECRET_KEY;
 
 const createDonors= async (User, Donor, Address) => {
     try {
@@ -18,9 +22,11 @@ const createDonors= async (User, Donor, Address) => {
             const email = faker.internet.email({provider: 'gmail.com'});
 
             const donorUser = new User({
+                username: email,
                 email: email,
                 hashedPassword: await bcrypt.hash('donorpassword', 10),
-                isActive: true
+                isActive: true,
+                role: "Donor",
             });
             await donorUser.save();
 
@@ -53,7 +59,7 @@ const createDonors= async (User, Donor, Address) => {
                 userId: donorUser._id,
                 firstName: faker.person.firstName(),
                 lastName: faker.person.lastName(),
-                hashedStripeId: await bcrypt.hash(customerId, 10),
+                hashedStripeId: CryptoJS.AES.encrypt(customerId, secretKey).toString(),
             });
             donors.push(await donor.save());
         }

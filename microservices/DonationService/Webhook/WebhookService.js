@@ -1,127 +1,6 @@
 require('dotenv').config();
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY); 
-const { publish } = require('../broker/Producer');
-const DonationService = require("../models/RegisterDonor/Donation/DonationService");
-const MonthlyDonationService = require('../models/RegisterDonor/MonthlyDonation/MonthlyDonationService');
-const PaymentTransactionService = require('../models/PaymentTransaction/PaymentTransactionService');
-const axios = require("axios");
-const GuestDonationService = require('../models/GuestDonor/GuestDonation/GuestDonationService');
-const GuestDonorService = require('../models/GuestDonor/GuestDonor/GuestDonorService');
-
-async function handleCheckoutSessionCompleted(session, donorId, projectId, donation, selectedPaymentMethods, donorType) {
-    const amount = session.amount_total / 100;
-    if(donorType === "Donation"){
-        const response = await axios.get(`http://172.30.208.1:3000/api/donors/${donorId}`);
-
-        if(!response){
-            throw new Error("No Donor Found to update");
-        }
-
-        if (response.data && amount > 0) {
-            await updateDonorStats(donorId, amount, projectId);
-        }
-    } else {
-        const response = await GuestDonorService.findById(donorId);
-
-        if(!response){
-            throw new Error("No Guest Donor Found");
-        }
-    }
-
-    await createTransactionRecord(donation, amount, selectedPaymentMethods, "success", donorType);
-
-    const monthlyDonationId = session.metadata.monthlyDonationId;
-    if (monthlyDonationId) {
-        await updateMonthlyDonation(monthlyDonationId, donorId, projectId, session, amount);
-    }
-
-    await updateProjectRaisedAmount(projectId, amount);
-}
-
-async function handleCheckoutSessionExpired(session, donation, selectedPaymentMethods, donorType) {
-    const amount = session.amount_total / 100;
-    await createTransactionRecord(donation, amount, selectedPaymentMethods, "failed", donorType);
-}
-
-async function handleInvoicePaymentSucceeded(session, donorId, projectId, donation, selectedPaymentMethods, donorType) {
-    const amount = session.amount_total / 100;
-    const subscriptionId = session.subscription;
-
-    const monthlyDonation = await MonthlyDonationService.getByStripeSubscriptionId(subscriptionId);
-    if (monthlyDonation) {
-        await updateMonthlyRenewDate(monthlyDonation, session);
-    }
-
-    const response = await axios.get(`http://172.30.208.1:3000/api/donors/${donorId}`);
-    if (response.data && amount > 0) {
-        await updateDonorStats(donorId, amount, projectId);
-    }
-
-    await createTransactionRecord(donation, amount, selectedPaymentMethods,  "success", donorType);
-}
-
-async function handleInvoicePaymentFailed(session, donation, selectedPaymentMethods, donorType) {
-    const amount = session.amount_total / 100;
-    await createTransactionRecord(donation, amount, selectedPaymentMethods, "failed", donorType);
-
-    const subscriptionId = session.subscription;
-
-    const monthlyDonation = await MonthlyDonationService.getByStripeSubscriptionId(subscriptionId);
-    if (monthlyDonation) {
-        await MonthlyDonationService.cancel(monthlyDonation._id);
-    }
-}
-
-async function updateDonorStats(donorId, amount, projectId) {
-    const body = { donationAmount: amount, projectId: projectId };
-    await axios.post(`http://172.30.208.1:3000/api/donors/${donorId}/update-stats`, body);
-}
-
-async function createTransactionRecord(donation, amount, selectedPaymentMethods, status, donorType) {
-    await PaymentTransactionService.create({
-        donationId: (await donation)._id,
-        amount: amount,
-        status: status,
-        paymentProvider: selectedPaymentMethods,
-        type: donorType
-    });
-}
-
-async function updateMonthlyDonation(monthlyDonationId, donorId, projectId, session, amount) {
-    try {
-        const monthlyDonation = await MonthlyDonationService.getMonthlyDonationById(monthlyDonationId);
-        const updatedMonthlyDonation = {
-            donorId: donorId,
-            projectId: projectId,
-            stripeSubscriptionId: session.subscription,
-            amount: amount,
-            renewDate: session.metadata.renewDate,
-            cancelledAt: null,
-            isActive: true,
-        };
-        await MonthlyDonationService.update(monthlyDonationId, updatedMonthlyDonation);
-    } catch (err) {
-        throw new Error('Failed to update renew date: ' + err.message);
-    }
-}
-
-async function updateMonthlyRenewDate(monthlyDonation, session) {
-    const currentRenewDate = monthlyDonation.renewDate || new Date();
-    const nextRenewDate = new Date(currentRenewDate.getFullYear(), currentRenewDate.getMonth() + 1, 15);
-    monthlyDonation.renewDate = nextRenewDate;
-    await MonthlyDonationService.update(monthlyDonation._id, monthlyDonation);
-}
-
-async function updateProjectRaisedAmount(projectId, amount) {
-    await publish({
-        topic: "donation_to_project",
-        event: "update_project",
-        message: {
-            projectId: projectId,
-            amount: amount,
-        },
-    });
-}
+const { handleCheckoutSessionCompleted, handleCheckoutSessionExpired, handleInvoicePaymentSucceeded, handleInvoicePaymentFailed } = require('../utils/WebhookUtils');
 
 class WebhookService {
     verifyEvent(payload, signature) {
@@ -137,51 +16,22 @@ class WebhookService {
     }
 
     async handleEvent(event) {
-        console.log("session");
         const session = event.data.object;
-        const projectId = session.metadata.projectId;
-        const message = session.metadata.personal_message;
-        const donationType = session.mode === "payment" ? "one-time" : "monthly";
-        const donorId = session.metadata.donorId;
-        const donorType = session.metadata.donorType;
-
-        let donation;
-        if(donorType == "Donation"){
-            donation = await DonationService.create({
-                projectId: projectId,
-                donorId: donorId,
-                donationType: donationType,
-                message: message
-            });
-        } else {
-            donation = await GuestDonationService.create({
-                projectId: projectId,
-                guestId: donorId,
-                message: message
-            });
-        }
-
-        const allPaymentMethods = session.payment_method_types;
-        const configuredMethods = Object.keys(session.payment_method_options || {});
-        const selectedPaymentMethods = allPaymentMethods.find(method =>
-            configuredMethods.includes(method)
-        ) || "unknown";
-
         switch (event.type) {
             case 'checkout.session.completed':
-                await handleCheckoutSessionCompleted(session, donorId, projectId, donation, selectedPaymentMethods, donorType);
+                await handleCheckoutSessionCompleted(session);
                 break;
 
             case 'checkout.session.expired':
-                await handleCheckoutSessionExpired(session, donation, selectedPaymentMethods, donationType);
+                await handleCheckoutSessionExpired(session);
                 break;
 
             case 'invoice.payment_succeeded':
-                await handleInvoicePaymentSucceeded(session, donorId, projectId, donation, selectedPaymentMethods, donorType);
+                await handleInvoicePaymentSucceeded(session);
                 break;
             
             case 'invoice.payment_failed':
-                await handleInvoicePaymentFailed(session, donation, selectedPaymentMethods, donorType);
+                await handleInvoicePaymentFailed(session);
                 break;
 
             default:

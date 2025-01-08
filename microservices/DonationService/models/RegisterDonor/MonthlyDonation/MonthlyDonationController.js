@@ -32,6 +32,18 @@ class MonthlyDonationController {
     }
   }
 
+  async getMonthlyDonationsByProject(req, res) {
+    try {
+        const limit = parseInt(req.query.limit) || 10;
+        const page = parseInt(req.query.page) || 1;
+        const projectId = req.params.id;
+        const results = await MonthlyDonationService.getMonthlyDonationsByProject(limit, page, projectId);
+        res.status(200).json(results);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+  }
+
   async getMonthlyDonationById(req, res) {
     const monthlyDonationId = req.params.id;
     try {

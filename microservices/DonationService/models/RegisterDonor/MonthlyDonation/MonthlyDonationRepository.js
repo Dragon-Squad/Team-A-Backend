@@ -49,8 +49,8 @@ class MonthlyDonationRepository {
     };
   }
 
-  async getAllByDonor(page, limit, donorId, status, sortField, sortOrder) {
-    const query = { donorId };
+  async getAllByDonor(page, limit, userId, status, sortField, sortOrder) {
+    const query = { userId };
 
     if (status) {
       query.isActive = status; 
@@ -85,6 +85,28 @@ class MonthlyDonationRepository {
       data: data
     };
   }
+
+  async getAllByProject(limit, page, projectId) {
+      const totalCount = await MonthlyDonation.countDocuments({ projectId: projectId }); 
+      const totalPages = Math.ceil(totalCount / limit);                         
+      const currentPage = page;                                               
+      const isLast = currentPage >= totalPages;                                
+  
+      const offset = (page - 1) * limit;
+      const data = await MonthlyDonation.find({ projectId: projectId })
+        .skip(offset)
+        .limit(limit);
+  
+      return {
+        meta: {
+          totalPages: totalPages,        
+          currentPage: currentPage,       
+          pageSize: limit,                
+          isLast: isLast                 
+        },
+        data: data                        
+      };
+    }
   
   async getByStripeSubscriptionId(stripeSubscriptionId){
     return await MonthlyDonation.findOne({ stripeSubscriptionId }).exec();
@@ -99,6 +121,27 @@ class MonthlyDonationRepository {
       isActive: false,
       cancelledAt: new Date()
     }, { new: true });
+  }
+
+  async getTopMonthlyDonors() {
+    try {
+      const topDonors = await MonthlyDonation.aggregate([
+        { $match: { isActive: true } },
+        {
+          $group: {
+            _id: '$userId',
+            totalDonated: { $sum: '$amount' }
+          }
+        },
+        { $sort: { totalDonated: -1 } },
+        { $limit: 10 },
+      ]);
+  
+      return topDonors;
+    } catch (error) {
+      console.error('Error fetching top monthly donors:', error);
+      throw error;
+    }
   }
 }
 
