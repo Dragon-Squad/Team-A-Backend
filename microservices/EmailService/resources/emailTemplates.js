@@ -319,7 +319,6 @@ const charityProjectCreatedMail = (
                     <p><strong>Project Name:</strong> <a href="${projectUrl}">${projectTitle}</a></p>
                     <p><strong>Region:</strong> ${projectRegion}</p>
                     <p><strong>Category:</strong> ${projectCategory}</p>
-                    <p><strong>Description:</strong> ${projectDescription}</p>
                     <p><strong>Goal:</strong> $${projectGoal}</p>
                 </div>
 
@@ -377,7 +376,6 @@ const charityProjectCompletedMail = (
     receiver,
     name,
     projectTitle,
-    projectUrl,
 ) => ({
     from: sender,
     to: receiver,
@@ -401,7 +399,6 @@ const charityProjectCompletedMail = (
                 <p> We encourage you to keep the momentum going by sharing this achievement with your supporters
                 and thanking those who contributed to the cause.</p>
 
-                <a href="${projectUrl}" class="cta-button">View Your Project</a>
             </div>
 
             <div class="footer">

@@ -76,6 +76,10 @@ const subscribe = async (topic) => {
                 await EmailExternalService.sendDonorDonationSuccessEmail(value);
                 break;
 
+                case "charity_project_completed":
+                await EmailExternalService.sendCharityProjectCompletedEmail(value);
+                break;
+
               default:
                 console.error(`Unexpected Kafka Key in ${topic} topic: ${key}`);
             }

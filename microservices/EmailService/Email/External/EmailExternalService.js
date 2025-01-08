@@ -85,16 +85,12 @@ class EmailExternalService {
 
     // Send charity an email on project completion
     async sendCharityProjectCompletedEmail(
-        receiver,
-        name,
-        projectTitle,
-        projectUrl
+        value
     ) {
         const mailOptions = charityProjectCompletedMail(
-            receiver,
-            name,
-            projectTitle,
-            projectUrl
+            value.userEmail,
+            value.charity.name,
+            value.project.title,
         );
         const info = await transporter.sendMail(mailOptions);
         console.log("Email sent:", info.response);
