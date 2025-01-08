@@ -291,7 +291,11 @@ const charityProjectCreatedMail = (
     receiver,
     name,
     projectTitle,
+    projectUrl,
+    projectRegion,
+    projectCategory,
     projectDescription,
+    projectGoal
 ) => ({
     from: sender,
     to: receiver,
@@ -312,8 +316,10 @@ const charityProjectCreatedMail = (
 
                 <p>Here are the details of your project:</p>
                 <div class="details">
-                    <p><strong>Project Name:</strong>${projectTitle}</p>
-                    <p><strong>Description:</strong> ${projectDescription}</p>
+                    <p><strong>Project Name:</strong> <a href="${projectUrl}">${projectTitle}</a></p>
+                    <p><strong>Region:</strong> ${projectRegion}</p>
+                    <p><strong>Category:</strong> ${projectCategory}</p>
+                    <p><strong>Goal:</strong> $${projectGoal}</p>
                 </div>
 
                 <p>Share your project link with your network and encourage them to contribute to your cause.
@@ -370,7 +376,6 @@ const charityProjectCompletedMail = (
     receiver,
     name,
     projectTitle,
-    projectUrl,
 ) => ({
     from: sender,
     to: receiver,
@@ -394,7 +399,6 @@ const charityProjectCompletedMail = (
                 <p> We encourage you to keep the momentum going by sharing this achievement with your supporters
                 and thanking those who contributed to the cause.</p>
 
-                <a href="${projectUrl}" class="cta-button">View Your Project</a>
             </div>
 
             <div class="footer">
