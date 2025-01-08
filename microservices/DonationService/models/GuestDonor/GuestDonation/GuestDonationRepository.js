@@ -11,7 +11,7 @@ class GuestDonationRepository {
   }
 
   async findById(id) {
-    return await GuestDonation.findById(id);
+    return await GuestDonation.findById(id).populate("transactionId");
   }
 
   async getAll(limit, page) {
@@ -23,7 +23,9 @@ class GuestDonationRepository {
     const offset = (page - 1) * limit;
     const data = await GuestDonation.find()
       .skip(offset)
-      .limit(limit);
+      .limit(limit)
+      .populate("transactionId")
+      .populate("transactionId");
 
     return {
       meta: {       
@@ -45,7 +47,8 @@ class GuestDonationRepository {
     const offset = (page - 1) * limit;
     const data = await GuestDonation.find({ projectId: projectId })
       .skip(offset)
-      .limit(limit);
+      .limit(limit)
+      .populate("transactionId");
 
     return {
       meta: {

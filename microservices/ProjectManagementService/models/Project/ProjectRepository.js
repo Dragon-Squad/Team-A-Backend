@@ -32,6 +32,7 @@ class ProjectRepository {
   async getAll(filters) {
     const query = {};
     const {
+      country,
       charityId,
       categoryId,
       regionId,
@@ -42,8 +43,9 @@ class ProjectRepository {
     } = filters;
 
     // Add filters to the query object
+    if (country) query.country = country;
     if (charityId) query.charityId = charityId;
-    if (categoryId) query.categoryId = categoryId;
+    if (categoryId) query.categoryIds = { $in: [categoryId] };
     if (regionId) query.regionId = regionId;
     if (status) query.status = status;
     if (search) query.title = { $regex: search, $options: "i" };
@@ -72,6 +74,16 @@ class ProjectRepository {
   async getCharityId(id){
     const project = await Project.findById(id);
     return project.charityId.toString;
+  }
+
+  async countDocuments(query) {
+    return await Project.countDocuments(query);
+  }
+
+  async countByStatusAndDate(query) {
+    const activeCount = await Project.countDocuments({ ...query, status: 'active' });
+    const completedCount = await Project.countDocuments({ ...query, status: 'completed' });
+    return { activeCount, completedCount };
   }
 }
 

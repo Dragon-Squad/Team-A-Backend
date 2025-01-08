@@ -2,6 +2,7 @@
   "dependencies": {
     "@faker-js/faker": "^9.3.0",
     "bcryptjs": "^2.4.3",
+    "crypto-js": "^4.2.0",
     "dotenv": "^16.4.5",
     "firebase-admin": "^13.0.2",
     "fs": "^0.0.1-security",

@@ -1,5 +1,5 @@
 const { Kafka, logLevel } = require("kafkajs");
-const { getProjectById, updateProjectRaisedAmount } = require("../models/Project/External/ProjectExternalService");
+const { getProjectById, updateProjectRaisedAmount, getProjectsByFilter, getNames } = require("../models/Project/External/ProjectExternalService");
 
 // Configuration properties
 const CLIENT_ID = "ProjectA";
@@ -60,6 +60,14 @@ const subscribe = async (topic) => {
     
           case "update_project":
             await updateProjectRaisedAmount(value);
+            break;
+
+          case "find_projects":
+            await getProjectsByFilter(value);
+            break;
+
+          case "find_names":
+            await getNames(value);
             break;
     
           default:

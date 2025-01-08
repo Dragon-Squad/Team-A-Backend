@@ -11,7 +11,7 @@ class DonationRepository {
   }
 
   async findById(id) {
-    return await Donation.findById(id);
+    return await Donation.findById(id).populate("transactionId");
   }
 
   async getAll(limit, page) {
@@ -23,7 +23,8 @@ class DonationRepository {
     const offset = (page - 1) * limit;
     const data = await Donation.find()
       .skip(offset)
-      .limit(limit);
+      .limit(limit)
+      .populate("transactionId");
 
     return {
       meta: {       
@@ -36,16 +37,17 @@ class DonationRepository {
     };
   }
 
-  async getAllByDonor(limit, page, donorId) {
-    const totalCount = await Donation.countDocuments({ donorId: donorId });  
+  async getAllByDonor(limit, page, userId) {
+    const totalCount = await Donation.countDocuments({ userId: userId });  
     const totalPages = Math.ceil(totalCount / limit);                       
     const currentPage = page;                                          
     const isLast = currentPage >= totalPages;                             
 
     const offset = (page - 1) * limit;
-    const data = await Donation.find({ donorId: donorId })
+    const data = await Donation.find({ userId: userId })
       .skip(offset)
-      .limit(limit);
+      .limit(limit)
+      .populate("transactionId");
 
     return {
       meta: {
@@ -67,7 +69,8 @@ class DonationRepository {
     const offset = (page - 1) * limit;
     const data = await Donation.find({ projectId: projectId })
       .skip(offset)
-      .limit(limit);
+      .limit(limit)
+      .populate("transactionId");
 
     return {
       meta: {
@@ -78,6 +81,24 @@ class DonationRepository {
       },
       data: data                        
     };
+  }
+
+  async calculateTotalDonations(projectIds) {
+    const donations = await Donation.find({ projectId: { $in: projectIds } })
+      .populate({
+        path: "transactionId",
+        match: { status: "success" },
+        select: "amount",
+      });
+  
+    const totalDonations = donations.reduce((total, donation) => {
+      if (donation.transactionId) {
+        total += donation.transactionId.amount;
+      }
+      return total;
+    }, 0);
+  
+    return totalDonations;
   }
 }
 

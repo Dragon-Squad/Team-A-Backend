@@ -19,9 +19,4 @@ const completedProjectSchema = new Schema({
   stripeId: { type: String },
 });
 
-completedProjectSchema.pre("save", function (next) {
-  const date = new Date(this.endDate);
-  this.partitionKey = `${date.getFullYear()}-${date.getMonth() + 1}`; 
-});
-
 module.exports = mongoose.model("CompletedProject", completedProjectSchema);

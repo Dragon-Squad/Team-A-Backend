@@ -10,21 +10,13 @@ const {
 
 class EmailExternalService {
     // Send an email for successful donation
-    async sendDonorDonationSuccessEmail(
-        value,
-        receiver,
-        name,
-        projectTitle,
-        projectUrl,
-        amount
-    ) {
+    async sendDonorDonationSuccessEmail(value) {
 
         const mailOptions = donorDonationSuccessMail(
-            receiver,
-            name,
-            projectTitle,
-            projectUrl,
-            amount
+            value.userEmail,
+            value.projectTitle,
+            value.projectUrl,
+            value.amount
         );
         const info = await transporter.sendMail(mailOptions);
         console.log("Email sent:", info.response);

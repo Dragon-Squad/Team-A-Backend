@@ -54,6 +54,15 @@ class RegionController {
             res.status(400).json({ error: error.message });
         }
     }
+
+    async getAllRegions(req, res){
+        try {
+            const result = await RegionService.getAllRegions();
+            res.status(200).json(result);
+        } catch (error) {
+            res.status(400).json({ error: error.message });
+        }
+    }
 }
 
 module.exports = new RegionController();
