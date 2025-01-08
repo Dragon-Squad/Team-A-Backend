@@ -139,6 +139,26 @@ class ProjectController {
       res.status(500).json({ message: error.message });
     }
   }
+
+  async getTotalProjects(req, res) {
+    try {
+      const filters = req.query;
+      const total = await ProjectService.getTotalProjects(filters);
+      res.status(200).json(total);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+
+  async getTotalProjectStatus(req, res) {
+    try {
+      const filters = req.query;
+      const statusCounts = await ProjectService.getTotalProjectStatus(filters);
+      res.status(200).json(statusCounts);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
 }
 
 module.exports = new ProjectController();
