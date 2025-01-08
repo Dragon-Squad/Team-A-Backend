@@ -1,29 +1,40 @@
 const ProjectValidator = require("./ProjectValidator");
 const ProjectRepository = require("./ProjectRepository");
 const CategoryService = require("../Category/CategoryService");
-const CharityRepository = require("../Charity/CharityRepository");
 const RegionService = require("../Region/RegionService");
 const { publish } = require("../../broker/Producer");
 const axios = require("axios");
 const { ProjectResponseDTO } = require("./ProjectDto");
 
+const TEAM_B_BACKEND_URL = process.env.TEAM_B_BACKEND_URL || "http://172.30.208.1:3000/api";
+
 async function validateCharity(charityId) {
   const charityResponse = await axios.get(
-    `http://172.30.208.1:3000/api/charities/${charityId}`
+    TEAM_B_BACKEND_URL + `/charities/${charityId}`
   );
-  if (!charityResponse.data) {
+  if (!charityResponse.data) 
     throw new Error("No Charity Found");
-  }
+  
+  return charityResponse.data;
+}
+
+async function validateCharityName(keyword) {
+  const charityResponse = await axios.get(
+    TEAM_B_BACKEND_URL + `/charities/search?keyword=${keyword}`
+  );
+  if (!charityResponse.data) 
+    throw new Error("No Charity Found");
+  
   return charityResponse.data;
 }
 
 async function validateUser(userId) {
   const userResponse = await axios.get(
-    `http://172.30.208.1:3000/api/users/${userId}`
+     TEAM_B_BACKEND_URL + `/users/${userId}`
   );
-  if (!userResponse.data) {
+  if (!userResponse.data) 
     throw new Error("No Email Found");
-  }
+  
   return userResponse.data;
 }
 
@@ -42,9 +53,9 @@ async function validateCategory(categoryIds) {
 
 async function validateRegion(regionId) {
   const region = await RegionService.getRegionById(regionId);
-  if (!region) {
+  if (!region) 
     throw new Error("Error validating region ID");
-  }
+  
   return region;
 }
 
@@ -143,7 +154,6 @@ class ProjectService {
       (project.status === "halted" && status === "active")
     ) {
       if (status === "halted") {
-        // const charityId = await ProjectRepository.getCharityId(id);
         const charity = await validateCharity(reason);
         const user = await validateUser(charity.userId);
 
@@ -189,17 +199,22 @@ class ProjectService {
   async getById(id) {
     const project = await ProjectRepository.getById(id);
     if (!project) throw new Error("Project not found");
-    return new ProjectResponseDTO(project);
+
+    const charity = await validateCharity(project.charityId);
+    const categories = project.categoryIds; // Directly use the populated fields
+    const region = project.regionId;
+
+    return new ProjectResponseDTO(project, categories, region, charity);
   }
 
   async getAll(filters) {
     if (filters.charityName) {
-      const charityIds = await CharityRepository.searchByName(
-        filters.charityName
-      );
+      const charityIds = await validateCharityName(filters.charityName);
 
       if (charityIds.length > 0) {
-        filters.charityId = { $in: charityIds };
+        if (!Array.isArray(filters.charityIds)) {
+          filters.charityIds = [filters.charityIds];
+        }     
       } else {
         return {
           total: 0,
@@ -212,8 +227,20 @@ class ProjectService {
       delete filters.charityName;
     }
 
+    if (filters.categoryIds) {
+      if (!Array.isArray(filters.categoryIds)) {
+        filters.categoryIds = [filters.categoryIds];
+      }
+    }
+
     const projects = await ProjectRepository.getAll(filters);
-    return projects.map((project) => new ProjectResponseDTO(project));
+    return Promise.all(projects.map(async (project) => {
+      const charity = await validateCharity(project.charityId);
+      const categories = project.categoryIds; // Directly use the populated categoryIds
+      const region = project.regionId; // Directly use the populated regionId
+  
+      return new ProjectResponseDTO(project, categories, region, charity); // Pass all data
+    }));
   }
 
   async getTotalProjects(filters) {

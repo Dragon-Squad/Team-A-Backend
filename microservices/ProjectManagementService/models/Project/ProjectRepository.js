@@ -18,13 +18,12 @@ class ProjectRepository {
   async getById(id) {
     // Find a project by ID and populate related fields (charity, category, region)
     const project = await Project.findById(id)
-      .populate("charityId") // Populates the charityId field with the full Charity document
       .populate("categoryIds") // Populates the categoryId field with the full Category document
       .populate("regionId"); // Populates the regionId field with the full Region document
 
-    if (!project) {
+    if (!project) 
       return null; // Return null if no project is found
-    }
+    
 
     return project;
   }
@@ -32,9 +31,9 @@ class ProjectRepository {
   async getAll(filters) {
     const query = {};
     const {
+      charityIds,
+      categoryIds,
       country,
-      charityId,
-      categoryId,
       regionId,
       status,
       search,
@@ -43,9 +42,9 @@ class ProjectRepository {
     } = filters;
 
     // Add filters to the query object
+    if (charityIds) query.charityId = { $in: charityIds };
+    if (categoryIds) query.categoryIds = { $in: categoryIds };
     if (country) query.country = country;
-    if (charityId) query.charityId = charityId;
-    if (categoryId) query.categoryIds = { $in: [categoryId] };
     if (regionId) query.regionId = regionId;
     if (status) query.status = status;
     if (search) query.title = { $regex: search, $options: "i" };
@@ -57,7 +56,6 @@ class ProjectRepository {
     const projects = await Project.find(query)
       .skip(skip)
       .limit(parseInt(limit))
-      .populate("charityId") // Populates the charityId field with Charity document
       .populate("categoryIds") // Populates the categoryId field with Category document
       .populate("regionId"); // Populates the regionId field with Region document
 
