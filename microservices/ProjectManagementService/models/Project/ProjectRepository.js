@@ -32,8 +32,8 @@ class ProjectRepository {
   async getAll(filters) {
     const query = {};
     const {
-      charityId,
-      categoryId,
+      charityIds,
+      categoryIds,
       regionId,
       status,
       search,
@@ -42,8 +42,8 @@ class ProjectRepository {
     } = filters;
 
     // Add filters to the query object
-    if (charityId) query.charityId = charityId;
-    if (categoryId) query.categoryId = categoryId;
+    if (charityIds) query.charityId = { $in: charityIds };
+    if (categoryIds) query.categoryIds = { $in: categoryIds };
     if (regionId) query.regionId = regionId;
     if (status) query.status = status;
     if (search) query.title = { $regex: search, $options: "i" };
@@ -55,7 +55,6 @@ class ProjectRepository {
     const projects = await Project.find(query)
       .skip(skip)
       .limit(parseInt(limit))
-      .populate("charityId") // Populates the charityId field with Charity document
       .populate("categoryIds") // Populates the categoryId field with Category document
       .populate("regionId"); // Populates the regionId field with Region document
 
