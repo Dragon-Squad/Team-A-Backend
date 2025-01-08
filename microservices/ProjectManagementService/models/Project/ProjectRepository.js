@@ -75,6 +75,10 @@ class ProjectRepository {
     const project = await Project.findById(id);
     return project.charityId.toString;
   }
+
+  async countDocuments(query) {
+    return await Project.countDocuments(query);
+  }
 }
 
 module.exports = new ProjectRepository();

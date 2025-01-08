@@ -204,6 +204,16 @@ class ProjectService {
 
     return await ProjectRepository.getAll(filters);
   }
+
+  async getTotalProjects(filters) {
+    const query = {};
+    if (filters.country) query.country = filters.country;
+    if (filters.continent) query.continent = filters.continent;
+    if (filters.categoryId) query.categoryIds = { $in: [filters.categoryId] };
+
+    const total = await ProjectRepository.countDocuments(query);
+    return { total };
+  }
 }
 
 module.exports = new ProjectService();
