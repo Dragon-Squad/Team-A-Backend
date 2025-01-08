@@ -50,13 +50,13 @@ ProjectRouter.patch(
   ProjectController.resume
 );
 
+ProjectRouter.get("/total", ProjectController.getTotalProjects);
+
+ProjectRouter.get("/total-status", ProjectController.getTotalProjectStatus);
+
 ProjectRouter.get(
   "/:id", 
   ProjectController.getById
 );
-
-ProjectRouter.get("/total", ProjectController.getTotalProjects);
-
-ProjectRouter.get("/total-status", ProjectController.getTotalProjectStatus);
 
 module.exports = ProjectRouter;
