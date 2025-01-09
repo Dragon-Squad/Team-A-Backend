@@ -1,4 +1,4 @@
-const ProjectRepository = require("../CompleteProjectRepository");
+const ProjectRepository = require("../CompletedProjectRepository");
 
 class CompletedProjectExternalService {
   async create(projectData) {
