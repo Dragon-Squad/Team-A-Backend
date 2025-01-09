@@ -1,4 +1,4 @@
-const CompletedProject = require("./CompleteProjectSchema");
+const CompletedProject = require("./CompletedProjectSchema");
 
 class CompletedProjectRepository {
   async create(completedProjectData) {
