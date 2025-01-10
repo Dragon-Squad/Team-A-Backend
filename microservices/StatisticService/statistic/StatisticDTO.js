@@ -7,6 +7,15 @@ class TotalDonationDTO{
     }
 }
 
+class CharityProjectsDTO{
+    constructor(projects){
+        this.totalProjects = projects.length;
+        for(const project of projects){
+            this.totalDonations += project.raisedAmount;
+        }
+    }
+}
+
 class CompareDonationDTO {
     constructor(firstCategoryProjects, secondCategoryProjects, firstRegionsProjects, secondRegionsProjects, names) {
         // Initialize category and region data structures
@@ -54,4 +63,4 @@ class CompareDonationDTO {
     }
 }
 
-module.exports = { TotalDonationDTO, CompareDonationDTO };
+module.exports = { TotalDonationDTO, CompareDonationDTO, CharityProjectsDTO };

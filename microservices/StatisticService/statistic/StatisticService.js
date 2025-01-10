@@ -1,6 +1,6 @@
 const { publish } = require("../broker/Producer");
 const { connectConsumer } = require("../broker/Consumer");
-const { TotalDonationDTO, CompareDonationDTO } = require("./StatisticDTO");
+const { TotalDonationDTO, CompareDonationDTO, CharityProjectsDTO } = require("./StatisticDTO");
 
 async function getProjects(){
     const consumer = await connectConsumer("to_stat");
@@ -163,6 +163,27 @@ class StatisticService{
         }
     }
     
+    async getCharityProjectStatistic(charityId) {
+        try {
+            if(!charityId){
+                throw new Error("No charity Id provided!");
+            }
+
+            const filters = {charityIds: [charityId]};
+            console.log(filters);
+            await publish({
+                topic: "to_project",
+                event: "find_projects",
+                message: filters,
+            });
+
+            const projects = await getProjects(); 
+            const charityProjectsDTO = new CharityProjectsDTO(projects);
+            return { charityProjectsDTO };
+        } catch (err) {
+            throw new Error(err.message);
+        }
+    }
 }
 
 module.exports = new StatisticService();

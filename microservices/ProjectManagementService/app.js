@@ -17,7 +17,7 @@ const runApp = async () => {
     await connectDB();
 
     // Connect to Redis
-    await initializeRedisClients();
+    // await initializeRedisClients();
 
     // Configure the app
     configureApp();

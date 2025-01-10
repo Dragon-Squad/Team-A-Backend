@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-const { kafkaProducer } = require("../broker/Producer"); 
+const { publish } = require("../broker/Producer"); 
 
 const CompletedProjectRepository = require("./CompletedProjectRepository");
 
@@ -30,7 +30,6 @@ class CompletedProjectService {
    
     async notifyCharity(userEmail, charity, project) {
         const message = {
-            key: "charity_project_completed",
             value: {
                 charity: charity,
                 project: project,
@@ -39,6 +38,7 @@ class CompletedProjectService {
         };
         await kafkaProducer.send({
             topic: "to_email",
+            event: "charity_project_completed",
             messages: [message]
         });
     }
