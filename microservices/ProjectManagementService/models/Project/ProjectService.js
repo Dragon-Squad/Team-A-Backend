@@ -1,81 +1,21 @@
 const ProjectValidator = require("./ProjectValidator");
 const ProjectRepository = require("./ProjectRepository");
-const CategoryService = require("../Category/CategoryService");
-const RegionService = require("../Region/RegionService");
 const { publish } = require("../../broker/Producer");
-const axios = require("axios");
 const { ProjectResponseDTO } = require("./ProjectDto");
-
-const TEAM_B_BACKEND_URL = process.env.TEAM_B_BACKEND_URL || "http://172.30.208.1:3000/api";
-
-async function validateCharity(charityId) {
-  const charityResponse = await axios.get(
-    TEAM_B_BACKEND_URL + `/charities/${charityId}`
-  );
-  if (!charityResponse.data) 
-    throw new Error("No Charity Found");
-  
-  return charityResponse.data;
-}
-
-async function validateCharityName(keyword) {
-  const charityResponse = await axios.get(
-    TEAM_B_BACKEND_URL + `/charities/search?keyword=${keyword}`
-  );
-  if (!charityResponse.data) 
-    throw new Error("No Charity Found");
-  
-  return charityResponse.data;
-}
-
-async function validateUser(userId) {
-  const userResponse = await axios.get(
-     TEAM_B_BACKEND_URL + `/users/${userId}`
-  );
-  if (!userResponse.data) 
-    throw new Error("No Email Found");
-  
-  return userResponse.data;
-}
-
-async function validateCategory(categoryIds) {
-  const categories = [];
-
-  for (const categoryId of categoryIds) {
-    const category = await CategoryService.getCategoryById(categoryId);
-    if (!category) {
-      throw new Error("Error validating category ID");
-    }
-    categories.push(category);
-  }
-  return categories;
-}
-
-async function validateRegion(regionId) {
-  const region = await RegionService.getRegionById(regionId);
-  if (!region) 
-    throw new Error("Error validating region ID");
-  
-  return region;
-}
-
-function mergeNotificationLists(region, categories) {
-  const result = new Set();
-
-  categories.forEach((category) => {
-    category.notificationList.forEach((item) => result.add(item));
-  });
-
-  region.notificationList.forEach((item) => result.add(item));
-
-  return result;
-}
+const {
+  validateCharity,
+  validateCharityName,
+  validateUser,
+  validateCategory,
+  validateRegion,
+  mergeNotificationLists
+} = require("../../utils/projectServiceUtils");
 
 class ProjectService {
-  async create(projectData) {
+  async create(projectData, accessToken) {
     ProjectValidator.validateProjectCreationRequest(projectData);
 
-    const charity = await validateCharity(projectData.charityId);
+    const charity = await validateCharity(projectData.charityId, accessToken);
     const user = await validateUser(charity.userId);
 
     const categories = await validateCategory(projectData.categoryIds);
@@ -117,10 +57,10 @@ class ProjectService {
     return projectDTO;
   }
 
-  async update(id, projectData) {
+  async update(id, projectData, accessToken) {
     ProjectValidator.validateProjectUpdateRequest(id, projectData);
 
-    if (projectData.charityId) await validateCharity(projectData.charityId);
+    if (projectData.charityId) await validateCharity(projectData.charityId, accessToken);
 
     if (projectData.categoryId) await validateCategory(projectData.categoryId);
 
@@ -145,7 +85,7 @@ class ProjectService {
     return result;
   }
 
-  async updateStatus(id, status, reason) {
+  async updateStatus(id, status, reason, accessToken) {
     const project = await ProjectRepository.getById(id);
     if (!project) return false;
 
@@ -154,7 +94,7 @@ class ProjectService {
       (project.status === "halted" && status === "active")
     ) {
       if (status === "halted") {
-        const charity = await validateCharity(reason);
+        const charity = await validateCharity(reason, accessToken);
         const user = await validateUser(charity.userId);
 
         const categoryIds = project.categoryIds.map((category) => category._id);
@@ -196,20 +136,20 @@ class ProjectService {
     return await ProjectRepository.update(id, "active");
   }
 
-  async getById(id) {
+  async getById(id, accessToken) {
     const project = await ProjectRepository.getById(id);
     if (!project) throw new Error("Project not found");
 
-    const charity = await validateCharity(project.charityId);
+    const charity = await validateCharity(project.charityId, accessToken);
     const categories = project.categoryIds; // Directly use the populated fields
     const region = project.regionId;
 
     return new ProjectResponseDTO(project, categories, region, charity);
   }
 
-  async getAll(filters) {
+  async getAll(filters, accessToken) {
     if (filters.charityName) {
-      const charityIds = await validateCharityName(filters.charityName);
+      const charityIds = await validateCharityName(filters.charityName, accessToken);
 
       if (charityIds.length > 0) {
         if (!Array.isArray(filters.charityIds)) {
@@ -236,7 +176,7 @@ class ProjectService {
     const { total, page, limit, projects } = await ProjectRepository.getAll(filters);
 
     const projectDTOs = await Promise.all(projects.map(async (project) => {
-      const charity = await validateCharity(project.charityId);
+      const charity = await validateCharity(project.charityId, accessToken);
       const categories = project.categoryIds; // Directly use the populated categoryIds
       const region = project.regionId; // Directly use the populated regionId
   

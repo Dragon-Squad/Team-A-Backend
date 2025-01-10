@@ -6,7 +6,8 @@ class ProjectController {
   // Create a Project
   async create(req, res) {
     try {
-      const projectData = await CreateProjectRequestDTO.validateAsync(req.body);
+      const accessToken = req.cookies.accessToken;
+      const projectData = await CreateProjectRequestDTO.validateAsync(req.body, accessToken);
       const response = await ProjectService.create(projectData);
       res.status(201).json(response);
     } catch (error) {
@@ -17,8 +18,9 @@ class ProjectController {
   // Update Project Details
   async update(req, res) {
     try {
+      const accessToken = req.cookies.accessToken;
       const { id } = req.params;
-      const projectData = await UpdateProjectRequestDTO.validateAsync(req.body);
+      const projectData = await UpdateProjectRequestDTO.validateAsync(req.body, accessToken);
       const response = await ProjectService.update(id, projectData);
       if (!response)
         return res.status(404).json({ message: "Project not found" });
@@ -59,12 +61,14 @@ class ProjectController {
   // Halt a Project
   async halt(req, res) {
     try {
+      const accessToken = req.cookies.accessToken;
       const { id } = req.params;
       const reason = req.body.reason;
       const haltedProject = await ProjectService.updateStatus(
         id,
         "halted",
-        reason
+        reason,
+        accessToken
       );
       if (!haltedProject)
         return res.status(404).json({ message: "Project not found" });
@@ -78,11 +82,13 @@ class ProjectController {
   // Resume a Project
   async resume(req, res) {
     try {
+      const accessToken = req.cookies.accessToken;
       const { id } = req.params;
       const resumedProject = await ProjectService.updateStatus(
         id,
         "active",
-        ""
+        "",
+        accessToken
       );
       if (!resumedProject)
         return res.status(404).json({ message: "Project not found" });
@@ -96,24 +102,25 @@ class ProjectController {
   // Read a Project by ID
   async getById(req, res) {
     try {
+      const accessToken = req.cookies.accessToken;
       const { id } = req.params;
       const clientId = req.headers["x-client-id"] || req.ip; // Use client ID or IP for hashing
       const cacheKey = `project:${id}`;
 
       // Check Redis cache
-      const cachedProject = await RedisMiddleware.readData(clientId, cacheKey);
-      if (cachedProject) {
-        console.log("Cache hit for project ID:", id);
-        return res.status(200).json(cachedProject);
-      }
+      // const cachedProject = await RedisMiddleware.readData(clientId, cacheKey);
+      // if (cachedProject) {
+      //   console.log("Cache hit for project ID:", id);
+      //   return res.status(200).json(cachedProject);
+      // }
 
       // Fetch from database if not cached
-      const project = await ProjectService.getById(id);
+      const project = await ProjectService.getById(id, accessToken);
       if (!project)
         return res.status(404).json({ message: "Project not found" });
 
       // Cache the result
-      await RedisMiddleware.writeData(clientId, cacheKey, project);
+      // await RedisMiddleware.writeData(clientId, cacheKey, project);
 
       res.status(200).json(project);
     } catch (error) {
@@ -124,22 +131,23 @@ class ProjectController {
   // Get All Projects
   async getAll(req, res) {
     try {
+      const accessToken = req.cookies.accessToken;
       const filters = req.query;
       const clientId = req.headers["x-client-id"] || req.ip; // Use client ID or IP for hashing
       const cacheKey = `projects:${hash.sha1(filters)}`; // Generate a unique key for filters
 
       // Check Redis cache
-      const cachedProjects = await RedisMiddleware.readData(clientId, cacheKey);
-      if (cachedProjects) {
-        console.log("Cache hit for project list with filters:", filters);
-        return res.status(200).json(cachedProjects);
-      }
+      // const cachedProjects = await RedisMiddleware.readData(clientId, cacheKey);
+      // if (cachedProjects) {
+      //   console.log("Cache hit for project list with filters:", filters);
+      //   return res.status(200).json(cachedProjects);
+      // }
 
       // Fetch from database if not cached
-      const projects = await ProjectService.getAll(filters);
+      const projects = await ProjectService.getAll(filters, accessToken);
 
       // Cache the result
-      await RedisMiddleware.writeData(clientId, cacheKey, projects);
+      // await RedisMiddleware.writeData(clientId, cacheKey, projects);
 
       res.status(200).json(projects);
     } catch (error) {

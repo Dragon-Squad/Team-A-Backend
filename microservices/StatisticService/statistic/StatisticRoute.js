@@ -19,4 +19,11 @@ StatisticRouter.get(
     StatisticController.compareDonation
 );
 
+StatisticRouter.get(
+    '/charity', 
+    authenticate,
+    authorize([UserType.ADMIN]),
+    StatisticController.getCharityProjectStatistic
+);
+
 module.exports = StatisticRouter;

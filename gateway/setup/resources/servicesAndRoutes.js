@@ -55,6 +55,7 @@ const shardedProjectRoutes = [
 const statisticRoutes = [
     '/statistic/donation/total',
     '/statistic/donation/compare',
+    '/statistic/charity'
 ];
 
 const services = [
