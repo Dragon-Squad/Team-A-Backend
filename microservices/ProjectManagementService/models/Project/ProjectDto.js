@@ -26,7 +26,10 @@ class ProjectResponseDTO {
   constructor(project, categories, region, charity) {
     this.id = project._id;
     this.title = project.title;
+    this.description = project.description;
+    this.country = project.country;
     this.goalAmount = project.goalAmount;
+    this.raisedAmount = project.raisedAmount;
     this.startDate = project.startDate;
     this.endDate = project.endDate;
     this.status = project.status;
@@ -39,6 +42,9 @@ class ProjectResponseDTO {
       id: region._id,
       name: region.name // Include only the name of the region
     };
+    this.createdAt = project.createdAt;
+    this.images = project.images;
+    this.videos = project.videos;
   }
 }
 
