@@ -48,36 +48,61 @@ or Execute this if you are using Window
 
 <hr>
 
-### 3. Setup Backend
+### 3. Run BackEnd
+
+The backend will be run in multiple devices:
+-   Device 1: `Server Discovery`, `Kafka`, `Gateway`
+-   Device 2: `Microservices`
+-   Device 3: `Redis` (maybe)
+-   Device 4: `Front End`
+
+#### Server Discovery - Kafka (Device 1)
 
 Execute this if you are using Linux/MacOs
 
 ```sh
-sudo chmod +x ./setup.sh
-./setup.sh
+sudo chmod +x ./consul_and_kafka.sh
+./consul_and_kafka.sh
 ```
 
 or Execute this if you are using Window
 
 ```sh
-.\setup.bat
+.\consul_and_kafka.bat
 ```
 
 <hr>
 
-### 4. Run the Backend
+#### Microservices (Device 2)
 
 Execute this if you are using Linux/MacOs
 
 ```sh
-sudo chmod +x ./run.sh
-./run.sh
+sudo chmod +x ./microservices.sh
+./microservices.sh
 ```
 
 or Execute this if you are using Window
 
 ```sh
-.\run.bat
+.\microservices.bat
+```
+
+<hr>
+
+#### Gateway (Device 1)
+
+Execute this if you are using Linux/MacOs
+
+```sh
+sudo chmod +x ./kong.sh
+./kong.sh
+```
+
+or Execute this if you are using Window
+
+```sh
+.\kong.bat
 ```
 
 To verify that the services were added successfully, you can access: http://localhost:8001/services
@@ -85,7 +110,7 @@ To verify that the routes were added successfully, you can access: http://localh
 
 <hr>
 
-### 5. Setup ngrok
+### 4. Setup ngrok (Device 1)
 
 Installation
 
@@ -105,7 +130,7 @@ ngrok config add-authtoken 2qIXJmZmfbafahDA6qTkdoZzKmv_4xS9wp3sHzAMfSDjfzWJr
 ngrok http --url=crack-rightly-cow.ngrok-free.app 8000
 ```
 
-### 6. Connect Redis Locally
+### 5. Connect Redis Locally
 
 1. **Install Redis**:
 
