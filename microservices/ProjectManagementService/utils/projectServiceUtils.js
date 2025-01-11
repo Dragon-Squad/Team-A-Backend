@@ -8,7 +8,7 @@ const TEAM_B_BACKEND_URL =
 module.exports = {
     validateCharity: async function (charityId, accessToken) {
         const charityResponse = await axios.get(
-            TEAM_B_BACKEND_URL + `/charities/${charityId}`,
+            TEAM_B_BACKEND_URL + `/charities/by-charity-id/${charityId}`,
             {
                 credentials: "include",
                 method: "GET",
@@ -35,7 +35,7 @@ module.exports = {
                 },
             }
         );
-        if (!charityResponse.data) throw new Error("No Charity Found");
+        //if (!charityResponse.data) throw new Error("No Charity Found");
 
         return charityResponse.data;
     },
