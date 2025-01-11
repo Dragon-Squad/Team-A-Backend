@@ -2,7 +2,7 @@ const axios = require("axios");
 
 async function getDonor(accessToken){
     const response = await axios.get(
-        `http://172.30.208.1:3000/api/donors/my`,
+        `http://100.112.207.9:3000/api/donors/my`,
         {
             credentials: "include",
             method: "GET",
@@ -20,7 +20,7 @@ async function getDonor(accessToken){
 
 async function getUser(userId){
     const response = await axios.get(
-        `http://172.30.208.1:3000/api/users/${userId}`,
+        `http://100.112.207.9:3000/api/users/${userId}`,
       );
     if (!response.data) {
         throw new Error("Error validating user ID");

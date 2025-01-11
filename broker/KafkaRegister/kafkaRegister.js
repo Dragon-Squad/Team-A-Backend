@@ -1,7 +1,7 @@
 const { exec } = require('child_process');
 const Consul = require('consul');
 
-const CONSUL_HOST = 'localhost';
+const CONSUL_HOST = '100.112.124.71';
 const CONSUL_PORT = 8500;
 const SERVICE_NAME = 'kafka';
 const SERVICE_PORT = 9092;

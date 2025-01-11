@@ -2,7 +2,7 @@ require("dotenv").config();
 const Consul = require('consul');
 
 const WSL_IPV4 = process.env.WSL_IPV4;
-const CONSUL_HOST = 'localhost';
+const CONSUL_HOST = '100.112.124.71';
 const CONSUL_PORT = 8500;
 
 // Map of services and their ports

@@ -4,7 +4,7 @@ const { publish } = require("../broker/Producer");
 
 const CompletedProjectRepository = require("./CompletedProjectRepository");
 
-const TEAM_B_BACKEND_URL = process.env.TEAM_B_BACKEND_URL || "http://172.30.208.1:3000/api";
+const TEAM_B_BACKEND_URL = process.env.TEAM_B_BACKEND_URL || "http://100.112.207.9:3000/api";
 
 class CompletedProjectService {
     async archiveProject(projectId) {

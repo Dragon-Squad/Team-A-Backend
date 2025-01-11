@@ -3,7 +3,7 @@ const fs = require('fs').promises;
 const path = require('path');
 const Consul = require('consul');
 
-const CONSUL_HOST = 'localhost';
+const CONSUL_HOST = '100.112.124.71';
 const CONSUL_PORT = 8500;
 const SERVER_NAME = "kafka";
 const envDir = path.join(__dirname, '../');  
