@@ -16,3 +16,5 @@ cd broker/KafkaRegister || { echo "KafkaRegister directory not found!"; exit 1; 
 npm install
 node kafkaRegister.js
 cd ../..
+
+echo ">> Done!"
