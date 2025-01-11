@@ -54,7 +54,7 @@ services:
         to_stat:1:1
     ports:
       - "9092:9092"
-  
+
 networks:
   microservice-network:
     name: microservice-network

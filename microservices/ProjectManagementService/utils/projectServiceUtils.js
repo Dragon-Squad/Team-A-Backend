@@ -13,7 +13,7 @@ module.exports = {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
-              Cookie: `accessToken=${accessToken}`,
+              "Cookie": `accessToken=${accessToken}`,
             }
         }
       );
@@ -31,7 +31,7 @@ module.exports = {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
-              Cookie: `accessToken=${accessToken}`,
+              "Cookie": `accessToken=${accessToken}`,
             }
         }
       );
