@@ -1,6 +1,7 @@
 const ProjectService = require("./ProjectService");
 const RedisMiddleware = require("../../redisMiddleware");
 const hash = require("object-hash");
+const { CreateProjectRequestDTO, UpdateProjectRequestDTO } = require("./ProjectDto");
 
 class ProjectController {
   // Create a Project
