@@ -44,7 +44,9 @@ class DonationService {
     
                 consumer.run({
                     eachMessage: async ({ message }) => {
+                        console.log(message);
                         const value = message.value ? JSON.parse(message.value.toString()) : null;
+                        console.log(value);
                         if (value.project._id === projectId) {
                             if (value.project.status !== "active") {
                                 clearTimeout(timer);
