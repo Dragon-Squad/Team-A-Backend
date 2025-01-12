@@ -3,7 +3,7 @@ const RegionService = require("../models/Region/RegionService");
 const axios = require("axios");
 
 const TEAM_B_BACKEND_URL =
-    process.env.TEAM_B_BACKEND_URL || "http://100.112.207.9:3000/api";
+    process.env.TEAM_B_BACKEND_URL || "https://team-b-backend.tail8c88ab.ts.net:3000/api";
 
 module.exports = {
     validateCharity: async function (charityId, accessToken) {

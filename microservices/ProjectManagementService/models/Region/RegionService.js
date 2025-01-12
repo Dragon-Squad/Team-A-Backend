@@ -9,14 +9,14 @@ const ListType = Object.freeze({
 async function fetchDonorDetails(donorId) {
     if (!donorId) throw new Error("No Donor Id provided");
 
-    const donorResponse = await axios.get(`http://100.112.207.9:3000/api/donors/${donorId}`);
+    const donorResponse = await axios.get(`https://team-b-backend.tail8c88ab.ts.net:3000/api/donors/${donorId}`);
     if (!donorResponse.data) throw new Error("No Donor Found");
 
     return donorResponse.data;
 }
 
 async function fetchUserEmail(donorId) {
-    const userResponse = await axios.get(`http://100.112.207.9:3000/api/users/${donorId}`);
+    const userResponse = await axios.get(`https://team-b-backend.tail8c88ab.ts.net:3000/api/users/${donorId}`);
     if (!userResponse.data) throw new Error("No Email Found");
 
     return userResponse.data.email;

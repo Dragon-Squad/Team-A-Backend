@@ -193,7 +193,7 @@ async function handleInvoicePaymentFailed(session) {
 
 async function updateDonorStats(userId, amount, projectId) {
     const body = { donationAmount: amount, projectId: projectId };
-    await axios.post(`http://100.112.207.9:3000/api/donors/${userId}/update-stats`, body);
+    await axios.post(`https://team-b-backend.tail8c88ab.ts.net:3000/api/donors/${userId}/update-stats`, body);
 }
 
 async function createTransactionRecord(amount, selectedPaymentMethods, status) {
