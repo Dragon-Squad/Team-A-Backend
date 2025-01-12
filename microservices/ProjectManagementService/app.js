@@ -27,11 +27,15 @@ const runApp = async () => {
     app.use(`/category`, CategoryRouter);
     app.use(`/region`, RegionRouter);
 
-    app.get("/health/check", (req, res) => {
+    app.get("/health-check", (req, res) => {
       res.status(200).json({ message: "Server is working!" });
     });
 
     await subscribe("to_project");
+
+    app.get('/health-check', (req, res) => {
+      res.status(200).json({ message: 'Server is working!' });
+    });
 
     // Add error handler
     app.use(errorHandler);

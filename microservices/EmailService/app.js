@@ -42,7 +42,7 @@ const runApp = async () => {
 
     app.use(`/email`, EmailRouter);
 
-    app.get('/test', (req, res) => {
+    app.get('/health-check', (req, res) => {
       res.status(200).json({ message: 'Server is working!' });
     });
 

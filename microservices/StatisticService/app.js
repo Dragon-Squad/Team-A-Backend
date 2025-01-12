@@ -9,6 +9,10 @@ const runApp = async () => {
     // Add routes
     app.use(`/statistic`, StatisticRouter);
 
+    app.get('/health-check', (req, res) => {
+      res.status(200).json({ message: 'Server is working!' });
+    });
+
     // Add error handler
     app.use(errorHandler);
 

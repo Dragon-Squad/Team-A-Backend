@@ -19,6 +19,10 @@ const runApp = async () => {
     app.use(`/donation/monthly/`, MonthlyDonationRouter);
     app.use(`/donation/guest/`, GuestDonationRouter);
 
+    app.get('/health-check', (req, res) => {
+      res.status(200).json({ message: 'Server is working!' });
+    });
+
     // Add error handler
     app.use(errorHandler);
 
