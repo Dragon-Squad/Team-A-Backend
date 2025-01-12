@@ -1,4 +1,5 @@
 const Project = require("./ProjectSchema");
+var ObjectId = require('mongodb').ObjectId;
 
 class ProjectRepository {
   async create(projectData) {
@@ -41,8 +42,16 @@ class ProjectRepository {
       limit = 10,
     } = filters;
 
+    let realCharityIds;
+
+    if (typeof charityIds === "string") {
+      realCharityIds = [new ObjectId(charityIds)];
+    } else {
+      realCharityIds = charityIds.map((id) => new ObjectId(id));
+    }
+
     // Add filters to the query object
-    if (charityIds) query.charityId = { $in: charityIds };
+    if (charityIds) query.charityId = { $in: realCharityIds };
     if (categoryIds) query.categoryIds = { $in: categoryIds };
     if (country) query.country = country;
     if (regionId) query.regionId = regionId;
