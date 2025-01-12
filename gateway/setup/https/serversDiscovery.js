@@ -53,7 +53,7 @@ async function serversDiscovery(serviceMap) {
         }
   
         const node = result[0];
-        const instance = `http://${node.ServiceAddress}:${node.ServicePort}`;
+        const instance = `${node.ServiceAddress}:${node.ServicePort}`;
   
         instances.set(key, instance);  
       }
