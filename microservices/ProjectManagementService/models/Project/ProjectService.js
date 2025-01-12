@@ -154,7 +154,7 @@ class ProjectService {
       if (charityIds.length > 0) {
         if (!Array.isArray(filters.charityIds)) {
           filters.charityIds = [filters.charityIds];
-        }     
+        }
       } else {
         return {
           total: 0,
@@ -175,13 +175,26 @@ class ProjectService {
 
     const { total, page, limit, projects } = await ProjectRepository.getAll(filters);
 
+    const verifiedCharities = new Map();
+    
     const projectDTOs = await Promise.all(projects.map(async (project) => {
-      const charity = await validateCharity(project.charityId, accessToken);
-      const categories = project.categoryIds; // Directly use the populated categoryIds
-      const region = project.regionId; // Directly use the populated regionId
-  
-      return new ProjectResponseDTO(project, categories, region, charity); // Pass all data
+      let charity;
+    
+      // Check if the charity is already in the map
+      if (verifiedCharities.has(project.charityId)) {
+        charity = verifiedCharities.get(project.charityId);
+      } else {
+        // Fetch charity details and add them to the map
+        charity = await validateCharity(project.charityId, accessToken);
+        verifiedCharities.set(project.charityId, charity);
+      }
+    
+      const categories = project.categoryIds;
+      const region = project.regionId;
+    
+      return new ProjectResponseDTO(project, categories, region, charity);
     }));
+
 
     return {
       total,
