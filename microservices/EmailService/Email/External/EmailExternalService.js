@@ -32,6 +32,7 @@ class EmailExternalService {
                 "", 
                 value.project.region.name,
                 value.project.categories.name, 
+                value.project.description, 
                 value.project.goalAmount.toString()
             );
             const info = await transporter.sendMail(mailOptions);
@@ -45,6 +46,7 @@ class EmailExternalService {
             const mailOptions = donorProjectHaltedMail(
                 notificationDetail.email,
                 notificationDetail.name,
+                value.project.title,
                 "",
                 value.reason
             );
@@ -61,7 +63,8 @@ class EmailExternalService {
             value.project.title, 
             "", 
             value.project.region.name,
-            value.project.categories.name, 
+            value.project.categories.name,
+            value.project.description,
             value.project.goalAmount.toString()
         );
         const info = await transporter.sendMail(mailOptions);
@@ -75,7 +78,7 @@ class EmailExternalService {
         const mailOptions = charityProjectHaltedMail(
             value.charity.email,
             value.charity.name,
-            value.project.name,
+            value.project.title, 
             "",
             value.reason
         );
