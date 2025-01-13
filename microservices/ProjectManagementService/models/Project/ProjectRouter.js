@@ -32,7 +32,7 @@ ProjectRouter.delete(
 ProjectRouter.patch(
   "/active/:id",
   authenticate,
-  authorize([UserType.CHARITY, UserType.ADMIN]),
+  authorize([UserType.ADMIN]),
   ProjectController.active
 );
 
