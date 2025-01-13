@@ -14,7 +14,6 @@ const {
 class ProjectService {
   async create(projectData, accessToken) {
     ProjectValidator.validateProjectCreationRequest(projectData);
-
     const charity = await validateCharity(projectData.charityId, accessToken);
     const user = await validateUser(charity.userId);
 
@@ -36,13 +35,16 @@ class ProjectService {
 
     const project = await ProjectRepository.create(preparedData);
 
-    const projectDTO = new ProjectResponseDTO({
-      ...project,
-      region,
+    const projectDTO = new ProjectResponseDTO(
+      project,
       categories,
-    });
+      region,
+      charity,
+    );
 
-    const mergedNotificationList = mergeNotificationLists(region, categories);
+    const result = mergeNotificationLists(region, categories);
+    const mergedNotificationList = result.notificationList;
+    const userList = result.userList;
 
     await publish({
       topic: "to_email",
@@ -51,6 +53,7 @@ class ProjectService {
         charity: { name: charity.name, email: user.email },
         project: projectDTO,
         notificationList: [...mergedNotificationList],
+        userList: [...userList],
       },
     });
 
@@ -175,7 +178,7 @@ class ProjectService {
 
     const { total, page, limit, projects } = await ProjectRepository.getAll(filters);
     console.log(projects);
-    
+
     const verifiedCharities = new Map();
     
     const projectDTOs = await Promise.all(projects.map(async (project) => {
