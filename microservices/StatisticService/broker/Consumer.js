@@ -4,7 +4,7 @@ const { Kafka, logLevel } = require("kafkajs");
 const CLIENT_ID = "StatA";
 const GROUP_ID = "StatA";
 const BROKERS = process.env.BROKERS;
-const FROM_BEGINNING = process.env.FROM_BEGINNING === "true";
+const FROM_BEGINNING = process.env.FROM_BEGINNING || true;
 
 const kafka = new Kafka({
   clientId: CLIENT_ID,

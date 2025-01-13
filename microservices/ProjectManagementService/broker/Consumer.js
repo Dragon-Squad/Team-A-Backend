@@ -5,7 +5,7 @@ const { getProjectById, updateProjectRaisedAmount, getProjectsByFilter, getNames
 const CLIENT_ID = "ProjectA";
 const GROUP_ID = "ProjectA";
 const BROKERS = process.env.BROKERS;
-const FROM_BEGINNING = process.env.FROM_BEGINNING === "true";
+const FROM_BEGINNING = process.env.FROM_BEGINNING || true;
 
 const kafka = new Kafka({
   clientId: CLIENT_ID,

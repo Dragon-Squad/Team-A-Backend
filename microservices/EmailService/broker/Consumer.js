@@ -4,7 +4,7 @@ const EmailExternalService = require("../Email/External/EmailExternalService");
 const CLIENT_ID = "EmailA";
 const GROUP_ID = "EmailA";
 const BROKERS = process.env.BROKERS;
-const FROM_BEGINNING = process.env.FROM_BEGINNING === "true";
+const FROM_BEGINNING = process.env.FROM_BEGINNING || true;
 
 // Kafka instance
 const kafka = new Kafka({
