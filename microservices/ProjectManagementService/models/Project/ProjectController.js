@@ -8,8 +8,8 @@ class ProjectController {
   async create(req, res) {
     try {
       const accessToken = req.cookies.accessToken;
-      const projectData = await CreateProjectRequestDTO.validateAsync(req.body, accessToken);
-      const response = await ProjectService.create(projectData);
+      // const projectData = await CreateProjectRequestDTO.validateAsync(req.body, accessToken);
+      const response = await ProjectService.create(req.body, accessToken);
       res.status(201).json(response);
     } catch (error) {
       res.status(400).json({ message: error.message });
