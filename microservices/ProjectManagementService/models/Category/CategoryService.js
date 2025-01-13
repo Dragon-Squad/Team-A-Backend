@@ -1,26 +1,13 @@
-const CategoryRepository = require('./CategoryRepository');
+const CategoryRepository = require("./CategoryRepository");
 const axios = require("axios");
+const { getDonor, fetchUserEmail } = require("../../utils/donnorServiceUtils");
 
 const ListType = Object.freeze({
-    SUBSCRIPTION: 'subscriptionList',
-    NOTIFICATION: 'notificationList',
+    SUBSCRIPTION: "subscriptionList",
+    NOTIFICATION: "notificationList",
 });
 
-async function fetchDonorDetails(donorId) {
-    if (!donorId) throw new Error("No Donor Id provided");
 
-    const response = await axios.get(`https://team-b-backend.tail8c88ab.ts.net:3000/api/donors/${donorId}`);
-    if (!response.data) throw new Error("No Donor Found");
-
-    return response.data;
-}
-
-async function fetchUserEmail(donorId) {
-    const response = await axios.get(`https://team-b-backend.tail8c88ab.ts.net:3000/api/donors/${donorId}/email`);
-    if (!response.data) throw new Error("No Email Found");
-
-    return response.data.email;
-}
 
 async function getCategoryById(categoryId) {
     if (!categoryId) throw new Error("No Category Id provided");
@@ -31,21 +18,31 @@ async function getCategoryById(categoryId) {
     return category;
 }
 
-async function ensureSubscribed(category, categoryId, donorId) {
-    if (!category.subscriptionList.includes(donorId)) {
-        await CategoryRepository.push(categoryId, donorId, ListType.SUBSCRIPTION);
-        throw new Error(`You have not subscribed to the ${category.name} Category`);
+async function ensureSubscribed(category, categoryId, userId) {
+    if (!category.subscriptionList.includes(userId)) {
+        await CategoryRepository.push(
+            categoryId,
+            userId,
+            ListType.SUBSCRIPTION
+        );
+        throw new Error(
+            `You have not subscribed to the ${category.name} Category`
+        );
     }
 }
 
 class CategoryService {
-    async subscribe(categoryId, donorId) {
+    async subscribe(categoryId, userId, accessToken) {
         try {
-            const donor = await fetchDonorDetails(donorId);
+            const donor = await getDonor(accessToken);
             const category = await getCategoryById(categoryId);
 
-            if (!category.subscriptionList.includes(donorId)) {
-                await CategoryRepository.push(categoryId, donorId, ListType.SUBSCRIPTION);
+            if (!category.subscriptionList.includes(userId)) {
+                await CategoryRepository.push(
+                    categoryId,
+                    userId,
+                    ListType.SUBSCRIPTION
+                );
                 return "Subscribe Successfully";
             }
 
@@ -55,21 +52,33 @@ class CategoryService {
         }
     }
 
-    async notificationOn(categoryId, donorId) {
+    async notificationOn(categoryId, userId, accessToken) {
         try {
-            const donor = await fetchDonorDetails(donorId);
-            const donorEmail = await fetchUserEmail(donorId);
+            const donor = await getDonor(accessToken);
+            // const userId = donor.userId;
+            const donorEmail = await fetchUserEmail(userId);
             console.log(donorEmail);
             const category = await getCategoryById(categoryId);
 
-            await ensureSubscribed(category, categoryId, donorId);
+            await ensureSubscribed(category, categoryId, userId);
 
-            if (category.notificationList.some(notification => notification.email === donorEmail)) {
+            if (
+                category.notificationList.some(
+                    (notification) => notification.email === donorEmail
+                )
+            ) {
                 return `The Notification for the ${category.name} is already on`;
             }
 
-            const notification = { email: donorEmail, name: `${donor.firstName} ${donor.lastName}` };
-            await CategoryRepository.push(categoryId, notification, ListType.NOTIFICATION);
+            const notification = {
+                email: donorEmail,
+                name: `${donor.firstName} ${donor.lastName}`,
+            };
+            await CategoryRepository.push(
+                categoryId,
+                notification,
+                ListType.NOTIFICATION
+            );
 
             return `Notification for the ${category.name} is turned on`;
         } catch (error) {
@@ -77,18 +86,34 @@ class CategoryService {
         }
     }
 
-    async unsubscribe(categoryId, donorId) {
+    async unsubscribe(categoryId, userId, accessToken) {
         try {
-            const donor = await fetchDonorDetails(donorId);
-            const donorEmail = await fetchUserEmail(donorId);
+            const donor = await getDonor(accessToken);
+            // const userId = donor.userId;
+            const donorEmail = await fetchUserEmail(userId);
             const category = await getCategoryById(categoryId);
 
-            if (category.subscriptionList.includes(donorId)) {
-                await CategoryRepository.pull(categoryId, donorId, ListType.SUBSCRIPTION);
+            if (category.subscriptionList.includes(userId)) {
+                await CategoryRepository.pull(
+                    categoryId,
+                    userId,
+                    ListType.SUBSCRIPTION
+                );
 
-                if (category.notificationList.some(notification => notification.email === donorEmail)) {
-                    const notification = { email: donorEmail, name: `${donor.firstName} ${donor.lastName}` };
-                    await CategoryRepository.pull(categoryId, notification, ListType.NOTIFICATION);
+                if (
+                    category.notificationList.some(
+                        (notification) => notification.email === donorEmail
+                    )
+                ) {
+                    const notification = {
+                        email: donorEmail,
+                        name: `${donor.firstName} ${donor.lastName}`,
+                    };
+                    await CategoryRepository.pull(
+                        categoryId,
+                        notification,
+                        ListType.NOTIFICATION
+                    );
                 }
 
                 return "Unsubscribe Successfully";
@@ -100,20 +125,32 @@ class CategoryService {
         }
     }
 
-    async notificationOff(categoryId, donorId) {
+    async notificationOff(categoryId, userId, accessToken) {
         try {
-            const donor = await fetchDonorDetails(donorId);
-            const donorEmail = await fetchUserEmail(donorId);
+            const donor = await getDonor(accessToken);
+            // const userId = donor.userId;
+            const donorEmail = await fetchUserEmail(userId);
             const category = await getCategoryById(categoryId);
 
-            await ensureSubscribed(category, categoryId, donorId);
+            await ensureSubscribed(category, categoryId, userId);
 
-            if (!category.notificationList.some(notification => notification.email === donorEmail)) {
+            if (
+                !category.notificationList.some(
+                    (notification) => notification.email === donorEmail
+                )
+            ) {
                 return `The Notification for the ${category.name} is already off`;
             }
 
-            const notification = { email: donorEmail, name: `${donor.firstName} ${donor.lastName}` };
-            await CategoryRepository.pull(categoryId, notification, ListType.NOTIFICATION);
+            const notification = {
+                email: donorEmail,
+                name: `${donor.firstName} ${donor.lastName}`,
+            };
+            await CategoryRepository.pull(
+                categoryId,
+                notification,
+                ListType.NOTIFICATION
+            );
 
             return `Notification for the ${category.name} is turned off`;
         } catch (error) {
@@ -121,22 +158,22 @@ class CategoryService {
         }
     }
 
-    async getCategoryById(id){
+    async getCategoryById(id) {
         try {
             const category = await CategoryRepository.findById(id);
             return category;
-        } catch(error){
+        } catch (error) {
             throw new Error(error.message);
         }
     }
 
-    async getAllCategories(){
+    async getAllCategories() {
         try {
             const categories = await CategoryRepository.getAll();
             delete categories.subscriptionList;
             delete categories.notificationList;
             return categories;
-        } catch(error){
+        } catch (error) {
             throw new Error(error.message);
         }
     }
