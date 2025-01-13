@@ -1,8 +1,3 @@
-#!/bin/bash
-
-# Exit on any error
-set -e
-
 echo "================== Consul ======================="
 echo ">> Starting Consul Docker container..."
 docker-compose -f consul/docker-compose.yml up -d --build
@@ -18,3 +13,5 @@ node kafkaRegister.js
 cd ../..
 
 echo ">> Done!"
+read -n 1 -s -r -p "Press any key to continue..."
+echo
