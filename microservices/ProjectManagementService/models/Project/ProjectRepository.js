@@ -22,9 +22,9 @@ class ProjectRepository {
       .populate("categoryIds") // Populates the categoryId field with the full Category document
       .populate("regionId"); // Populates the regionId field with the full Region document
 
-    if (!project) 
+    if (!project)
       return null; // Return null if no project is found
-    
+
 
     return project;
   }
