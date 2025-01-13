@@ -7,6 +7,8 @@ const axios = require("axios");
 const GuestDonationService = require('../models/GuestDonor/GuestDonation/GuestDonationService');
 
 function getDataFromSession(session){
+    console.log(session);
+
     const amount = session.amount_total / 100;
     const projectId = session.metadata.projectId;
     const message = session.metadata.personal_message;
@@ -17,9 +19,9 @@ function getDataFromSession(session){
 
     const allPaymentMethods = session.payment_method_types;
     const configuredMethods = Object.keys(session.payment_method_options || {});
-    const selectedPaymentMethods = allPaymentMethods.find(method =>
+    const selectedPaymentMethods = allPaymentMethods ? allPaymentMethods.find(method =>
         configuredMethods.includes(method)
-    ) || "unknown";
+    ) : "unknown";
 
     return {amount, projectId, message, donationType, donorType, userId, userEmail, selectedPaymentMethods};
 }
@@ -53,7 +55,7 @@ async function handleCheckoutSessionCompleted(session) {
 
     const monthlyDonationId = session.metadata.monthlyDonationId;
     const monthlyAmount = session.metadata.monthlyAmount;
-    if (monthlyDonationId) {
+    if (monthlyDonationId && donationType === "monthly") {
         await updateMonthlyDonation(monthlyDonationId, userId, projectId, session, monthlyAmount);
     }
 

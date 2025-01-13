@@ -174,7 +174,8 @@ class ProjectService {
     }
 
     const { total, page, limit, projects } = await ProjectRepository.getAll(filters);
-
+    console.log(projects);
+    
     const verifiedCharities = new Map();
     
     const projectDTOs = await Promise.all(projects.map(async (project) => {

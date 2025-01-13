@@ -33,7 +33,7 @@ const createCharities = async (User, Charity, Address) => {
                     username: email,
                     email: email,
                     hashedPassword: await bcrypt.hash('charitypassword', 10),
-                    isActive: true, 
+                    isActive: true,
                     avatar: imageUrl,
                     role: "Charity",
                 });
@@ -73,7 +73,7 @@ const createCharities = async (User, Charity, Address) => {
                     address: address._id,
                     region: charity.regions,
                     category: charity.category,
-                    hashedStripeId: CryptoJS.AES.encrypt(customerId, secretKey).toString(),
+                    hashedStripeId: customerId,
                 });
                 await charityDoc.save();
                 return charityDoc;

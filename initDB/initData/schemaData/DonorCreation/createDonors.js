@@ -59,7 +59,7 @@ const createDonors= async (User, Donor, Address) => {
                 userId: donorUser._id,
                 firstName: faker.person.firstName(),
                 lastName: faker.person.lastName(),
-                hashedStripeId: CryptoJS.AES.encrypt(customerId, secretKey).toString(),
+                hashedStripeId: customerId,
             });
             donors.push(await donor.save());
         }
