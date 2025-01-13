@@ -2,10 +2,10 @@
 
 ## Tech Stack
 
-![Consul](https://img.shields.io/badge/Consul-FF3D00?style=for-the-badge&logo=consul&logoColor=white) 
-![Kafka](https://img.shields.io/badge/Apache_Kafka-231F20?style=for-the-badge&logo=apachekafka&logoColor=white) 
+![Consul](https://img.shields.io/badge/Consul-FF3D00?style=for-the-badge&logo=consul&logoColor=white)
+![Kafka](https://img.shields.io/badge/Apache_Kafka-231F20?style=for-the-badge&logo=apachekafka&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
-![NodeJS](https://img.shields.io/badge/Node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white) 
+![NodeJS](https://img.shields.io/badge/Node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white)
 ![Express](https://img.shields.io/badge/Express.js-%23404d59.svg?style=for-the-badge&logo=express&logoColor=%2361DAFB)
 ![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
 ![Stripe](https://img.shields.io/badge/Stripe-6772E5?style=for-the-badge&logo=stripe&logoColor=white)
@@ -53,7 +53,7 @@ or Execute this if you are using Window
 The backend will be run in multiple devices:
 -   Device 1: `Server Discovery`, `Kafka`, `Gateway`
 -   Device 2: `Microservices`
--   Device 3: `Redis` (maybe)
+-   Device 3: `Redis`
 -   Device 4: `Front End`
 
 #### Server Discovery - Kafka (Device 1)
@@ -72,6 +72,13 @@ or Execute this if you are using Window
 ```
 
 <hr>
+
+#### Redis (Device 3)
+
+````sh
+docker-compose -f redis/docker-compose.yml up -d --build
+````
+
 
 #### Microservices (Device 2)
 
@@ -110,44 +117,19 @@ To verify that the routes were added successfully, you can access: http://localh
 
 <hr>
 
-### 4. Setup ngrok (Device 1)
 
-Installation
+Install tailscale: https://tailscale.com/download
 
-- Get ngrok from this link: `https://download.ngrok.com/windows`
+On your microservice and gateway devices (Device 1 and Device 2), execute this generate the tailscale certificate
 
-Config and run:
+````sh
+tailscale cert <machine_name>.<tailnetname>
+````
+Then double-click to the generated certificate to download
 
-- Add Authtoken:
 
-```
-ngrok config add-authtoken 2qIXJmZmfbafahDA6qTkdoZzKmv_4xS9wp3sHzAMfSDjfzWJr
-```
+Waiting for Kong setup to complete and turn on the tailscale funnel to start the host ip for the gateway (Device 1)
 
-- Start Endpoint:
-
-```
-ngrok http --url=crack-rightly-cow.ngrok-free.app 8000
-```
-
-### 5. Connect Redis Locally
-
-1. **Install Redis**:
-
-   - Download and install Redis from [here](https://redis.io/download).
-
-2. **Start Redis Server**:
-
-   - Run the following command in your terminal to start the Redis server on port 6379 and 6380:
-
-     ```bash
-     redis-server --port 6379
-     redis-server --port 6380
-     ```
-
-3. **Connect to Redis**:
-   - In your application, ensure the Redis connection URI is set to the correct local port (6379, 6380) in your environment variables (e.g., `.env`):
-     ```env
-     REDIS_URL_INSTANCE_1=redis://localhost:6379
-     REDIS_URL_INSTANCE_2=redis://localhost:6380
-     ```
+````sh
+tailscale funnel --https=10000 localhost:8000
+````
