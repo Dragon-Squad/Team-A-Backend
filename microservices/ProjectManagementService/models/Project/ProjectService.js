@@ -1,7 +1,7 @@
 const ProjectValidator = require("./ProjectValidator");
 const ProjectRepository = require("./ProjectRepository");
 const { publish } = require("../../broker/Producer");
-const { ProjectResponseDTO } = require("./ProjectDto");
+const { ProjectResponseDTO, ProjectUpdateResponseDTO } = require("./ProjectDto");
 const {
   validateCharity,
   validateCharityName,
@@ -70,7 +70,7 @@ class ProjectService {
     if (projectData.regionId) await validateRegion(projectData.regionId);
 
     const updatedProject = await ProjectRepository.update(id, projectData);
-    return updatedProject ? new ProjectResponseDTO(updatedProject) : null;
+    return updatedProject ? new ProjectUpdateResponseDTO(updatedProject) : null;
   }
 
   async delete(id) {
