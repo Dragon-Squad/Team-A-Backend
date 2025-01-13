@@ -48,10 +48,19 @@ class ProjectRepository {
                 realCharityIds = charityIds.map((id) => new ObjectId(id));
             }
         }
+        
+        let realCategoryIds = null;
+        if (categoryIds) {
+            if (typeof categoryIds === "string") {
+                realCategoryIds = [new ObjectId(categoryIds)];
+            } else {
+                realCategoryIds = categoryIds.map((id) => new ObjectId(id));
+            }
+        }
 
         // Add filters to the query object
         if (realCharityIds) query.charityId = { $in: realCharityIds };
-        if (categoryIds) query.categoryIds = { $in: categoryIds };
+        if (realCategoryIds) query.categoryIds = { $in: realCategoryIds };
         if (country) query.country = country;
         if (regionId) query.regionId = regionId;
         if (status) query.status = status;

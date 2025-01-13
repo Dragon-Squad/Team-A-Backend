@@ -28,11 +28,11 @@ class EmailExternalService {
             const mailOptions = donorProjectCreatedMail(
                 notificationDetail.email,
                 notificationDetail.name,
-                value.project._doc.title, 
+                value.project.title, 
                 "", 
                 value.project.region.name,
                 value.project.categories.name, 
-                value.project._doc.goalAmount.toString()
+                value.project.goalAmount.toString()
             );
             const info = await transporter.sendMail(mailOptions);
             console.log("Email sent:", info.response);
@@ -58,11 +58,11 @@ class EmailExternalService {
         const mailOptions = charityProjectCreatedMail(
             value.charity.email,
             value.charity.name,
-            value.project._doc.title, 
+            value.project.title, 
             "", 
             value.project.region.name,
             value.project.categories.name, 
-            value.project._doc.goalAmount.toString()
+            value.project.goalAmount.toString()
         );
         const info = await transporter.sendMail(mailOptions);
         console.log("Email sent:", info.response);
