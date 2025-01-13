@@ -70,14 +70,21 @@ module.exports = {
     },
 
     mergeNotificationLists: function (region, categories) {
-        const result = new Set();
+        const notificationList = new Set();
+        const userList = new Set();
 
         categories.forEach((category) => {
-            category.notificationList.forEach((item) => result.add(item));
+            category.notificationList.forEach((item) => userList.add(item));
         });
 
-        region.notificationList.forEach((item) => result.add(item));
+        region.notificationList.forEach((item) => userList.add(item));
 
-        return result;
+        categories.forEach((category) => {
+            category.notificationList.forEach((item) => notificationList.add(item));
+        });
+
+        region.notificationList.forEach((item) => notificationList.add(item));
+
+        return { notificationList: [...notificationList], userList: [...userList] };
     },
 };
