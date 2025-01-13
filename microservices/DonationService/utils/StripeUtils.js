@@ -69,7 +69,7 @@ async function createOrRetrieveOneTimeProduct(unitAmount) {
 
 function createSessionConfig(customerId, monthlyDonationId, personalMessage, projectId, amount, userId, donorType, userEmail, monthlyAmount) {
     const today = new Date();
-    let billingCycleAnchor = new Date(today.getFullYear(), today.getMonth(), 13); 
+    let billingCycleAnchor = new Date(today.getFullYear(), today.getMonth(), 15); 
     if (today.getDate() > 15) {
         billingCycleAnchor.setMonth(billingCycleAnchor.getMonth() + 1);
     }

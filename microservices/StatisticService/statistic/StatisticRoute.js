@@ -6,7 +6,7 @@ const UserType = require('../enum/UserType');
 const StatisticRouter = express.Router();
 
 StatisticRouter.get(
-    '/donation/total', 
+    '/donation/total',
     authenticate,
     authorize([UserType.ADMIN]),
     StatisticController.getTotalDonation
@@ -20,9 +20,9 @@ StatisticRouter.get(
 );
 
 StatisticRouter.get(
-    '/charity', 
+    '/charity',
     authenticate,
-    authorize([UserType.ADMIN]),
+    authorize([UserType.CHARITY, UserType.ADMIN]),
     StatisticController.getCharityProjectStatistic
 );
 
