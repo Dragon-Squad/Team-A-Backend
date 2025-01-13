@@ -21,8 +21,8 @@ class ProjectController {
     try {
       const accessToken = req.cookies.accessToken;
       const { id } = req.params;
-      const projectData = await UpdateProjectRequestDTO.validateAsync(req.body, accessToken);
-      const response = await ProjectService.update(id, projectData);
+      // const projectData = await UpdateProjectRequestDTO.validateAsync(req.body, accessToken);
+      const response = await ProjectService.update(id, req.body, accessToken);
       if (!response)
         return res.status(404).json({ message: "Project not found" });
 

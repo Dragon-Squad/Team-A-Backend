@@ -70,6 +70,8 @@ module.exports = {
     },
 
     mergeNotificationLists: function (region, categories) {
+        console.log(region)
+        console.log(categories)
         const notificationList = new Set();
         const userList = new Set();
 
