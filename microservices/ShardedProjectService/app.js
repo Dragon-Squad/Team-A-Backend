@@ -12,7 +12,7 @@ const runApp = async () => {
     // Configure the app
     configureApp();
 
-    await Consumer.subscribe("project_to_shard");
+    await Consumer.subscribe("to_shard");
 
     // Add routes
     app.use(`/deleted/projects`, DeletedProjectRouter);

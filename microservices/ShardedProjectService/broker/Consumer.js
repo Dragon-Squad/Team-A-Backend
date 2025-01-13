@@ -61,7 +61,7 @@ const subscribe = async (topic, messageHandler) => {
         try {
           const key = message.key?.toString();
           const value = message.value ? JSON.parse(message.value.toString()) : null;
-        
+
           if (value) {
             switch (key) {
               case "deleted_project":
@@ -72,7 +72,7 @@ const subscribe = async (topic, messageHandler) => {
                 console.log(value);
                 await CompletedProjectExternalService.create(value);
                 break;
-        
+
               default:
                 console.error(`Unexpected Kafka Key in ${topic} topic: ${key}`);
             }
