@@ -97,7 +97,7 @@ class ProjectService {
       (project.status === "halted" && status === "active")
     ) {
       if (status === "halted") {
-        const charity = await validateCharity(reason, accessToken);
+        const charity = await validateCharity(project.charityId, accessToken);
         const user = await validateUser(charity.userId);
 
         const categoryIds = project.categoryIds.map((category) => category._id);
@@ -105,10 +105,11 @@ class ProjectService {
         const categories = await validateCategory(categoryIds);
         const region = await validateRegion(project.regionId);
 
-        const mergedNotificationList = mergeNotificationLists(
+        const result = mergeNotificationLists(
           region,
           categories
         );
+        const mergedNotificationList = result.notificationList;
 
         await publish({
           topic: "to_email",

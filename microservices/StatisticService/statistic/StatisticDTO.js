@@ -9,6 +9,7 @@ class TotalDonationDTO{
 
 class CharityProjectsDTO{
     constructor(projects){
+        this.totalDonations = 0;
         this.totalProjects = projects.length;
         for(const project of projects){
             this.totalDonations += project.raisedAmount;
