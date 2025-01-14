@@ -61,7 +61,7 @@ class ProjectRepository {
         // Add filters to the query object
         if (realCharityIds) query.charityId = { $in: realCharityIds };
         if (realCategoryIds) query.categoryIds = { $in: realCategoryIds };
-        if (country) query.country = country;
+        if (country) query.country = { $regex: country, $options: "i" };
         if (regionId) query.regionId = regionId;
         if (status) query.status = status;
         if (search) query.title = { $regex: search, $options: "i" };
