@@ -157,7 +157,7 @@ class ProjectService {
 
       if (charityIds.length > 0) {
         if (!Array.isArray(filters.charityIds)) {
-          filters.charityIds = [filters.charityIds];
+          filters.charityIds = charityIds.map((charity) => charity._id);
         }
       } else {
         return {
