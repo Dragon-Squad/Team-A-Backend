@@ -1,63 +1,63 @@
-version: '3.8'
+version: "3.8"
 
 services:
-  emailservice:
-    build: ./EmailService
-    container_name: email_service
-    hostname: email_service
-    env_file:
-      - .env
-    networks:
-      - microservice-network
-    ports:
-      - "${EMAIL_SERVER_PORT}:${EMAIL_SERVER_PORT}"
+    emailservice:
+        build: ./EmailService
+        container_name: email_service
+        hostname: email_service
+        env_file:
+            - .env
+        networks:
+            - microservice-network
+        ports:
+            - "${EMAIL_SERVER_PORT}:${EMAIL_SERVER_PORT}"
 
-  projectmanagementservice:
-    build: ./ProjectManagementService
-    container_name: project_management_service
-    hostname: project_management_service
-    env_file:
-      - .env
-    networks:
-      - microservice-network
-    ports:
-      - "${PROJECT_SERVER_PORT}:${PROJECT_SERVER_PORT}"
+    projectmanagementservice:
+        build: ./ProjectManagementService
+        container_name: project_management_service
+        hostname: project_management_service
+        env_file:
+            - .env
+        networks:
+            - microservice-network
+        ports:
+            - "${PROJECT_SERVER_PORT}:${PROJECT_SERVER_PORT}"
 
-  donationservice:
-    build: ./DonationService
-    container_name: donation_service
-    hostname: donation_service
-    env_file:
-      - .env
-    networks:
-      - microservice-network
-    ports:
-      - "${DONATION_SERVER_PORT}:${DONATION_SERVER_PORT}"
+    donationservice:
+        build: ./DonationService
+        container_name: donation_service
+        hostname: donation_service
+        env_file:
+            - .env
+        networks:
+            - microservice-network
+        ports:
+            - "${DONATION_SERVER_PORT}:${DONATION_SERVER_PORT}"
 
-  shardedprojectservice:
-    build: ./ShardedProjectService
-    container_name: sharded_project_service
-    hostname: sharded_project_service
-    env_file:
-      - .env
-    networks:
-      - microservice-network
-    ports:
-      - "${SHARD_SERVER_PORT}:${SHARD_SERVER_PORT}"
+    shardedprojectservice:
+        build: ./ShardedProjectService
+        container_name: sharded_project_service
+        hostname: sharded_project_service
+        env_file:
+            - .env
+        networks:
+            - microservice-network
+        ports:
+            - "${SHARD_SERVER_PORT}:${SHARD_SERVER_PORT}"
 
-  statisticservice:
-    build: ./StatisticService
-    container_name: statistic_service
-    hostname: statistic_service
-    env_file:
-      - .env
-    networks:
-      - microservice-network
-    ports:
-      - "${STATISTIC_SERVER_PORT}:${STATISTIC_SERVER_PORT}"
+    statisticservice:
+        build: ./StatisticService
+        container_name: statistic_service
+        hostname: statistic_service
+        env_file:
+            - .env
+        networks:
+            - microservice-network
+        ports:
+            - "${STATISTIC_SERVER_PORT}:${STATISTIC_SERVER_PORT}"
 
 networks:
-  microservice-network:
-    name: microservice-network
-    driver: bridge
-    external: true
+    microservice-network:
+        name: microservice-network
+        driver: bridge
+        external: true

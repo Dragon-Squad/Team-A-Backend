@@ -117,7 +117,6 @@ To verify that the routes were added successfully, you can access: http://localh
 
 <hr>
 
-
 Install tailscale: https://tailscale.com/download
 
 On each of the service(Email Service, Donation Service, Project Management Service and Shard Project Service) and gateway devices (Device 1 and Device 2), execute this to generate the tailscale certificates
@@ -125,8 +124,8 @@ On each of the service(Email Service, Donation Service, Project Management Servi
 ````sh
 tailscale cert <machine_name>.<tailnetname>
 ````
-Then double-click to the generated certificate to download
 
+Then double-click to the generated certificate to download
 
 Waiting for Kong setup to complete and turn on the tailscale funnel for the gateway (Device 1)
 

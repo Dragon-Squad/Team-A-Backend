@@ -1,38 +1,43 @@
-require('dotenv').config();
-const mongoose = require('mongoose');
+require("dotenv").config();
+const mongoose = require("mongoose");
 
 let AuthDB, CharityDB, DonorDB, DonationDB, ProjectDB, ShardedProjectDB;
 
-
 const connectAuthDB = async () => {
-  if (!AuthDB) {
-    AuthDB = await mongoose.createConnection(process.env.MONGO_URI_AUTH, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    console.log('Connected to AuthDB');
-  }
-  return AuthDB;
+    if (!AuthDB) {
+        AuthDB = await mongoose.createConnection(process.env.MONGO_URI_AUTH, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+        });
+        console.log("Connected to AuthDB");
+    }
+    return AuthDB;
 };
 
 const connectCharityDB = async () => {
-  if (!CharityDB) {
-    CharityDB = await mongoose.createConnection(process.env.MONGO_URI_CHARITY, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    console.log('Connected to CharityDB');
-  }
-  return CharityDB;
+    if (!CharityDB) {
+        CharityDB = await mongoose.createConnection(
+            process.env.MONGO_URI_CHARITY,
+            {
+                useNewUrlParser: true,
+                useUnifiedTopology: true,
+            }
+        );
+        console.log("Connected to CharityDB");
+    }
+    return CharityDB;
 };
 
 const connectDonationDB = async () => {
     if (!DonationDB) {
-        DonationDB = await mongoose.createConnection(process.env.MONGO_URI_DONATION, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-      });
-      console.log('Connected to DonationDB');
+        DonationDB = await mongoose.createConnection(
+            process.env.MONGO_URI_DONATION,
+            {
+                useNewUrlParser: true,
+                useUnifiedTopology: true,
+            }
+        );
+        console.log("Connected to DonationDB");
     }
     return DonationDB;
 };
@@ -40,34 +45,47 @@ const connectDonationDB = async () => {
 const connectDonorDB = async () => {
     if (!DonorDB) {
         DonorDB = await mongoose.createConnection(process.env.MONGO_URI_DONOR, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-      });
-      console.log('Connected to DonorDB');
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+        });
+        console.log("Connected to DonorDB");
     }
     return DonorDB;
 };
 
 const connectProjectDB = async () => {
     if (!ProjectDB) {
-        ProjectDB = await mongoose.createConnection(process.env.MONGO_URI_PROJECT, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-      });
-      console.log('Connected to ProjectDB');
+        ProjectDB = await mongoose.createConnection(
+            process.env.MONGO_URI_PROJECT,
+            {
+                useNewUrlParser: true,
+                useUnifiedTopology: true,
+            }
+        );
+        console.log("Connected to ProjectDB");
     }
     return ProjectDB;
 };
 
 const connectShardedProjectDB = async () => {
-  if (!ShardedProjectDB) {
-    ShardedProjectDB = await mongoose.createConnection(process.env.MONGO_URI_SHARDED_PROJECT, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    console.log('Connected to ShardedProjectDB');
-  }
-  return ShardedProjectDB;
+    if (!ShardedProjectDB) {
+        ShardedProjectDB = await mongoose.createConnection(
+            process.env.MONGO_URI_SHARDED_PROJECT,
+            {
+                useNewUrlParser: true,
+                useUnifiedTopology: true,
+            }
+        );
+        console.log("Connected to ShardedProjectDB");
+    }
+    return ShardedProjectDB;
 };
 
-module.exports = { connectAuthDB, connectCharityDB, connectDonationDB, connectDonorDB, connectProjectDB, connectShardedProjectDB };
+module.exports = {
+    connectAuthDB,
+    connectCharityDB,
+    connectDonationDB,
+    connectDonorDB,
+    connectProjectDB,
+    connectShardedProjectDB,
+};

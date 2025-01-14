@@ -9,5 +9,5 @@ module.exports = {
     createRoute,
     createService,
     enableRateLimitingPlugin,
-    serversDiscovery
+    serversDiscovery,
 };

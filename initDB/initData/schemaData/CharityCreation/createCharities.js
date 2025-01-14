@@ -1,18 +1,18 @@
-require('dotenv').config();
-const bcrypt = require('bcryptjs');
-const initialData = require('../../../resources/initialData');
+require("dotenv").config();
+const bcrypt = require("bcryptjs");
+const initialData = require("../../../resources/initialData");
 const charitiesData = initialData.charities;
-const { faker } = require ('@faker-js/faker');
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-const { uploadImage } = require('../../fileData/uploadFile');
-const CryptoJS = require('crypto-js');
+const { faker } = require("@faker-js/faker");
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+const { uploadImage } = require("../../fileData/uploadFile");
+const CryptoJS = require("crypto-js");
 
 const secretKey = process.env.SECRET_KEY;
 
 const createCharities = async (User, Charity, Address) => {
     try {
         // Process each charity entry
-        console.log('Creating charity accounts...');
+        console.log("Creating charity accounts...");
         const charityDocs = await Promise.all(
             charitiesData.map(async (charity) => {
                 const address = new Address({
@@ -21,18 +21,24 @@ const createCharities = async (User, Charity, Address) => {
                     state: faker.location.state(),
                     zipCode: faker.location.zipCode(),
                     country: faker.location.country(),
-                    continent: faker.location.continent()
+                    continent: faker.location.continent(),
                 });
                 await address.save();
 
-                const email = `${charity.companyName.replace(' ', '').toLowerCase()}@charitan.com`;
-                const imageUrl = await uploadImage(charity.avatar, "Charity", "Charity");
+                const email = `${charity.companyName
+                    .replace(" ", "")
+                    .toLowerCase()}@charitan.com`;
+                const imageUrl = await uploadImage(
+                    charity.avatar,
+                    "Charity",
+                    "Charity"
+                );
 
                 // Create a user in authDB
                 const charityUser = new User({
                     username: email,
                     email: email,
-                    hashedPassword: await bcrypt.hash('charitypassword', 10),
+                    hashedPassword: await bcrypt.hash("charitypassword", 10),
                     isActive: true,
                     avatar: imageUrl,
                     role: "Charity",
@@ -57,10 +63,12 @@ const createCharities = async (User, Charity, Address) => {
                         customerId = newCustomer.id;
                     }
                 } catch (err) {
-                    throw new Error('Failed to retrieve or create customer: ' + err.message);
+                    throw new Error(
+                        "Failed to retrieve or create customer: " + err.message
+                    );
                 }
 
-                if (!customerId){
+                if (!customerId) {
                     throw new Error("Can not create Stripe Customer");
                 }
 
@@ -80,11 +88,11 @@ const createCharities = async (User, Charity, Address) => {
             })
         );
 
-        console.log('All charity accounts created successfully.');
+        console.log("All charity accounts created successfully.");
         return charityDocs;
     } catch (error) {
-        console.error('Error creating charity accounts:', error);
-        throw new Error('Error creating charity accounts: ' + error);
+        console.error("Error creating charity accounts:", error);
+        throw new Error("Error creating charity accounts: " + error);
     }
 };
 
