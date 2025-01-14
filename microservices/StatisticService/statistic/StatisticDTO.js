@@ -1,44 +1,50 @@
-class TotalDonationDTO{
-    constructor(projects){
+class TotalDonationDTO {
+    constructor(projects) {
         this.totalDonations = 0;
-        for(const project of projects){
+        for (const project of projects) {
             this.totalDonations += project.raisedAmount;
         }
     }
 }
 
-class CharityProjectsDTO{
-    constructor(projects){
+class CharityProjectsDTO {
+    constructor(projects) {
         this.totalDonations = 0;
         this.totalProjects = projects.length;
-        for(const project of projects){
+        for (const project of projects) {
             this.totalDonations += project.raisedAmount;
         }
     }
 }
 
 class CompareDonationDTO {
-    constructor(firstCategoryProjects, secondCategoryProjects, firstRegionsProjects, secondRegionsProjects, names) {
+    constructor(
+        firstCategoryProjects,
+        secondCategoryProjects,
+        firstRegionsProjects,
+        secondRegionsProjects,
+        names
+    ) {
         // Initialize category and region data structures
-        let firstCategory = { 
-            name: names[0], 
-            donatedValue: 0, 
-            projectCount: firstCategoryProjects.length
+        let firstCategory = {
+            name: names[0],
+            donatedValue: 0,
+            projectCount: firstCategoryProjects.length,
         };
-        let secondCategory = { 
-            name: names[1], 
-            donatedValue: 0, 
-            projectCount: secondCategoryProjects.length
+        let secondCategory = {
+            name: names[1],
+            donatedValue: 0,
+            projectCount: secondCategoryProjects.length,
         };
-        let firstRegion = { 
-            name: names[2], 
-            donatedValue: 0, 
-            projectCount: firstRegionsProjects.length
+        let firstRegion = {
+            name: names[2],
+            donatedValue: 0,
+            projectCount: firstRegionsProjects.length,
         };
-        let secondRegion = { 
-            name: names[3], 
-            donatedValue: 0, 
-            projectCount: secondRegionsProjects.length
+        let secondRegion = {
+            name: names[3],
+            donatedValue: 0,
+            projectCount: secondRegionsProjects.length,
         };
 
         // Summing up donations by category and region

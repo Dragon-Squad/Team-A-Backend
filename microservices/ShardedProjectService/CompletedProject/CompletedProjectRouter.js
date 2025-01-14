@@ -1,11 +1,11 @@
 const express = require("express");
 const CompletedProjectController = require("./CompletedProjectController");
 const CompletedProjectRouter = express.Router();
-const { authenticate, authorize } = require('../middleware/auth');
-const UserType = require('../enum/UserType');
+const { authenticate, authorize } = require("../middleware/auth");
+const UserType = require("../enum/UserType");
 
 CompletedProjectRouter.post(
-    "/archive", 
+    "/archive",
     authenticate,
     authorize([UserType.ADMIN]),
     CompletedProjectController.archiveCompletedProject
