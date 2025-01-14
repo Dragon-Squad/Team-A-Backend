@@ -1,4 +1,4 @@
-const DonationService = require('./DonationService');
+const DonationService = require("./DonationService");
 
 class DonationController {
     // Method to call donate
@@ -30,7 +30,10 @@ class DonationController {
         try {
             const accessToken = req.cookies.accessToken;
             const donationId = req.params.id;
-            const results = await DonationService.getDonationById(donationId, accessToken);
+            const results = await DonationService.getDonationById(
+                donationId,
+                accessToken
+            );
             res.status(200).json(results);
         } catch (error) {
             res.status(500).json({ message: error.message });
@@ -42,7 +45,11 @@ class DonationController {
             const limit = parseInt(req.query.limit) || 10;
             const page = parseInt(req.query.page) || 1;
             const accessToken = req.cookies.accessToken;
-            const results = await DonationService.getDonationsByDonor(limit, page, accessToken);
+            const results = await DonationService.getDonationsByDonor(
+                limit,
+                page,
+                accessToken
+            );
             res.status(200).json(results);
         } catch (error) {
             res.status(500).json({ message: error.message });
@@ -53,7 +60,10 @@ class DonationController {
         try {
             const limit = parseInt(req.query.limit) || 10;
             const page = parseInt(req.query.page) || 1;
-            const results = await DonationService.getDonationsByDonor(limit, page);
+            const results = await DonationService.getDonationsByDonor(
+                limit,
+                page
+            );
             res.status(200).json(results);
         } catch (error) {
             res.status(500).json({ message: error.message });
@@ -65,7 +75,11 @@ class DonationController {
             const limit = parseInt(req.query.limit) || 10;
             const page = parseInt(req.query.page) || 1;
             const projectId = req.params.id;
-            const results = await DonationService.getDonationsByProject(limit, page, projectId);
+            const results = await DonationService.getDonationsByProject(
+                limit,
+                page,
+                projectId
+            );
             res.status(200).json(results);
         } catch (error) {
             res.status(500).json({ message: error.message });

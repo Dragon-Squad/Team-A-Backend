@@ -5,7 +5,7 @@ class DonationDTO {
         this.transaction = donation.transactionId;
         this.donationType = donation.donationType;
         this.message = donation.message;
-        this.createAt = donation.createdAt
+        this.createAt = donation.createdAt;
         this.donor = donor;
     }
 }

@@ -1,4 +1,4 @@
-const GuestDonationService = require('./GuestDonationService');
+const GuestDonationService = require("./GuestDonationService");
 
 class GuestDonationController {
     // Method to call donate
@@ -18,7 +18,10 @@ class GuestDonationController {
         try {
             const limit = parseInt(req.query.limit) || 10;
             const page = parseInt(req.query.page) || 1;
-            const results = await GuestDonationService.getAllGuestDonations(limit, page);
+            const results = await GuestDonationService.getAllGuestDonations(
+                limit,
+                page
+            );
             res.status(200).json(results);
         } catch (error) {
             res.status(500).json({ message: error.message });
@@ -28,7 +31,9 @@ class GuestDonationController {
     async getGuestDonationById(req, res) {
         try {
             const guestDonationId = req.params.id;
-            const results = await GuestDonationService.getGuestDonationById(guestDonationId);
+            const results = await GuestDonationService.getGuestDonationById(
+                guestDonationId
+            );
             res.status(200).json(results);
         } catch (error) {
             res.status(500).json({ message: error.message });
@@ -40,7 +45,12 @@ class GuestDonationController {
             const limit = parseInt(req.query.limit) || 10;
             const page = parseInt(req.query.page) || 1;
             const projectId = req.params.id;
-            const results = await GuestDonationService.getGuestDonationsByProject(limit, page, projectId);
+            const results =
+                await GuestDonationService.getGuestDonationsByProject(
+                    limit,
+                    page,
+                    projectId
+                );
             res.status(200).json(results);
         } catch (error) {
             res.status(500).json({ message: error.message });
