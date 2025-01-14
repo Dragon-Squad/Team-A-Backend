@@ -19,7 +19,7 @@ StatisticRouter.get(
     StatisticController.compareDonation
 );
 
-StatisticRouter.get(
+StatisticRouter.post(
     '/charity',
     authenticate,
     authorize([UserType.CHARITY, UserType.ADMIN]),
