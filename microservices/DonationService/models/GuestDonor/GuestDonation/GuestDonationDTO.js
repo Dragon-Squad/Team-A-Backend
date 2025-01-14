@@ -4,7 +4,7 @@ class GuestDonationDTO {
         this.projectId = donation.projectId;
         this.transaction = donation.transactionId;
         this.message = donation.message;
-        this.createAt = donation.createdAt
+        this.createAt = donation.createdAt;
         this.donor = donor;
     }
 }

@@ -7,8 +7,6 @@ const ListType = Object.freeze({
     NOTIFICATION: "notificationList",
 });
 
-
-
 async function getCategoryById(categoryId) {
     if (!categoryId) throw new Error("No Category Id provided");
 

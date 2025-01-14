@@ -372,11 +372,7 @@ const charityProjectHaltedMail = (
     `,
 });
 
-const charityProjectCompletedMail = (
-    receiver,
-    name,
-    projectTitle,
-) => ({
+const charityProjectCompletedMail = (receiver, name, projectTitle) => ({
     from: sender,
     to: receiver,
     subject: "Congratulations! Your Project Has Reached Its Donation Goal",

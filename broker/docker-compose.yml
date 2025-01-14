@@ -1,62 +1,62 @@
-version: '3.8'
+version: "3.8"
 
 services:
-  zookeeper:
-    image: zookeeper:latest
-    container_name: zookeeper
-    hostname: zookeeper
-    networks:
-      - microservice-network
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-    ports:
-      - "2181:2181"
+    zookeeper:
+        image: zookeeper:latest
+        container_name: zookeeper
+        hostname: zookeeper
+        networks:
+            - microservice-network
+        environment:
+            ZOOKEEPER_CLIENT_PORT: 2181
+        ports:
+            - "2181:2181"
 
-  kafka_manager:
-    image: hlebalbau/kafka-manager:stable
-    container_name: kafka-manager
-    restart: always
-    networks:
-      - microservice-network
-    environment:
-      ZK_HOSTS: "zookeeper:2181"
-      APPLICATION_SECRET: "random-secret"
-      KAFKA_MANAGER_AUTH_ENABLED: "true"
-      KAFKA_MANAGER_USERNAME: admin
-      KAFKA_MANAGER_PASSWORD: bigbang
-    ports:
-      - "9000:9000"
-    command: -Dpidfile.path=/dev/null
+    kafka_manager:
+        image: hlebalbau/kafka-manager:stable
+        container_name: kafka-manager
+        restart: always
+        networks:
+            - microservice-network
+        environment:
+            ZK_HOSTS: "zookeeper:2181"
+            APPLICATION_SECRET: "random-secret"
+            KAFKA_MANAGER_AUTH_ENABLED: "true"
+            KAFKA_MANAGER_USERNAME: admin
+            KAFKA_MANAGER_PASSWORD: bigbang
+        ports:
+            - "9000:9000"
+        command: -Dpidfile.path=/dev/null
 
-  kafka-connect:
-    image: wurstmeister/kafka:latest
-    container_name: kafka
-    hostname: kafka
-    networks:
-      - microservice-network
-    depends_on:
-      - zookeeper
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
-      KAFKA_LISTENERS: "PLAINTEXT://0.0.0.0:9092"
-      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka:9092"
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_MESSAGE_MAX_BYTES: 104857600
-      KAFKA_FETCH_MAX_BYTES: 104857600
-      KAFKA_CREATE_TOPICS: >
-        project_to_charity:1:1,
-        project_to_shard:1:1,
-        project_to_donation:1:1,
-        donation_to_email:1:1,
-        to_email:1:1,
-        to_project:1:1,
-        to_stat:1:1
-    ports:
-      - "9092:9092"
+    kafka-connect:
+        image: wurstmeister/kafka:latest
+        container_name: kafka
+        hostname: kafka
+        networks:
+            - microservice-network
+        depends_on:
+            - zookeeper
+        environment:
+            KAFKA_BROKER_ID: 1
+            KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+            KAFKA_LISTENERS: "PLAINTEXT://0.0.0.0:9092"
+            KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka:9092"
+            KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+            KAFKA_MESSAGE_MAX_BYTES: 104857600
+            KAFKA_FETCH_MAX_BYTES: 104857600
+            KAFKA_CREATE_TOPICS: >
+                project_to_charity:1:1,
+                project_to_shard:1:1,
+                project_to_donation:1:1,
+                donation_to_email:1:1,
+                to_email:1:1,
+                to_project:1:1,
+                to_stat:1:1
+        ports:
+            - "9092:9092"
 
 networks:
-  microservice-network:
-    name: microservice-network
-    driver: bridge
-    external: true
+    microservice-network:
+        name: microservice-network
+        driver: bridge
+        external: true

@@ -1,14 +1,27 @@
-const { waitForKongAdminAPI, createService, createRoute, enableRateLimitingPlugin, serversDiscovery } = require("./https");
-const { emailRoutes, projectRoutes, donationRoutes, shardedProjectRoutes, statisticRoutes, services } = require("./resources/servicesAndRoutes");
+const {
+    waitForKongAdminAPI,
+    createService,
+    createRoute,
+    enableRateLimitingPlugin,
+    serversDiscovery,
+} = require("./https");
+const {
+    emailRoutes,
+    projectRoutes,
+    donationRoutes,
+    shardedProjectRoutes,
+    statisticRoutes,
+    services,
+} = require("./resources/servicesAndRoutes");
 const IPAdr = process.env.IP_ADR || "172.30.208.1";
 
 const serviceMap = new Map([
-    ['email', 'EmailService'],
-    ['project', 'ProjectManagementService'],
-    ['donation', 'DonationService'],
-    ['shard', 'ShardedProjectService'],
-    ['statistic', "StatisticService"],
-  ]);
+    ["email", "EmailService"],
+    ["project", "ProjectManagementService"],
+    ["donation", "DonationService"],
+    ["shard", "ShardedProjectService"],
+    ["statistic", "StatisticService"],
+]);
 
 // Main function to create services and their corresponding routes
 async function setupServices() {
@@ -22,11 +35,26 @@ async function setupServices() {
         }
 
         // Step 1: Create services
-        const emailServiceId = await createService(serviceMap.get('email'), urlMap.get('email'));
-        const projectManagementServiceId = await createService(serviceMap.get('project'), urlMap.get('project'));
-        const donationServiceId = await createService(serviceMap.get('donation'), urlMap.get('donation'));
-        const shardedProjectServiceId = await createService(serviceMap.get('shard'), urlMap.get('shard'));
-        const statisticServiceId = await createService(serviceMap.get('statistic'), urlMap.get('statistic'));
+        const emailServiceId = await createService(
+            serviceMap.get("email"),
+            urlMap.get("email")
+        );
+        const projectManagementServiceId = await createService(
+            serviceMap.get("project"),
+            urlMap.get("project")
+        );
+        const donationServiceId = await createService(
+            serviceMap.get("donation"),
+            urlMap.get("donation")
+        );
+        const shardedProjectServiceId = await createService(
+            serviceMap.get("shard"),
+            urlMap.get("shard")
+        );
+        const statisticServiceId = await createService(
+            serviceMap.get("statistic"),
+            urlMap.get("statistic")
+        );
 
         // Step 2: Create routes for the created services
         // Routes for Email Service
@@ -35,7 +63,10 @@ async function setupServices() {
                 await createRoute(emailServiceId, route);
                 console.log(`Route created for EmailService: ${route}`);
             } catch (routeError) {
-                console.error(`Error creating route ${route} for EmailService:`, routeError.message);
+                console.error(
+                    `Error creating route ${route} for EmailService:`,
+                    routeError.message
+                );
             }
         }
 
@@ -43,9 +74,14 @@ async function setupServices() {
         for (const route of projectRoutes) {
             try {
                 await createRoute(projectManagementServiceId, route);
-                console.log(`Route created for ProjectManagementService: ${route}`);
+                console.log(
+                    `Route created for ProjectManagementService: ${route}`
+                );
             } catch (routeError) {
-                console.error(`Error creating route ${route} for ProjectManagementService:`, routeError.message);
+                console.error(
+                    `Error creating route ${route} for ProjectManagementService:`,
+                    routeError.message
+                );
             }
         }
 
@@ -55,7 +91,10 @@ async function setupServices() {
                 await createRoute(donationServiceId, route);
                 console.log(`Route created for DonationService: ${route}`);
             } catch (routeError) {
-                console.error(`Error creating route ${route} for DonationService:`, routeError.message);
+                console.error(
+                    `Error creating route ${route} for DonationService:`,
+                    routeError.message
+                );
             }
         }
 
@@ -63,9 +102,14 @@ async function setupServices() {
         for (const route of shardedProjectRoutes) {
             try {
                 await createRoute(shardedProjectServiceId, route);
-                console.log(`Route created for shardedProjectService: ${route}`);
+                console.log(
+                    `Route created for shardedProjectService: ${route}`
+                );
             } catch (routeError) {
-                console.error(`Error creating route ${route} for shardedProjectService:`, routeError.message);
+                console.error(
+                    `Error creating route ${route} for shardedProjectService:`,
+                    routeError.message
+                );
             }
         }
 
@@ -75,7 +119,10 @@ async function setupServices() {
                 await createRoute(statisticServiceId, route);
                 console.log(`Route created for statisticService: ${route}`);
             } catch (routeError) {
-                console.error(`Error creating route ${route} for statisticService:`, routeError.message);
+                console.error(
+                    `Error creating route ${route} for statisticService:`,
+                    routeError.message
+                );
             }
         }
 

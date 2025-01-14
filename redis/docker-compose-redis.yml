@@ -1,25 +1,25 @@
-version: '3.8'
+version: "3.8"
 
 services:
-  redis_instance_1:
-    image: redis:latest
-    container_name: redis_service_1
-    hostname: redis_service_1
-    networks:
-      - external-redis-network
-    ports:
-      - "6380:6379" # Map Redis instance 1 to port 6380 on your PC
+    redis_instance_1:
+        image: redis:latest
+        container_name: redis_service_1
+        hostname: redis_service_1
+        networks:
+            - external-redis-network
+        ports:
+            - "6380:6379" # Map Redis instance 1 to port 6380 on your PC
 
-  redis_instance_2:
-    image: redis:latest
-    container_name: redis_service_2
-    hostname: redis_service_2
-    networks:
-      - external-redis-network
-    ports:
-      - "6381:6379" # Map Redis instance 2 to port 6381 on your PC
+    redis_instance_2:
+        image: redis:latest
+        container_name: redis_service_2
+        hostname: redis_service_2
+        networks:
+            - external-redis-network
+        ports:
+            - "6381:6379" # Map Redis instance 2 to port 6381 on your PC
 
 networks:
-  external-redis-network:
-    name: external-redis-network
-    driver: bridge
+    external-redis-network:
+        name: external-redis-network
+        driver: bridge

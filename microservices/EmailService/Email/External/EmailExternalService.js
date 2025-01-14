@@ -11,7 +11,6 @@ const {
 class EmailExternalService {
     // Send an email for successful donation
     async sendDonorDonationSuccessEmail(value) {
-
         const mailOptions = donorDonationSuccessMail(
             value.userEmail,
             value.projectTitle,
@@ -28,11 +27,11 @@ class EmailExternalService {
             const mailOptions = donorProjectCreatedMail(
                 notificationDetail.email,
                 notificationDetail.name,
-                value.project.title, 
-                "", 
+                value.project.title,
+                "",
                 value.project.region.name,
-                value.project.categories.name, 
-                value.project.description, 
+                value.project.categories.name,
+                value.project.description,
                 value.project.goalAmount.toString()
             );
             const info = await transporter.sendMail(mailOptions);
@@ -60,8 +59,8 @@ class EmailExternalService {
         const mailOptions = charityProjectCreatedMail(
             value.charity.email,
             value.charity.name,
-            value.project.title, 
-            "", 
+            value.project.title,
+            "",
             value.project.region.name,
             value.project.categories.name,
             value.project.description,
@@ -70,7 +69,6 @@ class EmailExternalService {
         const info = await transporter.sendMail(mailOptions);
         console.log("Email sent:", info.response);
     }
-    
 
     // Send charity an email on project halt
     async sendCharityProjectHaltedEmail(value) {
@@ -78,7 +76,7 @@ class EmailExternalService {
         const mailOptions = charityProjectHaltedMail(
             value.charity.email,
             value.charity.name,
-            value.project.title, 
+            value.project.title,
             "",
             value.reason
         );
@@ -87,13 +85,11 @@ class EmailExternalService {
     }
 
     // Send charity an email on project completion
-    async sendCharityProjectCompletedEmail(
-        value
-    ) {
+    async sendCharityProjectCompletedEmail(value) {
         const mailOptions = charityProjectCompletedMail(
             value.userEmail,
             value.charity.name,
-            value.project.title,
+            value.project.title
         );
         const info = await transporter.sendMail(mailOptions);
         console.log("Email sent:", info.response);
