@@ -78,7 +78,7 @@ class GuestDonationService {
             });
     
             const unitAmount = Math.round(amount * 100);
-            const session = await createDonationSession(customerId, null, unitAmount, personalMessage, projectId, guestDonor._id, "GuestDonation", guestEmail);
+            const session = await createDonationSession(customerId, null, unitAmount, personalMessage, projectId, guestDonor._id.toString(), "GuestDonation", guestEmail);
             return { checkoutUrl: session.url };
     
         } catch (err) {
