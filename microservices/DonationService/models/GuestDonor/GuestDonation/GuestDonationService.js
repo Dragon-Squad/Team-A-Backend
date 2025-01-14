@@ -27,7 +27,7 @@ class GuestDonationService {
             } else {
                 // Create a new Stripe customer
                 const newCustomer = await stripe.customers.create({
-                    email: email,
+                    email: guestEmail,
                 });
                 customerId = newCustomer.id;
             }
@@ -43,7 +43,7 @@ class GuestDonationService {
             firstName: guestFirstName,
             lastName: guestLastName,
             email: guestEmail,
-            address: guestAddress,  
+            address: guestAddress,
         });
 
         await publish({
@@ -53,7 +53,7 @@ class GuestDonationService {
         });
     
         const consumer = await connectConsumer("project_to_donation");
-        const timeout = 10000; 
+        const timeout = 10000;
     
         try {
             const result = await new Promise((resolve, reject) => {
@@ -78,8 +78,7 @@ class GuestDonationService {
             });
     
             const unitAmount = Math.round(amount * 100);
-            console.log(donorId.toString());
-            const session = await createDonationSession(customerId, null, unitAmount, personalMessage, projectId, guestDonor, "GuestDonation", guestEmail);
+            const session = await createDonationSession(customerId, null, unitAmount, personalMessage, projectId, guestDonor._id, "GuestDonation", guestEmail);
             return { checkoutUrl: session.url };
     
         } catch (err) {
