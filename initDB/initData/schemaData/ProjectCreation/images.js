@@ -1,7 +1,7 @@
 const initialData = require('../../../resources/initialData');
 const globalProjectsData = initialData.globalProjects;
 const localProjectsData = initialData.localProjects;
-const { uploadImage } = require('../../fileData/uploadImage');
+const { uploadImage } = require('../../fileData/uploadFile');
 
 const createProjects = async (Project, charityDocs, categoryDocs, regionDocs) => {
     try {
