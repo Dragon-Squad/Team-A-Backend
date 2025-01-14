@@ -48,7 +48,7 @@ class ProjectRepository {
                 realCharityIds = charityIds.map((id) => new ObjectId(id));
             }
         }
-        
+
         let realCategoryIds = null;
         if (categoryIds) {
             if (typeof categoryIds === "string") {

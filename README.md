@@ -51,10 +51,11 @@ or Execute this if you are using Window
 ### 3. Run BackEnd
 
 The backend will be run in multiple devices:
--   Device 1: `Server Discovery`, `Kafka`, `Gateway`
--   Device 2: `Microservices`
--   Device 3: `Redis`
--   Device 4: `Front End`
+
+- Device 1: `Server Discovery`, `Kafka`, `Gateway`
+- Device 2: `Microservices`
+- Device 3: `Redis`
+- Device 4: `Front End`
 
 #### Server Discovery - Kafka (Device 1)
 
@@ -78,7 +79,6 @@ or Execute this if you are using Window
 ````sh
 docker-compose -f redis/docker-compose.yml up -d --build
 ````
-
 
 #### Microservices (Device 2)
 
@@ -112,12 +112,12 @@ or Execute this if you are using Window
 .\kong.bat
 ```
 
-To verify that the services were added successfully, you can access: http://localhost:8001/services
-To verify that the routes were added successfully, you can access: http://localhost:8001/routes
+To verify that the services were added successfully, you can access: <http://localhost:8001/services>
+To verify that the routes were added successfully, you can access: <http://localhost:8001/routes>
 
 <hr>
 
-Install tailscale: https://tailscale.com/download
+Install tailscale: <https://tailscale.com/download>
 
 On each of the service(Email Service, Donation Service, Project Management Service and Shard Project Service) and gateway devices (Device 1 and Device 2), execute this to generate the tailscale certificates
 

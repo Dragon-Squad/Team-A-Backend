@@ -1,20 +1,18 @@
-const RegionRepository = require('../RegionRepository');
+const RegionRepository = require("../RegionRepository");
 
 class RegionExternalService {
-    async getRegionNamesByIds(ids){
+    async getRegionNamesByIds(ids) {
         try {
-            let names = []
-            for(const id of ids){
+            let names = [];
+            for (const id of ids) {
                 const region = await RegionRepository.findById(id);
                 names.push(region.name);
             }
             return names;
-        } catch(error){
+        } catch (error) {
             throw new Error(error.message);
         }
     }
-
-
 }
 
 module.exports = new RegionExternalService();

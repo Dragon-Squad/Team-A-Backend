@@ -1,15 +1,15 @@
-const CategoryRepository = require('../CategoryRepository');
+const CategoryRepository = require("../CategoryRepository");
 
 class CategoryExternalService {
-    async getCategoryNamesByIds(ids){
+    async getCategoryNamesByIds(ids) {
         try {
-            let names = []
-            for(const id of ids){
+            let names = [];
+            for (const id of ids) {
                 const category = await CategoryRepository.findById(id);
                 names.push(category.name);
             }
             return names;
-        } catch(error){
+        } catch (error) {
             throw new Error(error.message);
         }
     }

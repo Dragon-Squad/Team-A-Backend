@@ -1,4 +1,4 @@
-const RegionService = require('./RegionService');
+const RegionService = require("./RegionService");
 
 class RegionController {
     async subscribe(req, res) {
@@ -16,7 +16,10 @@ class RegionController {
         try {
             const regionId = req.params.id;
             const { donorId } = req.body;
-            const result = await RegionService.notificationOn(regionId, donorId);
+            const result = await RegionService.notificationOn(
+                regionId,
+                donorId
+            );
             res.status(200).json({ message: result });
         } catch (error) {
             res.status(400).json({ error: error.message });
@@ -38,14 +41,17 @@ class RegionController {
         try {
             const regionId = req.params.id;
             const { donorId } = req.body;
-            const result = await RegionService.notificationOff(regionId, donorId);
+            const result = await RegionService.notificationOff(
+                regionId,
+                donorId
+            );
             res.status(200).json({ message: result });
         } catch (error) {
             res.status(400).json({ error: error.message });
         }
     }
 
-    async getRegionById(req, res){
+    async getRegionById(req, res) {
         try {
             const regionId = req.params.id;
             const result = await RegionService.getRegionById(regionId);
@@ -55,7 +61,7 @@ class RegionController {
         }
     }
 
-    async getAllRegions(req, res){
+    async getAllRegions(req, res) {
         try {
             const result = await RegionService.getAllRegions();
             res.status(200).json(result);

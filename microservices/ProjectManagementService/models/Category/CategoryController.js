@@ -1,4 +1,4 @@
-const CategoryService = require('./CategoryService');
+const CategoryService = require("./CategoryService");
 
 class CategoryController {
     async subscribe(req, res) {
@@ -6,7 +6,11 @@ class CategoryController {
             const accessToken = req.cookies.accessToken;
             const categoryId = req.params.id;
             const { userId } = req;
-            const result = await CategoryService.subscribe(categoryId, userId, accessToken);
+            const result = await CategoryService.subscribe(
+                categoryId,
+                userId,
+                accessToken
+            );
             res.status(200).json({ message: result });
         } catch (error) {
             res.status(400).json({ error: error.message });
@@ -18,7 +22,11 @@ class CategoryController {
             const accessToken = req.cookies.accessToken;
             const categoryId = req.params.id;
             const { userId } = req;
-            const result = await CategoryService.notificationOn(categoryId, userId, accessToken);
+            const result = await CategoryService.notificationOn(
+                categoryId,
+                userId,
+                accessToken
+            );
             res.status(200).json({ message: result });
         } catch (error) {
             res.status(400).json({ error: error.message });
@@ -30,7 +38,11 @@ class CategoryController {
             const accessToken = req.cookies.accessToken;
             const categoryId = req.params.id;
             const { userId } = req;
-            const result = await CategoryService.unsubscribe(categoryId, userId, accessToken);
+            const result = await CategoryService.unsubscribe(
+                categoryId,
+                userId,
+                accessToken
+            );
             res.status(200).json({ message: result });
         } catch (error) {
             res.status(400).json({ error: error.message });
@@ -42,14 +54,18 @@ class CategoryController {
             const accessToken = req.cookies.accessToken;
             const categoryId = req.params.id;
             const { userId } = req;
-            const result = await CategoryService.notificationOff(categoryId, userId, accessToken);
+            const result = await CategoryService.notificationOff(
+                categoryId,
+                userId,
+                accessToken
+            );
             res.status(200).json({ message: result });
         } catch (error) {
             res.status(400).json({ error: error.message });
         }
     }
 
-    async getCategoryById(req, res){
+    async getCategoryById(req, res) {
         try {
             const categoryId = req.params.id;
             const result = await CategoryService.getCategoryById(categoryId);
@@ -59,7 +75,7 @@ class CategoryController {
         }
     }
 
-    async getAllCategories(req, res){
+    async getAllCategories(req, res) {
         try {
             const result = await CategoryService.getAllCategories();
             res.status(200).json(result);

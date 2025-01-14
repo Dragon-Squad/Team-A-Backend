@@ -1,8 +1,8 @@
 const {
-  app,
-  SERVER_PORT,
-  configureApp,
-  errorHandler,
+    app,
+    SERVER_PORT,
+    configureApp,
+    errorHandler,
 } = require("./Config/AppConfig");
 const { connectDB } = require("./Config/DBConfig");
 const ProjectRouter = require("./models/Project/ProjectRouter");
@@ -12,42 +12,42 @@ const { subscribe } = require("./broker/Consumer");
 const { initializeRedisClients } = require("./redisConfig");
 
 const runApp = async () => {
-  try {
-    // Connect to DB
-    await connectDB();
+    try {
+        // Connect to DB
+        await connectDB();
 
-    // Connect to Redis
-    await initializeRedisClients();
+        // Connect to Redis
+        await initializeRedisClients();
 
-    // Configure the app
-    configureApp();
+        // Configure the app
+        configureApp();
 
-    // Add routes
-    app.use(`/projects`, ProjectRouter);
-    app.use(`/category`, CategoryRouter);
-    app.use(`/region`, RegionRouter);
+        // Add routes
+        app.use(`/projects`, ProjectRouter);
+        app.use(`/category`, CategoryRouter);
+        app.use(`/region`, RegionRouter);
 
-    app.get("/health-check", (req, res) => {
-      res.status(200).json({ message: "Server is working!" });
-    });
+        app.get("/health-check", (req, res) => {
+            res.status(200).json({ message: "Server is working!" });
+        });
 
-    await subscribe("to_project");
+        await subscribe("to_project");
 
-    app.get('/health-check', (req, res) => {
-      res.status(200).json({ message: 'Server is working!' });
-    });
+        app.get("/health-check", (req, res) => {
+            res.status(200).json({ message: "Server is working!" });
+        });
 
-    // Add error handler
-    app.use(errorHandler);
+        // Add error handler
+        app.use(errorHandler);
 
-    // Start the server
-    app.listen(SERVER_PORT, () => {
-      console.log(`Server running on port ${SERVER_PORT}`);
-    });
-  } catch (err) {
-    console.error("Error during initialization:", err);
-    process.exit(1);
-  }
+        // Start the server
+        app.listen(SERVER_PORT, () => {
+            console.log(`Server running on port ${SERVER_PORT}`);
+        });
+    } catch (err) {
+        console.error("Error during initialization:", err);
+        process.exit(1);
+    }
 };
 
 runApp();

@@ -3,7 +3,8 @@ const RegionService = require("../models/Region/RegionService");
 const axios = require("axios");
 
 const TEAM_B_BACKEND_URL =
-    process.env.TEAM_B_BACKEND_URL || "https://team-b-backend.tail8c88ab.ts.net:3000/api";
+    process.env.TEAM_B_BACKEND_URL ||
+    "https://team-b-backend.tail8c88ab.ts.net:3000/api";
 
 module.exports = {
     validateCharity: async function (charityId, accessToken) {
@@ -70,8 +71,8 @@ module.exports = {
     },
 
     mergeNotificationLists: function (region, categories) {
-        console.log(region)
-        console.log(categories)
+        console.log(region);
+        console.log(categories);
         const notificationList = new Set();
         const userList = new Set();
 
@@ -82,11 +83,16 @@ module.exports = {
         region.notificationList.forEach((item) => userList.add(item));
 
         categories.forEach((category) => {
-            category.notificationList.forEach((item) => notificationList.add(item));
+            category.notificationList.forEach((item) =>
+                notificationList.add(item)
+            );
         });
 
         region.notificationList.forEach((item) => notificationList.add(item));
 
-        return { notificationList: [...notificationList], userList: [...userList] };
+        return {
+            notificationList: [...notificationList],
+            userList: [...userList],
+        };
     },
 };
